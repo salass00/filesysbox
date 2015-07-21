@@ -1,0 +1,26 @@
+==id $Id: filesysbox_lib.sfd,v 1.0 2014/12/07 21:22:00 salass00 Exp $
+* "filesysbox.library"
+==base _FileSysBoxBase
+==basetype struct Library *
+==libname filesysbox.library
+==bias 30
+==public
+==include <exec/types.h>
+==include <dos/dos.h>
+==include <utility/tagitem.h>
+==include <libraries/filesysbox.h>
+APTR FbxQueryMountMsg(struct Message * msg, LONG attr) (a0,d0)
+struct FbxFS * FbxSetupFS(struct Message * msg, const struct TagItem * tags, const struct fuse_operations * ops, LONG opssize, APTR udata) (a0,a1,a2,d0,a3)
+LONG FbxEventLoop(struct FbxFS * fs) (a0)
+void FbxCleanupFS(struct FbxFS * fs) (a0)
+void FbxReturnMountMsg(struct Message * msg, SIPTR r1, SIPTR r2) (a0,d0,d1)
+LONG FbxFuseVersion() ()
+LONG FbxVersion() ()
+void FbxSetSignalCallback(struct FbxFS * fs, FbxSignalCallbackFunc func, ULONG signals) (a0,a1,d0)
+struct FbxTimerCallbackData * FbxInstallTimerCallback(struct FbxFS * fs, FbxTimerCallbackFunc func, ULONG period) (a0,a1,d0)
+void FbxUninstallTimerCallback(struct FbxFS * fs, struct FbxTimerCallbackData * cb) (a0,a1)
+void FbxSignalDiskChange(struct FbxFS * fs) (a0)
+void FbxCopyStringBSTRToC(BSTR src, STRPTR dst, ULONG size) (a0,a1,d0)
+void FbxCopyStringCToBSTR(CONST_STRPTR src, BSTR dst, ULONG size) (a0,a1,d0)
+==end
+
