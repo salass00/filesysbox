@@ -1,0 +1,5 @@
+# Ignore object and archive files
+*.[oa]
+# Ignore generated exe file
+filesysbox.library
+
