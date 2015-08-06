@@ -41,7 +41,11 @@ APTR FbxQueryMountMsg(
 	case FBXQMM_MOUNT_CONTROL:
 		fssm = BADDR(devnode->dn_Startup);
 		de = BADDR(fssm->fssm_Environ);
+#ifdef __AROS__
+		return (de->de_Control > 4095) ? AROS_BSTR_ADDR(de->de_Control) : NULL;
+#else
 		return (de->de_Control > 4095) ? (BADDR(de->de_Control) + 1) : NULL;
+#endif
 	case FBXQMM_FSSM:
 		fssm = BADDR(devnode->dn_Startup);
 		return fssm;

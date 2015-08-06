@@ -2,3 +2,9 @@ filesysbox.library 53.1 (16.7.2015)
 
 - First released version.
 
+
+filesysbox.library 53.2 (6.8.2015)
+
+- FBXQMM_MOUNT_CONTROL doesn't skip the first character of the Control string
+  on AROS any more.
+
