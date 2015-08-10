@@ -343,7 +343,7 @@ struct FbxFS {
 	}
 
 #define CHECKWRITABLE(errbool) \
-	if (fs->currvol->writeprotect) { \
+	if (fs->currvol->writeprotect || (fs->currvol->vflags & FBXVF_READ_ONLY)) { \
 		fs->r2 = ERROR_DISK_WRITE_PROTECTED; \
 		return errbool; \
 	}

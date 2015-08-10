@@ -8,3 +8,8 @@ filesysbox.library 53.2 (6.8.2015)
 - FBXQMM_MOUNT_CONTROL doesn't skip the first character of the Control string
   on AROS any more.
 
+
+filesysbox.library 53.3 (xx.xx.2015)
+
+- CHECKWRITABLE() now also checks if the FBXVF_READ_ONLY flag is set.
+

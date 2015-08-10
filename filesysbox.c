@@ -1114,10 +1114,7 @@ static int FbxOpenFile(struct FbxFS *fs, struct FileHandle *fh,
 	case MODE_READWRITE:
 		if (!exists) {
 			/* did not exist, lets create */
-			if (fs->currvol->writeprotect) {
-				fs->r2 = ERROR_DISK_WRITE_PROTECTED;
-				return DOSFALSE;
-			}
+			CHECKWRITABLE(DOSFALSE);
 			if (FSOP mknod) {
 				error = Fbx_mknod(fs, fullpath, DEFAULT_PERMS|S_IFREG, 0);
 				if (error) {
@@ -1152,10 +1149,7 @@ static int FbxOpenFile(struct FbxFS *fs, struct FileHandle *fh,
 	}
 
 	if (truncate) {
-		if (fs->currvol->writeprotect) {
-			fs->r2 = ERROR_DISK_WRITE_PROTECTED;
-			return DOSFALSE;
-		}
+		CHECKWRITABLE(DOSFALSE);
 		error = Fbx_truncate(fs, fullpath, 0);
 		if (error) {
 			fs->r2 = FbxFuseErrno2Error(error);
