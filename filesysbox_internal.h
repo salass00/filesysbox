@@ -434,8 +434,13 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 #define AllocFbxExAllState(fs) AllocStructurePooled(fs, FbxExAllState)
 #define FreeFbxExAllState(fs,eas) FreeStructurePooled(fs, eas, FbxExAllState)
 
+#ifdef __AROS__
 #define AllocFbxDirData(fs,len) (struct FbxDirData *)AllocVecPooled((fs)->mempool, sizeof(struct FbxDirData) + (len))
 #define FreeFbxDirData(fs,dd) FreeVecPooled((fs)->mempool, dd)
+#else
+#define AllocFbxDirData(fs,len) (struct FbxDirData *)FbxAllocVecPooled((fs), sizeof(struct FbxDirData) + (len))
+#define FreeFbxDirData(fs,dd) FbxFreeVecPooled((fs), (dd))
+#endif
 
 #define AllocFuseFileInfo(fs) AllocStructurePooled(fs, fuse_file_info)
 #define FreeFuseFileInfo(fs,ffi) FreeStructurePooled(fs, ffi, fuse_file_info)
@@ -493,4 +498,10 @@ size_t utf8_strlcat(char *dst, const char *src, size_t dst_size);
 
 /* ucs4.c */
 ULONG ucs4_toupper(ULONG c);
+
+/* allocvecpooled.c */
+#ifndef __AROS__
+APTR FbxAllocVecPooled(struct FbxFS *fs, ULONG size);
+void FbxFreeVecPooled(struct FbxFS *fs, APTR ptr);
+#endif
 
