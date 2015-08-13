@@ -9,54 +9,39 @@
 #include <string.h>
 
 #ifndef __AROS__
-size_t strlcpy(char *dst, const char *src, size_t size) {
-	char *d = dst;
-	const char *s = src;
-	size_t n = size;
+size_t strlcpy(char *dst, const char *src, size_t dst_size) {
+	char *dst_start = dst;
+	char *dst_end = dst_start + dst_size;
 
-	if (n != 0 && --n != 0) {
-		do {
-			if ((*d++ = *s++) == '\0')
+	if (dst_end > dst) {
+		while ((*dst = *src) != '\0') {
+			if (++dst == dst_end) {
+				*--dst = '\0';
 				break;
-		} while (--n != 0);
+			}
+			src++;
+		}
 	}
-
-	if (n == 0) {
-		if (size != 0)
-			*d = '\0';
-
-		while (*s++ != '\0');
-	}
-
-	return s - src - 1;
+	dst += strlen(src);
+	return dst - dst_start;
 }
 
-size_t strlcat(char *dst, const char *src, size_t size) {
-	char *d = dst;
-	const char *s = src;
-	size_t n = size;
-	size_t dlen;
+size_t strlcat(char *dst, const char *src, size_t dst_size) {
+	char *dst_start = dst;
+	char *dst_end = dst_start + dst_size;
 
-	while (n-- != 0 && *d != '\0')
-		d++;
-
-	dlen = d - dst;
-	n = size - dlen;
-
-	if (n == 0)
-		return dlen + strlen(s);
-
-	while (*s != '\0') {
-		if (n != 1) {
-			*d++ = *s;
-			n--;
+	dst += strlen(dst);
+	if (dst_end > dst) {
+		while ((*dst = *src) != '\0') {
+			if (++dst == dst_end) {
+				*--dst = '\0';
+				break;
+			}
+			src++;
 		}
-		s++;
 	}
-
-	*d = '\0';
-
-	return dlen + (s - src);
+	dst += strlen(src);
+	return dst - dst_start;
 }
 #endif
 
