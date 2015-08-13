@@ -9,6 +9,7 @@
 #include <clib/debug_protos.h>
 
 #ifndef NODEBUG
+
 int vdebugf(const char *fmt, va_list args) {
 	char buffer[256];
 

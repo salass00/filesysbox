@@ -81,6 +81,11 @@ struct FileSysBoxBase {
 
 #else
 
+#ifndef __AROS__
+extern int my_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg);
+#define vsnprintf(buffer,size,fmt,arg) my_vsnprintf(buffer,size,fmt,arg)
+#endif
+
 int debugf(const char *fmt, ...);
 int vdebugf(const char *fmt, va_list args);
 

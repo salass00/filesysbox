@@ -22,7 +22,7 @@ main_SRCS := $(wildcard main/*.c)
 main_OBJS := $(main_SRCS:.c=.o)
 SRCS := init.c filesysbox.c uptime.c doslist.c \
 	utf8.c ucs4.c strlcpy.c debugf.c kputstr.c \
-	allocvecpooled.c
+	vsnprintf.c allocvecpooled.c
 OBJS := $(main_SRCS:.c=.o) $(SRCS:.c=.o)
 
 .PHONY: all
