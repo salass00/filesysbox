@@ -9,7 +9,7 @@ filesysbox.library 53.2 (6.8.2015)
   on AROS any more.
 
 
-filesysbox.library 53.3 (xx.xx.2015)
+filesysbox.library 53.3 (13.8.2015)
 
 - CHECKWRITABLE() now also checks if the FBXVF_READ_ONLY flag is set.
 
