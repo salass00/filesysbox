@@ -6,7 +6,13 @@
  */
 
 #include "filesysbox_internal.h"
+#ifdef __AROS__
+#include <clib/arossupport_protos.h>
+#else
+#include <clib/debug_protos.h>
+#endif
 
+#ifndef NODEBUG
 int vdebugf(const char *fmt, va_list args) {
 	char buffer[256];
 
@@ -23,4 +29,6 @@ int debugf(const char *fmt, ...) {
 	va_end(ap);
 	return retval;
 }
+#endif
+
 

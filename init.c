@@ -11,21 +11,27 @@
 
 static const char USED_VAR verstag[] = VERSTAG;
 
-struct AROSSupportBase *DebugAROSBase;
+struct Library *SysBase;
+#ifdef __AROS__
 struct Library *aroscbase;
+#else
+struct Library *__UtilityBase;
+#endif
 
 #ifdef __AROS__
 static AROS_UFH3(struct FileSysBoxBase *, LibInit,
 	AROS_UFHA(struct FileSysBoxBase *, libBase, D0),
 	AROS_UFHA(BPTR, seglist, A0),
-	AROS_UFHA(struct Library *, SysBase, A6))
+	AROS_UFHA(struct Library *, sysbase, A6))
 {
 	AROS_USERFUNC_INIT
 #else
 static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
-	REG(a0, BPTR seglist), REG(a6, struct Library *SysBase))
+	REG(a0, BPTR seglist), REG(a6, struct Library *sysbase))
 {
 #endif
+
+	SysBase = sysbase;
 
 	libBase->libnode.lib_Node.ln_Type = NT_LIBRARY;
 	libBase->libnode.lib_Node.ln_Pri  = 0;
@@ -36,16 +42,17 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 	libBase->libnode.lib_IdString     = (STRPTR)VSTRING;
 
 	libBase->seglist = seglist;
-	libBase->sysbase = SysBase;
+	libBase->sysbase = sysbase;
 
 	libBase->dosbase = OpenLibrary((CONST_STRPTR)"dos.library", 39);
 	if (libBase->dosbase == NULL) goto error;
 
 #ifdef __AROS__
-	DebugAROSBase = (struct AROSSupportBase *)((struct ExecBase *)SysBase)->DebugAROSBase;
-
 	aroscbase = OpenLibrary((CONST_STRPTR)"arosc.library", 41);
 	if (aroscbase == NULL) goto error;
+#else
+	__UtilityBase = OpenLibrary((CONST_STRPTR)"utility.library", 39);
+	if (__UtilityBase == NULL) goto error;
 #endif
 
 	InitSemaphore(&libBase->dlproc_sem);
@@ -133,6 +140,11 @@ BPTR LibExpunge(
 		result = libBase->seglist;
 
 		/* Undo what the init code did */
+#ifdef __AROS__
+		CloseLibrary(aroscbase);
+#else
+		CloseLibrary(__UtilityBase);
+#endif
 
 		Remove((struct Node *)libBase);
 		FreeMem((BYTE *)libBase - libBase->libnode.lib_NegSize,
@@ -149,12 +161,12 @@ BPTR LibExpunge(
 }
 
 #ifdef __AROS__
-AROS_LH0(BPTR, LibReserved,
+AROS_LH0(APTR, LibReserved,
 	struct FileSysBoxBase *, libBase, 4, FileSysBox)
 {
 	AROS_LIBFUNC_INIT
 #else
-BPTR LibReserved(
+APTR LibReserved(
 	REG(a6, struct FileSysBoxBase *libBase))
 {
 #endif

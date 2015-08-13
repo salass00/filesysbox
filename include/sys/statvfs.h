@@ -5,6 +5,11 @@
 extern "C" {
 #endif
 
+#ifndef __AROS__
+typedef unsigned long fsblkcnt_t;
+typedef unsigned long fsfilcnt_t;
+#endif
+
 struct statvfs
 {
 	unsigned long f_bsize;

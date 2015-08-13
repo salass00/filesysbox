@@ -6,6 +6,7 @@
  */
 
 #include "filesysbox_internal.h"
+#include <dos/dostags.h>
 #include <string.h>
 
 struct FbxAsyncMsg {
@@ -39,13 +40,22 @@ static int FbxDosListProc(void) {
 	struct Library *DOSBase;
 	struct Process *proc;
 	struct MsgPort *port;
-	struct FbxAsyncMsg *msg;
+#ifndef __AROS__
+	struct Message *msg;
+#endif
+	struct FbxAsyncMsg *async_msg;
 	ULONG signals;
 
 	proc = (struct Process *)FindTask(NULL);
 	port = &proc->pr_MsgPort;
 
+#ifdef __AROS__
 	libBase = proc->pr_Task.tc_UserData;
+#else
+	WaitPort(port);
+	msg = GetMsg(port);
+	libBase = (struct FileSysBoxBase *)msg->mn_Node.ln_Name;
+#endif
 	DOSBase = libBase->dosbase;
 
 	for (;;) {
@@ -53,9 +63,9 @@ static int FbxDosListProc(void) {
 
 		if (!IsListEmpty(&port->mp_MsgList)) {
 			LockDosList(LDF_ALL|LDF_WRITE);
-			while ((msg = (struct FbxAsyncMsg *)GetMsg(port)) != NULL) {
-				struct FbxVolume *vol = msg->vol;
-				int cmd = msg->cmd;
+			while ((async_msg = (struct FbxAsyncMsg *)GetMsg(port)) != NULL) {
+				struct FbxVolume *vol = async_msg->vol;
+				int cmd = async_msg->cmd;
 				switch (cmd) {
 				case FBX_ASYNC_ADD:
 					AddDosEntry(&vol->dol);
@@ -69,13 +79,13 @@ static int FbxDosListProc(void) {
 					break;
 				case FBX_ASYNC_RENAME:
 					if (RemDosEntry(&vol->dol)) {
-						FbxStrlcpy(msg->fs, vol->volname, msg->name, CONN_VOLUME_NAME_BYTES);
+						FbxStrlcpy(async_msg->fs, vol->volname, async_msg->name, CONN_VOLUME_NAME_BYTES);
 						vol->volnamelen = strlen(vol->volname);
 						AddDosEntry(&vol->dol);
 					}
 					break;
 				}
-				FreeMem(msg, msg->msg.mn_Length);
+				FreeMem(async_msg, async_msg->msg.mn_Length);
 			}
 			UnLockDosList(LDF_ALL|LDF_WRITE);
 		}
@@ -88,8 +98,8 @@ static int FbxDosListProc(void) {
 		}
 	}
 
-	while ((msg = (struct FbxAsyncMsg *)GetMsg(port)) != NULL)
-		FreeMem(msg, msg->msg.mn_Length);
+	while ((async_msg = (struct FbxAsyncMsg *)GetMsg(port)) != NULL)
+		FreeMem(async_msg, async_msg->msg.mn_Length);
 
 	libBase->dlproc = NULL;
 
@@ -103,13 +113,20 @@ static int FbxDosListProc(void) {
 }
 
 struct Process *StartDosListProc(struct FileSysBoxBase *libBase) {
+#ifndef __AROS__
+	struct Library *SysBase = libBase->sysbase;
+	static struct Message msg;
+#endif
 	struct Library *DOSBase = libBase->dosbase;
+	struct Process *dlproc;
 
-	return CreateNewProcTags(
-		NP_Entry,       FbxDosListProc,
-		NP_UserData,    libBase,
+	dlproc = CreateNewProcTags(
+		NP_Entry,       (IPTR)FbxDosListProc,
+#ifdef __AROS__
+		NP_UserData,    (IPTR)libBase,
+#endif
 		NP_StackSize,   4096,
-		NP_Name,        "FileSysBox DosList handler",
+		NP_Name,        (IPTR)"FileSysBox DosList handler",
 		NP_Priority,    15,
 		NP_Cli,         FALSE,
 		NP_WindowPtr,   -1,
@@ -124,6 +141,18 @@ struct Process *StartDosListProc(struct FileSysBoxBase *libBase) {
 		NP_CloseOutput, FALSE,
 		NP_ConsoleTask, 0,
 		TAG_END);
+
+#ifndef __AROS__
+	if (dlproc != NULL) {
+		bzero(&msg, sizeof(msg));
+		msg.mn_Node.ln_Type = NT_MESSAGE;
+		msg.mn_Node.ln_Name = (STRPTR)libBase;
+		msg.mn_Length = sizeof(msg);
+		PutMsg(&dlproc->pr_MsgPort, &msg);
+	}
+#endif
+
+	return dlproc;
 }
 
 static int FbxAsyncDosListCmd(struct FbxFS *fs, struct FbxVolume *vol, int cmd, const char *name) {

@@ -19,6 +19,11 @@
 #define DOS_OWNER_NONE 0
 
 #ifdef __AROS__
+#define ts_sec  tv_sec
+#define ts_nsec tv_nsec
+#endif
+
+#ifdef __AROS__
 #define ID_BUSY_DISK AROS_MAKE_ID('B','U','S','Y')
 #else
 #define ID_BUSY_DISK (0x42555359L)
@@ -362,7 +367,9 @@ static struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mo
 static void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list) {
 	struct MinNode *node, *succ;
 
+#ifdef __AROS__
 	GetSysBase
+#endif
 
 	DEBUGF("FreeFbxDirDataList(%#p, %#p)\n", fs, list);
 
@@ -1883,21 +1890,21 @@ static void FbxDS2TimeSpec(struct FbxFS *fs, const struct DateStamp *ds, struct 
 	// add 8 years of seconds to adjust for different epoch.
 	sec += UNIXTIMEOFFSET;
 
-	ts->tv_sec = sec;
-	ts->tv_nsec = nsec;
+	ts->ts_sec = sec;
+	ts->ts_nsec = nsec;
 }
 
 static void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStamp *ds) {
 	ULONG sec, nsec;
 
-	sec = ts->tv_sec;
-	nsec = ts->tv_nsec;
+	sec = ts->ts_sec;
+	nsec = ts->ts_nsec;
 
 	// subtract 8 years of seconds to adjust for different epoch.
 	sec -= UNIXTIMEOFFSET;
 
 	// check for overflow (if date was < 1.1.1978)
-	if (sec > (ULONG)ts->tv_sec) {
+	if (sec > (ULONG)ts->ts_sec) {
 		sec = 0;
 		nsec = 0;
 	}
@@ -1941,8 +1948,8 @@ static int FbxSetDate(struct FbxFS *fs, struct FbxLock *lock, const char *name, 
 	} else {
 		struct utimbuf ubuf;
 
-		ubuf.actime  = tv[0].tv_sec;
-		ubuf.modtime = tv[1].tv_sec;
+		ubuf.actime  = tv[0].ts_sec;
+		ubuf.modtime = tv[1].ts_sec;
 
 		error = Fbx_utime(fs, fullpath, &ubuf);
 	}
@@ -2547,7 +2554,7 @@ static int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SI
 
 		if (ctrl->eac_MatchString != NULL &&
 			ctrl->eac_MatchFunc == NULL &&
-			!MatchPatternNoCase(ctrl->eac_MatchString, (CONST_STRPTR)ed->name))
+			!MatchPatternNoCase(ctrl->eac_MatchString, (STRPTR)ed->name))
 		{
 			continue;
 		}
@@ -3348,7 +3355,9 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 	}
 
 	GetSysBase
+#ifndef NODEBUG
 	GetDOSBase
+#endif
 
 	bzero(conn, sizeof(*conn));
 
@@ -3548,7 +3557,6 @@ void FbxCloseLibraries(struct FbxFS *fs) {
 	GetSysBase
 
 	CloseLibrary(fs->dosbase);
-	CloseLibrary(fs->intuitionbase);
 	CloseLibrary(fs->utilitybase);
 }
 

@@ -105,9 +105,6 @@ struct FbxFS *FbxSetupFS(
 	fs->dosbase = OpenLibrary((CONST_STRPTR)"dos.library", 39);
 	if (fs->dosbase == NULL) goto error;
 
-	fs->intuitionbase = OpenLibrary((CONST_STRPTR)"intuition.library", 39);
-	if (fs->intuitionbase == NULL) goto error;
-
 	fs->utilitybase = OpenLibrary((CONST_STRPTR)"utility.library", 39);
 	if (fs->utilitybase == NULL) goto error;
 
@@ -131,7 +128,7 @@ struct FbxFS *FbxSetupFS(
 	if (fs->notifyreplyport == NULL) goto error;
 
 	// make a copy of fuse_operations
-	CopyMem(ops, &fs->ops, min(opssize, sizeof(fs->ops)));
+	CopyMem((APTR)ops, &fs->ops, min(opssize, sizeof(fs->ops)));
 
 	// install dummy functions in empty slots of fuse_operations array.
 	#define FIX_SLOT(name) if (!FSOP name) FSOP name = (void *)&dumopfunc;

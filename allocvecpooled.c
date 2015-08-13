@@ -5,10 +5,9 @@
  * See the file LICENSE.APL
  */
 
-#ifndef __AROS__
-
 #include "filesysbox_internal.h"
 
+#ifndef __AROS__
 APTR FbxAllocVecPooled(struct FbxFS *fs, ULONG size) {
 	ULONG *pmem;
 
@@ -33,6 +32,5 @@ void FbxFreeVecPooled(struct FbxFS *fs, APTR ptr) {
 		FreePooled(fs->mempool, pmem, sizeof(ULONG) + size);
 	}
 }
-
 #endif
 

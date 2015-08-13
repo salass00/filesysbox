@@ -13,3 +13,6 @@ filesysbox.library 53.3 (xx.xx.2015)
 
 - CHECKWRITABLE() now also checks if the FBXVF_READ_ONLY flag is set.
 
+- Removed code for opening and closing of intuition.library since this library
+  was not used anywhere.
+

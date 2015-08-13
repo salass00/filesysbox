@@ -5,6 +5,10 @@
 #ifndef LIBRARIES_FILESYSBOX_H
 #define LIBRARIES_FILESYSBOX_H
 
+#ifndef DEVICES_TIMER_H
+#include <devices/timer.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
@@ -20,8 +24,10 @@ extern "C" {
 #endif
 
 #ifndef __AROS__
-typedef ULONG IPTR;
-typedef LONG  SIPTR;
+typedef ULONG              IPTR;
+typedef LONG               SIPTR;
+typedef unsigned long long UQUAD;
+typedef signed long long   QUAD;
 #endif
 
 typedef QUAD fbx_off_t;

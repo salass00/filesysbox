@@ -15,17 +15,34 @@
 // Consider them black-box objects.
 // Etc.
 
+#ifndef __AROS__
+#define NODEBUG // Debug only works in AROS build right now
+#endif
+
 #include <libraries/filesysbox.h>
+#include <exec/interrupts.h>
+#include <dos/filehandler.h>
 #include <proto/exec.h>
 #include <proto/dos.h>
-#include <proto/intuition.h>
 #include <proto/utility.h>
 #include <proto/timer.h>
-#ifdef __AROS__
-#include <aros/arossupportbase.h>
-#endif
 #include <stdio.h>
+#include <stdarg.h>
+#include <stddef.h>
 #include <SDI/SDI_compiler.h>
+
+#ifndef NEWLIST
+#define NEWLIST(list) \
+	do { \
+		((struct List *)(list))->lh_Head = (struct Node *)&((struct List *)(list))->lh_Tail; \
+		((struct List *)(list))->lh_Tail = NULL; \
+		((struct List *)(list))->lh_TailPred = (struct Node *)&((struct List *)(list))->lh_Head; \
+	} while (0)
+#endif
+
+#ifndef IsMinListEmpty
+#define IsMinListEmpty(list) IsListEmpty((struct List *)list)
+#endif
 
 #ifndef ZERO
 #define ZERO MKBADDR(NULL)
@@ -38,6 +55,10 @@
 #define FIBF_HOLD (1<<FIBB_HOLD)
 #endif
 
+#ifndef ENODATA
+#define ENODATA ENOENT
+#endif
+
 struct FileSysBoxBase {
     struct Library libnode;
     BPTR seglist;
@@ -48,16 +69,10 @@ struct FileSysBoxBase {
 	struct SignalSemaphore dlproc_sem;
 };
 
-#ifdef __AROS__
-extern struct AROSSupportBase *DebugAROSBase;
-#define kprintf  (DebugAROSBase->kprintf)
-#define vkprintf (DebugAROSBase->vkprintf)
-#endif
-
-int debugf(const char *fmt, ...);
-int vdebugf(const char *fmt, va_list args);
-
 #ifdef NODEBUG
+
+#define debugf(fmt, ...)
+#define vdebugf(fmt, args)
 
 #define DEBUGF(str,args...) ;
 #define ADEBUGF(str,args...) ;
@@ -69,6 +84,9 @@ int vdebugf(const char *fmt, va_list args);
 #define ODEBUGF(str,args...) ;
 
 #else
+
+int debugf(const char *fmt, ...);
+int vdebugf(const char *fmt, va_list args);
 
 // general debug
 #ifdef DEBUG
@@ -280,7 +298,6 @@ struct FbxFS {
 	struct MsgPort              *dlproc_port;
 	struct Library              *sysbase;
 	struct Library              *dosbase;
-	struct Library              *intuitionbase;
 	struct Library              *utilitybase;
 	struct Device               *timerbase;
 	struct timerequest          *timerio;
@@ -324,11 +341,10 @@ struct FbxFS {
 #define ACTIVE_UPDATE_TIMEOUT_MILLIS 10000
 #define INACTIVE_UPDATE_TIMEOUT_MILLIS 500
 
-#define GetSysBase struct Library *SysBase = fs->sysbase;
-#define GetDOSBase struct Library *DOSBase = fs->dosbase;
-#define GetIntuitionBase struct Library *IntuitionBase = fs->intuitionbase;
+#define GetSysBase     struct Library *SysBase     = fs->sysbase;
+#define GetDOSBase     struct Library *DOSBase     = fs->dosbase;
 #define GetUtilityBase struct Library *UtilityBase = fs->utilitybase;
-#define GetTimerBase struct Device *TimerBase = fs->timerbase;
+#define GetTimerBase   struct Device  *TimerBase   = fs->timerbase;
 
 #define CHECKVOLUME(errbool) \
 	if (NOVOLUME(fs->currvol)) { \
@@ -499,9 +515,15 @@ size_t utf8_strlcat(char *dst, const char *src, size_t dst_size);
 /* ucs4.c */
 ULONG ucs4_toupper(ULONG c);
 
-/* allocvecpooled.c */
 #ifndef __AROS__
+/* allocvecpooled.c */
 APTR FbxAllocVecPooled(struct FbxFS *fs, ULONG size);
 void FbxFreeVecPooled(struct FbxFS *fs, APTR ptr);
+#endif
+
+#ifndef __AROS__
+/* strlcpy.c */
+size_t strlcpy(char *dst, const char *src, size_t size);
+size_t strlcat(char *dst, const char *src, size_t size);
 #endif
 
