@@ -15,10 +15,6 @@
 // Consider them black-box objects.
 // Etc.
 
-#ifndef __AROS__
-#define NODEBUG // Debug only works in AROS build right now
-#endif
-
 #include <libraries/filesysbox.h>
 #include <exec/interrupts.h>
 #include <dos/filehandler.h>
