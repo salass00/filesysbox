@@ -5,6 +5,7 @@
  * See the file LICENSE.APL
  */
 
+#include <exec/alerts.h>
 #include <exec/resident.h>
 #include "filesysbox_internal.h"
 #include "filesysbox.library_rev.h"
@@ -45,14 +46,23 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 	libBase->sysbase = sysbase;
 
 	libBase->dosbase = OpenLibrary((CONST_STRPTR)"dos.library", 39);
-	if (libBase->dosbase == NULL) goto error;
+	if (libBase->dosbase == NULL) {
+		Alert(AG_OpenLib|AO_DOSLib);
+		goto error;
+	}
 
 #ifdef __AROS__
 	aroscbase = OpenLibrary((CONST_STRPTR)"arosc.library", 41);
-	if (aroscbase == NULL) goto error;
+	if (aroscbase == NULL) {
+		Alert(AG_OpenLib|AO_Unknown);
+		goto error;
+	}
 #else
 	__UtilityBase = OpenLibrary((CONST_STRPTR)"utility.library", 39);
-	if (__UtilityBase == NULL) goto error;
+	if (__UtilityBase == NULL) {
+		Alert(AG_OpenLib|AO_UtilityLib);
+		goto error;
+	}
 #endif
 
 	InitSemaphore(&libBase->dlproc_sem);
