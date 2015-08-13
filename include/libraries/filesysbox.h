@@ -23,7 +23,8 @@
 extern "C" {
 #endif
 
-#ifndef __AROS__
+#if !defined(__AROS__) && !defined(AROS_TYPES_DEFINED)
+#define AROS_TYPES_DEFINED
 typedef ULONG              IPTR;
 typedef LONG               SIPTR;
 typedef unsigned long long UQUAD;
