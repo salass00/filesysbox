@@ -10,7 +10,7 @@ VERSION := 53
 
 CFLAGS  := -O2 -s -Wall -Werror -Wwrite-strings -Iinclude -D__NOLIBBASE__
 LDFLAGS := -nostartfiles
-LIBS    := 
+LIBS    := -ldebug
 
 ifeq ($(HOST),m68k-amigaos)
 	CFLAGS  := -noixemul $(CFLAGS)

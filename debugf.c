@@ -6,18 +6,14 @@
  */
 
 #include "filesysbox_internal.h"
-#ifdef __AROS__
-#include <clib/arossupport_protos.h>
-#else
 #include <clib/debug_protos.h>
-#endif
 
 #ifndef NODEBUG
 int vdebugf(const char *fmt, va_list args) {
 	char buffer[256];
 
 	int retval = vsnprintf(buffer, sizeof(buffer), fmt, args);
-	kprintf("%s", buffer);
+	KPutStr((CONST_STRPTR)buffer);
 
 	return retval;
 }
