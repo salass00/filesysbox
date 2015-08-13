@@ -14,6 +14,7 @@
 #include <devices/trackdisk.h>
 #include <errno.h>
 #include <string.h>
+#include <SDI/SDI_interrupt.h>
 
 #define DOS_OWNER_ROOT 65535
 #define DOS_OWNER_NONE 0
@@ -54,7 +55,7 @@ void CopyStringCToBSTR(const char *cstr, BSTR bstr, size_t size) {
 }
 
 #ifdef __AROS__
-AROS_UFH5(int, FbxDiskChangeInterrupt,
+AROS_UFH5(int, FbxDiskChangeIntFunc,
 	AROS_UFHA(APTR, data, A1),
 	AROS_UFHA(APTR, code, A5),
 	AROS_UFHA(struct ExecBase *, SysBase, A6),
@@ -63,7 +64,7 @@ AROS_UFH5(int, FbxDiskChangeInterrupt,
 {
 	AROS_USERFUNC_INIT
 #else
-SAVEDS ASM int FbxDiskChangeInterrupt(REG(a0, APTR custom), REG(a1, APTR data)) {
+INTERRUPTPROTO(FbxDiskChangeIntFunc, int, APTR custom, APTR data) {
 #endif
 	struct FbxFS *fs = data;
 	struct FbxDiskChangeHandler *dch = fs->diskchangehandler;
@@ -78,6 +79,7 @@ SAVEDS ASM int FbxDiskChangeInterrupt(REG(a0, APTR custom), REG(a1, APTR data)) 
 	AROS_USERFUNC_EXIT
 #endif
 }
+MakeInterrupt(FbxDiskChangeInterrupt, FbxDiskChangeIntFunc, NULL, NULL);
 
 struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskChangeHandlerFunc func) {
 	struct FbxDiskChangeHandler *dch;
@@ -107,16 +109,13 @@ struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskCh
 	interrupt = AllocPooled(fs->mempool, sizeof(*interrupt));
 	if (interrupt == NULL) goto cleanup;
 
-	interrupt->is_Node.ln_Type = NT_INTERRUPT;
-	interrupt->is_Node.ln_Pri  = 0;
+	CopyMem(&FbxDiskChangeInterrupt, interrupt, sizeof(*interrupt));
 #ifdef __AROS__
 	interrupt->is_Node.ln_Name = (char *)AROS_BSTR_ADDR(fs->devnode->dn_Name);
 #else
 	interrupt->is_Node.ln_Name = (char *)BADDR(fs->devnode->dn_Name) + 1;
 #endif
-
 	interrupt->is_Data = fs;
-	interrupt->is_Code = (APTR)FbxDiskChangeInterrupt;
 
 	io->io_Command = TD_ADDCHANGEINT;
 	io->io_Data    = interrupt;
