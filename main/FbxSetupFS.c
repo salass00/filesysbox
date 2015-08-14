@@ -61,7 +61,9 @@ struct FbxFS *FbxSetupFS(
 	REG(a6, struct FileSysBoxBase *libBase))
 {
 #endif
-	struct Library *SysBase = libBase->sysbase;
+	struct Library *SysBase     = libBase->sysbase;
+	struct Library *DOSBase     = libBase->dosbase;
+	struct Library *UtilityBase = libBase->utilitybase;
 	struct FbxFS *fs;
 	struct TagItem *tstate;
 	const struct TagItem *tag;
@@ -76,8 +78,9 @@ struct FbxFS *FbxSetupFS(
 	fs->dbgflagssig = -1;
 	fs->diskchangesig = -1;
 
-	fs->sysbase = SysBase;
-	fs->dosbase = libBase->dosbase;
+	fs->sysbase     = SysBase;
+	fs->dosbase     = DOSBase;
+	fs->utilitybase = UtilityBase;
 
 	fs->thisproc = (struct Process *)FindTask(NULL);
 
@@ -101,12 +104,6 @@ struct FbxFS *FbxSetupFS(
 			}
 		}
 	}
-
-	fs->dosbase = OpenLibrary((CONST_STRPTR)"dos.library", 39);
-	if (fs->dosbase == NULL) goto error;
-
-	fs->utilitybase = OpenLibrary((CONST_STRPTR)"utility.library", 39);
-	if (fs->utilitybase == NULL) goto error;
 
 	if (FbxSetupTimerIO(fs) == NULL) goto error;
 
@@ -167,8 +164,6 @@ struct FbxFS *FbxSetupFS(
 
 	fs->xattr_amiga_comment = "user.amiga_comment";
 	fs->xattr_amiga_protection = "user.amiga_protection";
-
-	GetUtilityBase
 
 	// scan tags
 	tstate = (struct TagItem *)tags;

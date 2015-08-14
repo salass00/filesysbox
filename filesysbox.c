@@ -55,7 +55,7 @@ void CopyStringCToBSTR(const char *cstr, BSTR bstr, size_t size) {
 }
 
 #ifdef __AROS__
-AROS_UFH5(int, FbxDiskChangeIntFunc,
+AROS_UFH5(int, FbxDiskChangeInterrupt,
 	AROS_UFHA(APTR, data, A1),
 	AROS_UFHA(APTR, code, A5),
 	AROS_UFHA(struct ExecBase *, SysBase, A6),
@@ -64,7 +64,7 @@ AROS_UFH5(int, FbxDiskChangeIntFunc,
 {
 	AROS_USERFUNC_INIT
 #else
-INTERRUPTPROTO(FbxDiskChangeIntFunc, int, APTR custom, APTR data) {
+INTERRUPTPROTO(FbxDiskChangeInterrupt, int, APTR custom, APTR data) {
 #endif
 	struct FbxFS *fs = data;
 	struct FbxDiskChangeHandler *dch = fs->diskchangehandler;
@@ -79,7 +79,6 @@ INTERRUPTPROTO(FbxDiskChangeIntFunc, int, APTR custom, APTR data) {
 	AROS_USERFUNC_EXIT
 #endif
 }
-MakeInterrupt(FbxDiskChangeInterrupt, FbxDiskChangeIntFunc, NULL, NULL);
 
 struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskChangeHandlerFunc func) {
 	struct FbxDiskChangeHandler *dch;
@@ -109,13 +108,19 @@ struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskCh
 	interrupt = AllocPooled(fs->mempool, sizeof(*interrupt));
 	if (interrupt == NULL) goto cleanup;
 
-	CopyMem(&FbxDiskChangeInterrupt, interrupt, sizeof(*interrupt));
+	bzero(interrupt, sizeof(*interrupt));
+	interrupt->is_Node.ln_Type = NT_INTERRUPT;
 #ifdef __AROS__
 	interrupt->is_Node.ln_Name = (char *)AROS_BSTR_ADDR(fs->devnode->dn_Name);
 #else
 	interrupt->is_Node.ln_Name = (char *)BADDR(fs->devnode->dn_Name) + 1;
 #endif
 	interrupt->is_Data = fs;
+#ifdef __AROS__
+	interrupt->is_Code = (void (*)())FbxDiskChangeInterrupt;
+#else
+	interrupt->is_Code = (void (*)())ENTRY(FbxDiskChangeInterrupt);
+#endif
 
 	io->io_Command = TD_ADDCHANGEINT;
 	io->io_Data    = interrupt;
@@ -3548,15 +3553,6 @@ void FbxCleanupTimerIO(struct FbxFS *fs) {
 		DeleteIORequest(tr);
 		DeleteMsgPort(mp);
 	}
-}
-
-void FbxCloseLibraries(struct FbxFS *fs) {
-	DEBUGF("FbxCloseLibraries(%#p)\n", fs);
-
-	GetSysBase
-
-	CloseLibrary(fs->dosbase);
-	CloseLibrary(fs->utilitybase);
 }
 
 void FbxStopTimer(struct FbxFS *fs) {

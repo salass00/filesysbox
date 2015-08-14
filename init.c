@@ -13,11 +13,16 @@
 static const char USED_VAR verstag[] = VERSTAG;
 
 struct Library *SysBase;
-#ifdef __AROS__
-struct Library *aroscbase;
-#else
+#ifdef libnix
 struct Library *__UtilityBase;
 #endif
+#ifdef __AROS__
+struct Library *aroscbase;
+#endif
+
+static inline void SetSysBase(struct Library *sysbase) {
+	SysBase = sysbase;
+}
 
 #ifdef __AROS__
 static AROS_UFH3(struct FileSysBoxBase *, LibInit,
@@ -28,11 +33,9 @@ static AROS_UFH3(struct FileSysBoxBase *, LibInit,
 	AROS_USERFUNC_INIT
 #else
 static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
-	REG(a0, BPTR seglist), REG(a6, struct Library *sysbase))
+	REG(a0, BPTR seglist), REG(a6, struct Library *SysBase))
 {
 #endif
-
-	SysBase = sysbase;
 
 	libBase->libnode.lib_Node.ln_Type = NT_LIBRARY;
 	libBase->libnode.lib_Node.ln_Pri  = 0;
@@ -43,7 +46,7 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 	libBase->libnode.lib_IdString     = (STRPTR)VSTRING;
 
 	libBase->seglist = seglist;
-	libBase->sysbase = sysbase;
+	libBase->sysbase = SysBase;
 
 	libBase->dosbase = OpenLibrary((CONST_STRPTR)"dos.library", 39);
 	if (libBase->dosbase == NULL) {
@@ -51,18 +54,26 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 		goto error;
 	}
 
-#ifdef __AROS__
-	aroscbase = OpenLibrary((CONST_STRPTR)"arosc.library", 41);
-	if (aroscbase == NULL) {
-		Alert(AG_OpenLib|AO_Unknown);
-		goto error;
-	}
-#else
-	__UtilityBase = OpenLibrary((CONST_STRPTR)"utility.library", 39);
-	if (__UtilityBase == NULL) {
+	libBase->utilitybase = OpenLibrary((CONST_STRPTR)"utility.library", 39);
+	if (libBase->utilitybase == NULL) {
 		Alert(AG_OpenLib|AO_UtilityLib);
 		goto error;
 	}
+
+#ifdef __AROS__
+	libBase->aroscbase = OpenLibrary((CONST_STRPTR)"arosc.library", 41);
+	if (libBase->aroscbase == NULL) {
+		Alert(AG_OpenLib|AO_Unknown);
+		goto error;
+	}
+#endif
+
+	SetSysBase(SysBase);
+#ifdef libnix
+	__UtilityBase = libBase->utilitybase;
+#endif
+#ifdef __AROS__
+	aroscbase = libBase->aroscbase;
 #endif
 
 	InitSemaphore(&libBase->dlproc_sem);
@@ -70,6 +81,7 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 	return libBase;
 
 error:
+	CloseLibrary(libBase->utilitybase);
 	CloseLibrary(libBase->dosbase);
 
 	FreeMem((BYTE *)libBase - libBase->libnode.lib_NegSize,
@@ -151,10 +163,10 @@ BPTR LibExpunge(
 
 		/* Undo what the init code did */
 #ifdef __AROS__
-		CloseLibrary(aroscbase);
-#else
-		CloseLibrary(__UtilityBase);
+		CloseLibrary(libBase->aroscbase);
 #endif
+		CloseLibrary(libBase->utilitybase);
+		CloseLibrary(libBase->dosbase);
 
 		Remove((struct Node *)libBase);
 		FreeMem((BYTE *)libBase - libBase->libnode.lib_NegSize,

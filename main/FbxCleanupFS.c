@@ -56,7 +56,7 @@ void FbxCleanupFS(
 		DeletePool(fs->mempool);
 
 		FbxCleanupTimerIO(fs);
-		FbxCloseLibraries(fs);
+
 		FreeFbxFS(fs);
 	}
 

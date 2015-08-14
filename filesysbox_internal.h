@@ -56,12 +56,17 @@
 #endif
 
 struct FileSysBoxBase {
-    struct Library libnode;
-    BPTR seglist;
-	struct Library *sysbase;
-	struct Library *dosbase;
-	struct Process *dlproc;
-	ULONG dlproc_refcount;
+    struct Library         libnode;
+	UWORD                  pad;
+    BPTR                   seglist;
+	struct Library        *sysbase;
+	struct Library        *dosbase;
+	struct Library        *utilitybase;
+#ifdef __AROS__
+	struct Library        *aroscbase;
+#endif
+	struct Process        *dlproc;
+	ULONG                  dlproc_refcount;
 	struct SignalSemaphore dlproc_sem;
 };
 
@@ -482,7 +487,6 @@ int FbxStrcmp(struct FbxFS *fs, const char *s1, const char *s2);
 int FbxStrncmp(struct FbxFS *fs, const char *s1, const char *s2, size_t n);
 size_t FbxStrlcpy(struct FbxFS *fs, char *dst, const char *src, size_t dst_size);
 size_t FbxStrlcat(struct FbxFS *fs, char *dst, const char *src, size_t dst_size);
-void FbxCloseLibraries(struct FbxFS *fs);
 struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
 void FbxCleanupTimerIO(struct FbxFS *fs);
 void FbxStopTimer(struct FbxFS *fs);
