@@ -16,3 +16,9 @@ filesysbox.library 53.3 (13.8.2015)
 - Removed code for opening and closing of intuition.library since this library
   was not used anywhere.
 
+
+filesysbox.library 53.4 (xx.xx.2015)
+
+- Moved the opening and closing of dos.library and utility.library to the
+  libInit() and libExpunge() functions.
+
