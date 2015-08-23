@@ -22,3 +22,5 @@ filesysbox.library 53.4 (xx.xx.2015)
 - Moved the opening and closing of dos.library and utility.library to the
   libInit() and libExpunge() functions.
 
+- Fixed error reporting in FbxWriteFile().
+

@@ -1271,15 +1271,17 @@ static int FbxWriteFile(struct FbxFS *fs, struct FbxLock *lock, CONST_APTR buffe
 	}
 
 	res = Fbx_write(fs, lock->entry->path, buffer, bytes, lock->filepos, lock->info);
+	if (res < 0) {
+		fs->r2 = FbxFuseErrno2Error(res);
+		return -1;
+	}
 	if (res == bytes) {
 		lock->filepos += bytes;
 		fs->r2 = 0;
 	}
 
-	if (res > 0) {
-		lock->flags |= LOCKFLAG_MODIFIED; // for notification
-		FbxSetModifyState(fs, 1);
-	}
+	lock->flags |= LOCKFLAG_MODIFIED; // for notification
+	FbxSetModifyState(fs, 1);
 
 	return res;
 }
