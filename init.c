@@ -28,7 +28,7 @@ static inline void SetSysBase(struct Library *sysbase) {
 static AROS_UFH3(struct FileSysBoxBase *, LibInit,
 	AROS_UFHA(struct FileSysBoxBase *, libBase, D0),
 	AROS_UFHA(BPTR, seglist, A0),
-	AROS_UFHA(struct Library *, sysbase, A6))
+	AROS_UFHA(struct Library *, SysBase, A6))
 {
 	AROS_USERFUNC_INIT
 #else
