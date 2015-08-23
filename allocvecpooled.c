@@ -7,29 +7,27 @@
 
 #include "filesysbox_internal.h"
 
+extern struct Library *SysBase;
+
 #ifndef __AROS__
-APTR FbxAllocVecPooled(struct FbxFS *fs, ULONG size) {
+APTR AllocVecPooled(APTR mempool, ULONG size) {
 	ULONG *pmem;
 
-	GetSysBase
-
-	pmem = AllocPooled(fs->mempool, sizeof(ULONG) + size);
+	pmem = AllocPooled(mempool, sizeof(ULONG) + size);
 	if (pmem != NULL)
 		*pmem++ = size;
 
 	return pmem;
 }
 
-void FbxFreeVecPooled(struct FbxFS *fs, APTR ptr) {
+void FreeVecPooled(APTR mempool, APTR ptr) {
 	ULONG *pmem;
 	ULONG size;
-
-	GetSysBase
 
 	if (ptr != NULL) {
 		pmem = ptr;
 		size = *--pmem;
-		FreePooled(fs->mempool, pmem, sizeof(ULONG) + size);
+		FreePooled(mempool, pmem, sizeof(ULONG) + size);
 	}
 }
 #endif
