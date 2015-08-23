@@ -421,9 +421,12 @@ struct FbxNotifyNode {
 #define FSNOTIFYNODEFROMCHAIN(chain_) container_of(chain_, struct FbxNotifyNode, chain)
 
 struct FbxDirData {
-	struct MinNode node;
-	char           name[]; // variable length nil-term array
+	struct MinNode  node;
+	char           *name;
+	char           *comment;
 };
+
+#define FSDIRDATAFROMNODE(chain) container_of(chain, struct FbxDirData, node)
 
 struct FbxExAllState { // exallctrl->lastkey points to this
 	struct MinList freelist; // FbxDirData's to free from previous invocation of exall
@@ -459,7 +462,6 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 #define FreeFbxExAllState(fs,eas) FreeStructurePooled(fs, eas, FbxExAllState)
 
 #define AllocFbxDirData(fs,len) (struct FbxDirData *)AllocVecPooled((fs)->mempool, sizeof(struct FbxDirData) + (len))
-#define FreeFbxDirData(fs,dd) FreeVecPooled((fs)->mempool, dd)
 
 #define AllocFuseFileInfo(fs) AllocStructurePooled(fs, fuse_file_info)
 #define FreeFuseFileInfo(fs,ffi) FreeStructurePooled(fs, ffi, fuse_file_info)

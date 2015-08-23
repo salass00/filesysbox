@@ -368,19 +368,30 @@ static struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mo
 	return lock;
 }
 
-static void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list) {
-	struct MinNode *node, *succ;
+static void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd) {
+	DEBUGF("FreeFbxDirData(%#p, %#p)\n", fs, dd);
 
 #ifdef __AROS__
 	GetSysBase
 #endif
 
+	if (dd != NULL) {
+		if (dd->comment != NULL)
+			FreeVecPooled(fs->mempool, dd->comment);
+
+		FreeVecPooled(fs->mempool, dd);
+	}
+}
+
+static void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list) {
+	struct MinNode *chain, *succ;
+
 	DEBUGF("FreeFbxDirDataList(%#p, %#p)\n", fs, list);
 
-	node = list->mlh_Head;
-	while ((succ = node->mln_Succ) != NULL) {
-		FreeFbxDirData(fs, node);
-		node = succ;
+	chain = list->mlh_Head;
+	while ((succ = chain->mln_Succ) != NULL) {
+		FreeFbxDirData(fs, FSDIRDATAFROMNODE(chain));
+		chain = succ;
 	}
 
 	NEWLIST(list);
@@ -2361,6 +2372,8 @@ static int dir_fill_func(void *udata, const char *name, const struct fbx_stat *s
 			ed = AllocFbxDirData(fs, len);
 			if (ed == NULL) return 1;
 
+			ed->name = (char *)(ed + 1);
+			ed->comment = NULL;
 			FbxStrlcpy(fs, ed->name, name, len);
 
 			AddTail((struct List *)&lock->dirdatalist, (struct Node *)ed);
@@ -2467,7 +2480,6 @@ static int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SI
 {
 	struct FbxDirData *ed = NULL;
 	int error, iptrs;
-	int extra_size, extra_iptrs;
 	struct FbxExAllState *exallstate;
 	IPTR *lptr, *start, *prev;
 	struct DateStamp ds;
@@ -2538,6 +2550,9 @@ static int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SI
 
 		exallstate->iptrs = iptrs;
 		ctrl->eac_LastKey = (IPTR)exallstate;
+	} else if (ctrl->eac_LastKey == (IPTR)-1) {
+		fs->r2 = ERROR_NO_MORE_ENTRIES;
+		return DOSFALSE;
 	} else {
 		exallstate = (struct FbxExAllState *)ctrl->eac_LastKey;
 		// free previous exdata
@@ -2552,38 +2567,48 @@ static int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SI
 		ed = (struct FbxDirData *)RemHead((struct List *)&lock->dirdatalist);
 		if (ed == NULL) break;
 
-		AddTail((struct List *)&exallstate->freelist, (struct Node *)ed);
-
 		start = lptr;
 		*lptr = (IPTR)NULL; // clear next pointer
-		extra_size = 0;
 
 		if (ctrl->eac_MatchString != NULL &&
 			ctrl->eac_MatchFunc == NULL &&
 			!MatchPatternNoCase(ctrl->eac_MatchString, (STRPTR)ed->name))
 		{
+			FreeFbxDirData(fs, ed);
 			continue;
 		}
 
 		if (type >= ED_TYPE) {
-			if (!FbxLockName2Path(fs, lock, ed->name, fullpath))
-				continue;
+			if (!FbxLockName2Path(fs, lock, ed->name, fullpath)) {
+				FreeFbxDirData(fs, ed);
+				fs->r2 = ERROR_INVALID_COMPONENT_NAME;
+				return DOSFALSE;
+			}
 
 			error = Fbx_getattr(fs, fullpath, &statbuf);
-			if (error)
-				continue;
+			if (error) {
+				FreeFbxDirData(fs, ed);
+				fs->r2 = FbxFuseErrno2Error(error);
+				return DOSFALSE;
+			}
 		}
 
 		if (type >= ED_COMMENT) {
 			FbxGetComment(fs, fullpath, comment, MAXPATHLEN);
-			if (comment[0] != '\0')
-				extra_size += strlen(comment) + 1;
+
+			if (comment[0] != '\0') {
+				size_t len = strlen(comment) + 1;
+
+				ed->comment = AllocVecPooled(fs->mempool, len);
+				if (ed->comment == NULL) {
+					FreeFbxDirData(fs, ed);
+					fs->r2 = ERROR_NO_FREE_STORE;
+					return DOSFALSE;
+				}
+
+				FbxStrlcpy(fs, ed->comment, comment, len);
+			}
 		}
-
-		extra_iptrs = (extra_size + sizeof(IPTR) - 1) / sizeof(IPTR);
-
-		if ((char *)&lptr[iptrs + extra_iptrs] > ((char *)buffer + len))
-			continue;
 
 		lptr++; // skip next pointer
 
@@ -2600,13 +2625,7 @@ static int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SI
 			*lptr++ = ds.ds_Minute;
 			*lptr++ = ds.ds_Tick;
 		}
-		if (type >= ED_COMMENT) {
-			if (comment[0] != '\0') {
-				*lptr++ = (IPTR)&start[iptrs];
-				strcpy((char *)&start[iptrs], comment);
-			} else
-				*lptr++ = (IPTR)"";
-		}
+		if (type >= ED_COMMENT) *lptr++ = (ed->comment != NULL) ? (IPTR)ed->comment : (IPTR)"";
 		if (type >= ED_OWNER) {
 			ULONG uid = FbxUnix2AmigaOwner(statbuf.st_uid);
 			ULONG gid = FbxUnix2AmigaOwner(statbuf.st_gid);
@@ -2616,9 +2635,12 @@ static int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SI
 		if (ctrl->eac_MatchFunc != NULL &&
 			!CallHookPkt(ctrl->eac_MatchFunc, &type, start))
 		{
+			FreeFbxDirData(fs, ed);
 			lptr = start;
 			continue;
 		}
+
+		AddTail((struct List *)&exallstate->freelist, (struct Node *)ed);
 
 		ctrl->eac_Entries++;
 
@@ -2632,7 +2654,7 @@ static int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SI
 	} else {
 		FreeFbxDirDataList(fs, &lock->dirdatalist);
 		FreeFbxExAllState(fs, exallstate);
-		ctrl->eac_LastKey = (IPTR)NULL;
+		ctrl->eac_LastKey = (IPTR)-1;
 		fs->r2 = ERROR_NO_MORE_ENTRIES;
 		return DOSFALSE;
 	}
