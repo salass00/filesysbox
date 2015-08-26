@@ -2344,8 +2344,10 @@ static int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer,
 	if (ctrl != NULL) {
 		exallstate = (struct FbxExAllState *)ctrl->eac_LastKey;
 		if (exallstate) {
-			FreeFbxDirDataList(fs, &exallstate->freelist);
-			FreeFbxExAllState(fs, exallstate);
+			if (exallstate != (APTR)-1) {
+				FreeFbxDirDataList(fs, &exallstate->freelist);
+				FreeFbxExAllState(fs, exallstate);
+			}
 			ctrl->eac_LastKey = (IPTR)NULL;
 		}
 	}
@@ -2648,15 +2650,17 @@ static int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SI
 		prev = start;
 	}
 
-	if (ctrl->eac_Entries > 0) {
-		fs->r2 = 0;
-		return DOSTRUE;
-	} else {
-		FreeFbxDirDataList(fs, &lock->dirdatalist);
-		FreeFbxExAllState(fs, exallstate);
-		ctrl->eac_LastKey = (IPTR)-1;
+	if (IsMinListEmpty(&lock->dirdatalist)) {
+		if (ctrl->eac_Entries == 0) {
+			FreeFbxDirDataList(fs, &lock->dirdatalist);
+			FreeFbxExAllState(fs, exallstate);
+			ctrl->eac_LastKey = (IPTR)-1;
+		}
 		fs->r2 = ERROR_NO_MORE_ENTRIES;
 		return DOSFALSE;
+	} else {
+		fs->r2 = 0;
+		return DOSTRUE;
 	}
 }
 

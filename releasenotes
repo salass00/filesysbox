@@ -28,3 +28,12 @@ filesysbox.library 53.4 (23.8.2015)
 
 - FbxExamineAll() now also stops scanning on any error encountered.
 
+
+filesysbox.library 53.5 (26.8.2015)
+
+- FbxExamineAll() now only returns DOSTRUE when there are more entries
+  available.
+
+- Fixed a bad pointer access in FbxExamineAllEnd() introduced by a change in
+  the last version.
+
