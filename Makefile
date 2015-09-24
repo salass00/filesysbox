@@ -13,7 +13,7 @@ LDFLAGS := -nostartfiles
 LIBS    := -ldebug
 
 ifeq ($(HOST),m68k-amigaos)
-	CFLAGS  := -noixemul $(CFLAGS)
+	CFLAGS  := -noixemul -m68020 $(CFLAGS)
 	LDFLAGS := -noixemul $(LDFLAGS)
 	LIBS    := 
 endif
