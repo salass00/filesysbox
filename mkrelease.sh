@@ -41,5 +41,5 @@ rm -f filesysbox.${HOST}.7z
 
 rm -rf ${DESTDIR}
 
-echo "filesysbox.7z created"
+echo "filesysbox.${HOST}.7z created"
 
