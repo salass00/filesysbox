@@ -22,6 +22,7 @@ mkdir -p ${DESTDIR}/filesysbox-${NUMVERS}/Developer/include/libraries
 mkdir -p ${DESTDIR}/filesysbox-${NUMVERS}/Developer/include/proto
 mkdir -p ${DESTDIR}/filesysbox-${NUMVERS}/Developer/include/sys
 
+cp -p filesysbox.readme ${DESTDIR}/filesysbox-${NUMVERS}
 cp -p LICENSE.APL ${DESTDIR}/filesysbox-${NUMVERS}
 cp -p releasenotes ${DESTDIR}/filesysbox-${NUMVERS}
 cp -p filesysbox.library ${DESTDIR}/filesysbox-${NUMVERS}/Libs
@@ -32,8 +33,11 @@ cp -p include/libraries/filesysbox.h ${DESTDIR}/filesysbox-${NUMVERS}/Developer/
 cp -p include/proto/filesysbox.h ${DESTDIR}/filesysbox-${NUMVERS}/Developer/include/proto
 cp -p include/sys/statvfs.h ${DESTDIR}/filesysbox-${NUMVERS}/Developer/include/sys
 
-rm -f filesysbox.7z
-7za u filesysbox.7z ./${DESTDIR}/filesysbox-${NUMVERS}
+sed -i "s/^Version:      xx.xx/Version:      ${NUMVERS}/" ${DESTDIR}/filesysbox-${NUMVERS}/filesysbox.readme
+sed -i "s/^Architecture: xxx/Architecture: ${HOST}/" ${DESTDIR}/filesysbox-${NUMVERS}/filesysbox.readme
+
+rm -f filesysbox.${HOST}.7z
+7za u filesysbox.${HOST}.7z ./${DESTDIR}/filesysbox-${NUMVERS}
 
 rm -rf ${DESTDIR}
 

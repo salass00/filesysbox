@@ -2,5 +2,5 @@
 *.[oa]
 # Ignore generated exe file
 filesysbox.library
-# Ignore release archive
+# Ignore release archives
 *.7z
