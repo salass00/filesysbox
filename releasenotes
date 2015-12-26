@@ -38,7 +38,9 @@ filesysbox.library 53.5 (26.8.2015)
   the last version.
 
 
-filesysbox.library 53.6 (xx.xx.2015)
+filesysbox.library 53.6 (26.12.2015)
 
 - FbxSameLock() now returns DOSTRUE if entry pointers are the same.
+
+- Removed the now useless path comparison in FbxSameLock().
 

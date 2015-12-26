@@ -2143,15 +2143,13 @@ static int FbxSameLock(struct FbxFS *fs, struct FbxLock *lock, struct FbxLock *l
 		struct FbxEntry *entry = lock->entry;
 		struct FbxEntry *entry2 = lock2->entry;
 
-		if (entry == entry2) {
+		/* Check for same entries */
+		if (entry == entry2)
 			return DOSTRUE;
-		} else if (entry->diskkey != 0 && entry2->diskkey != 0) {
-			// compare inodes
-			if (entry->diskkey == entry2->diskkey) return DOSTRUE;
-		} else {
-			// compare paths if we don't have valid inodes
-			if (FbxStrcmp(fs, entry->path, entry2->path) == 0) return DOSTRUE;
-		}
+
+		/* Compare inodes (if valid) */
+		if (entry->diskkey != 0 && entry->diskkey == entry2->diskkey)
+			return DOSTRUE;
 	}
 	return DOSFALSE;
 }
