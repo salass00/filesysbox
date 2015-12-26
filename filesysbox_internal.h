@@ -162,13 +162,13 @@ int vdebugf(const char *fmt, va_list args);
 #define FBXDB_CCONV   5
 #define FBXDB_FSOPS   6
 
-#define FBXDF_GENERAL (1 << FBXDB_GENERAL)
-#define FBXDF_PACKETS (1 << FBXDB_PACKETS)
-#define FBXDF_NOTIFY  (1 << FBXDB_NOTIFY)
-#define FBXDF_RESOLVE (1 << FBXDB_RESOLVE)
-#define FBXDF_DIR     (1 << FBXDB_DIR)
-#define FBXDF_CCONV   (1 << FBXDB_CCONV)
-#define FBXDF_FSOPS   (1 << FBXDB_FSOPS)
+#define FBXDF_GENERAL (1 << FBXDB_GENERAL) /* 0x01 */
+#define FBXDF_PACKETS (1 << FBXDB_PACKETS) /* 0x02 */
+#define FBXDF_NOTIFY  (1 << FBXDB_NOTIFY)  /* 0x04 */
+#define FBXDF_RESOLVE (1 << FBXDB_RESOLVE) /* 0x08 */
+#define FBXDF_DIR     (1 << FBXDB_DIR)     /* 0x10 */
+#define FBXDF_CCONV   (1 << FBXDB_CCONV)   /* 0x20 */
+#define FBXDF_FSOPS   (1 << FBXDB_FSOPS)   /* 0x40 */
 
 #define min(x,y) ((x)<(y)?(x):(y))
 #define max(x,y) ((x)>(y)?(x):(y))

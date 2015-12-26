@@ -2143,7 +2143,9 @@ static int FbxSameLock(struct FbxFS *fs, struct FbxLock *lock, struct FbxLock *l
 		struct FbxEntry *entry = lock->entry;
 		struct FbxEntry *entry2 = lock2->entry;
 
-		if (entry->diskkey != 0 && entry2->diskkey != 0) {
+		if (entry == entry2) {
+			return DOSTRUE;
+		} else if (entry->diskkey != 0 && entry2->diskkey != 0) {
 			// compare inodes
 			if (entry->diskkey == entry2->diskkey) return DOSTRUE;
 		} else {
@@ -3429,22 +3431,22 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 		return NULL;
 	}
 
-	vol->dl.dl_Type = DLT_VOLUME;
-	vol->dl.dl_Task = fs->fsport;
+	vol->dl.dl_Type     = DLT_VOLUME;
+	vol->dl.dl_Task     = fs->fsport;
 	vol->dl.dl_DiskType = fs->dostype;
 #if defined(__AROS__) && defined(AROS_FAST_BSTR)
-	vol->dl.dl_Name = (STRPTR)vol->volname;
+	vol->dl.dl_Name     = (STRPTR)vol->volname;
 #else
-	vol->dl.dl_Name = MKBADDR(&vol->volnamelen);
+	vol->dl.dl_Name     = MKBADDR(&vol->volnamelen);
 #endif
 
 	FbxTimeSpec2DS(fs, &statbuf.st_ctim, &vol->dl.dl_VolumeDate);
 	FbxStrlcpy(fs, vol->volname, conn->volume_name, CONN_VOLUME_NAME_BYTES);
 	vol->volnamelen = strlen(vol->volname);
 
-	vol->fs = fs;
+	vol->fs           = fs;
 	vol->writeprotect = FALSE;
-	vol->vflags = 0;
+	vol->vflags       = 0;
 
 	NEWLIST(&vol->unres_notifys);
 	NEWLIST(&vol->locklist);
