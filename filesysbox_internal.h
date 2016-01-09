@@ -349,11 +349,6 @@ struct FbxFS {
 #define ACTIVE_UPDATE_TIMEOUT_MILLIS 10000
 #define INACTIVE_UPDATE_TIMEOUT_MILLIS 500
 
-#define GetSysBase     struct Library *SysBase     = fs->sysbase;
-#define GetDOSBase     struct Library *DOSBase     = fs->dosbase;
-#define GetUtilityBase struct Library *UtilityBase = fs->utilitybase;
-#define GetTimerBase   struct Device  *TimerBase   = fs->timerbase;
-
 #define CHECKVOLUME(errbool) \
 	if (NOVOLUME(fs->currvol)) { \
 		if (fs->inhibit) \

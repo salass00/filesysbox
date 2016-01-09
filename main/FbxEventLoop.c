@@ -25,6 +25,8 @@ LONG FbxEventLoop(
 	REG(a6, struct FileSysBoxBase *libBase))
 {
 #endif
+	struct Library *SysBase = fs->sysbase;
+	struct Library *DOSBase = fs->dosbase;
 	struct NotifyRequest nr;
 	LONG run = TRUE;
 
@@ -40,9 +42,6 @@ LONG FbxEventLoop(
 	const ULONG wsigs = packsig|notrepsig|timesig|dbgflagssig|diskchangesig;
 
 	FbxStartTimer(fs);
-
-	GetSysBase
-	GetDOSBase
 
 	bzero(&nr, sizeof(nr));
 	nr.nr_Name = (STRPTR)"ENV:FBX_DBGFLAGS";

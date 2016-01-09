@@ -26,7 +26,7 @@ void FbxUninstallTimerCallback(
 	ADEBUGF("FbxUninstallTimerCallback(%#p, %#p)\n", fs, cb);
 
 	if (fs != NULL && cb != NULL) {
-		GetSysBase
+		struct Library *SysBase = fs->sysbase;
 
 		Remove((struct Node *)&cb->fschain);
 		FreeFbxTimerCallbackData(fs, cb);

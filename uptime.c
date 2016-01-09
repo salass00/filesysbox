@@ -8,21 +8,19 @@
 #include "filesysbox_internal.h"
 
 void FbxInitUpTime(struct FbxFS *fs) {
+	struct Device *TimerBase = fs->timerbase;
 	struct EClockVal ev;
-
-	GetTimerBase
 
 	ReadEClock(&ev);
 	fs->eclock_initial = ((UQUAD)ev.ev_hi << 32)|((UQUAD)ev.ev_lo);
 }
 
 void FbxGetUpTime(struct FbxFS *fs, struct timeval *tv) {
+	struct Device *TimerBase = fs->timerbase;
 	struct EClockVal ev;
 	ULONG freq;
 	UQUAD eclock_current;
 	UQUAD eclock_elapsed;
-
-	GetTimerBase
 
 	freq = ReadEClock(&ev);
 	eclock_current = ((UQUAD)ev.ev_hi << 32)|((UQUAD)ev.ev_lo);

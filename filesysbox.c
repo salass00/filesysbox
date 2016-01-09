@@ -81,14 +81,13 @@ INTERRUPTPROTO(FbxDiskChangeInterrupt, int, APTR custom, APTR data) {
 }
 
 struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskChangeHandlerFunc func) {
+	struct Library *SysBase = fs->sysbase;
 	struct FbxDiskChangeHandler *dch;
 	struct FileSysStartupMsg *fssm = fs->fssm;
 	struct MsgPort *mp = NULL;
 	struct IOStdReq *io = NULL;
 	struct Interrupt *interrupt = NULL;
 	char devname[256];
-
-	GetSysBase
 
 	dch = AllocPooled(fs->mempool, sizeof(*dch));
 	if (dch == NULL) goto cleanup;
@@ -148,11 +147,10 @@ void FbxRemDiskChangeHandler(struct FbxFS *fs) {
 	struct FbxDiskChangeHandler *dch = fs->diskchangehandler;
 
 	if (dch != NULL) {
+		struct Library *SysBase = fs->sysbase;
 		struct IOStdReq *io = dch->io;
 		struct MsgPort *mp = io->io_Message.mn_ReplyPort;
 		struct Interrupt *interrupt = (struct Interrupt *)io->io_Data;
-
-		GetSysBase
 
 		if (CheckIO((struct IORequest *)io) == NULL) {
 			io->io_Command = TD_REMCHANGEINT;
@@ -198,7 +196,7 @@ int FbxStrcmp(struct FbxFS *fs, const char *s1, const char *s2) {
 		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
 			return utf8_stricmp(s1, s2);
 		} else {
-			GetUtilityBase
+			struct Library *UtilityBase = fs->utilitybase;
 			return Stricmp((CONST_STRPTR)s1, (CONST_STRPTR)s2);
 		}
 	}
@@ -211,7 +209,7 @@ int FbxStrncmp(struct FbxFS *fs, const char *s1, const char *s2, size_t n) {
 		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
 			return utf8_strnicmp(s1, s2, n);
 		} else {
-			GetUtilityBase
+			struct Library *UtilityBase = fs->utilitybase;
 			return Strnicmp((CONST_STRPTR)s1, (CONST_STRPTR)s2, n);
 		}
 	}
@@ -312,6 +310,7 @@ static struct FbxEntry *FbxFindEntry(struct FbxFS *fs, const char *path) {
 }
 
 static struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mode) {
+	struct Library *SysBase = fs->sysbase;
 	struct FbxLock *lock;
 
 	DEBUGF("FbxLockEntry(%#p, %#p, %d)\n", fs, e, mode);
@@ -332,8 +331,6 @@ static struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mo
 		fs->r2 = ERROR_OBJECT_IN_USE;
 		return NULL;
 	}
-
-	GetSysBase
 
 	lock = AllocFbxLock(fs);
 	if (lock == NULL) {
@@ -369,11 +366,11 @@ static struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mo
 }
 
 static void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd) {
-	DEBUGF("FreeFbxDirData(%#p, %#p)\n", fs, dd);
-
 #ifdef __AROS__
-	GetSysBase
+	struct Library *SysBase = fs->sysbase;
 #endif
+
+	DEBUGF("FreeFbxDirData(%#p, %#p)\n", fs, dd);
 
 	if (dd != NULL) {
 		if (dd->comment != NULL)
@@ -398,9 +395,9 @@ static void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list) {
 }
 
 static void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock) {
-	DEBUGF("FbxEndLock(%#p, %#p)\n", fs, lock);
+	struct Library *SysBase = fs->sysbase;
 
-	GetSysBase
+	DEBUGF("FbxEndLock(%#p, %#p)\n", fs, lock);
 
 	Remove((struct Node *)&lock->entrychain);
 	Remove((struct Node *)&lock->volumechain);
@@ -421,11 +418,10 @@ static void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock) {
 }
 
 static void FbxAddEntry(struct FbxFS *fs, struct FbxEntry *e) {
+	struct Library *SysBase = fs->sysbase;
 	ULONG i;
 
 	DEBUGF("FbxAddEntry(%#p, %#p)\n", fs, e);
-
-	GetSysBase
 
 	i = FbxHashPath(fs, e->path);
 	AddTail((struct List *)&fs->currvol->entrytab[i], (struct Node *)&e->hashchain);
@@ -537,11 +533,10 @@ static int FbxFuseErrno2Error(int error) {
 }
 
 static void FbxDoNotifyRequest(struct FbxFS *fs, struct NotifyRequest *nr) {
+	struct Library *SysBase = fs->sysbase;
 	struct NotifyMessage *notifymsg;
 
 	NDEBUGF("FbxDoNotifyRequest(%#p, %#p)\n", fs, nr);
-
-	GetSysBase
 
 	if (nr->nr_Flags & NRF_SEND_MESSAGE) {
 		if ((nr->nr_MsgCount > 0) && (nr->nr_Flags & NRF_WAIT_REPLY)) {
@@ -600,11 +595,10 @@ static void FbxSetEntryPath(struct FbxFS *fs, struct FbxEntry *e, const char *p)
 }
 
 static struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int type, QUAD id) {
+	struct Library *SysBase = fs->sysbase;
 	struct FbxEntry *e;
 
 	DEBUGF("FbxSetupEntry(%#p, '%s', %d, 0x%llx)\n", fs, path, type, id);
-
-	GetSysBase
 
 	e = AllocFbxEntry(fs);
 	if (e == NULL) {
@@ -628,9 +622,9 @@ static struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int ty
 static void FbxCleanupEntry(struct FbxFS *fs, struct FbxEntry *e) {
 	DEBUGF("FbxCleanupEntry(%#p, %#p)\n", fs, e);
 	if (e != NULL) {
-		DEBUGF("FbxCleanupEntry: path '%s'\n", e->path);
+		struct Library *SysBase = fs->sysbase;
 
-		GetSysBase
+		DEBUGF("FbxCleanupEntry: path '%s'\n", e->path);
 
 		if (IsMinListEmpty(&e->notifylist) && IsMinListEmpty(&e->locklist)) {
 			Remove((struct Node *)&e->hashchain);
@@ -850,14 +844,13 @@ static int Fbx_removexattr(struct FbxFS *fs, const char *path, const char *attr)
 }
 
 static void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e) {
+	struct Library *SysBase = fs->sysbase;
 	struct FbxNotifyNode *nn;
 	struct MinNode *chain, *succ;
 	struct NotifyRequest *nr;
 	char *fullpath = fs->pathbuf[2];
 
 	NDEBUGF("FbxTryResolveNotify(%#p, %#p)\n", fs, e);
-
-	GetSysBase
 
 	chain = fs->currvol->unres_notifys.mlh_Head;
 	while ((succ = chain->mln_Succ) != NULL) {
@@ -937,6 +930,7 @@ static void FbxClearArchiveFlags(struct FbxFS *fs, const char *fullpath) {
 }
 
 static int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock) {
+	struct Library *SysBase = fs->sysbase;
 	int error;
 
 	PDEBUGF("FbxOpenLock(%#p, %#p, %#p)\n", fs, fh, lock);
@@ -959,8 +953,6 @@ static int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *
 		fs->r2 = ERROR_OBJECT_IN_USE;
 		return DOSFALSE;
 	}
-
-	GetSysBase
 
 	lock->info = AllocFuseFileInfo(fs);
 	if (lock->info == NULL) {
@@ -989,11 +981,10 @@ static int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *
 }
 
 static int FbxCreateOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock, mode_t mode) {
+	struct Library *SysBase = fs->sysbase;
 	int error;
 
 	PDEBUGF("FbxCreateOpenLock(%#p, %#p, %#p, 0%o)\n", fs, fh, lock, mode);
-
-	GetSysBase
 
 	CHECKLOCK(lock, DOSFALSE);
 
@@ -1210,12 +1201,11 @@ static int FbxOpenFile(struct FbxFS *fs, struct FileHandle *fh,
 }
 
 static void FbxUnResolveNotifys(struct FbxFS *fs, struct FbxEntry *e) {
+	struct Library *SysBase = fs->sysbase;
 	struct MinNode *chain, *succ;
 	struct FbxNotifyNode *nn;
 
 	NDEBUGF("unresolve_notifys(%#p, %#p)\n", fs, e);
-
-	GetSysBase
 
 	// move possible notifys onto unresolved list
 	chain = e->notifylist.mlh_Head;
@@ -1373,6 +1363,7 @@ static int FbxUnLockObject(struct FbxFS *fs, struct FbxLock *lock) {
 }
 
 static int FbxCloseFile(struct FbxFS *fs, struct FbxLock *lock) {
+	struct Library *SysBase = fs->sysbase;
 	struct FbxEntry *e;
 
 	PDEBUGF("FbxCloseFile(%#p, %#p)\n", fs, lock);
@@ -1380,8 +1371,6 @@ static int FbxCloseFile(struct FbxFS *fs, struct FbxLock *lock) {
 	CHECKVOLUME(DOSFALSE);
 
 	CHECKLOCK(lock, DOSFALSE);
-
-	GetSysBase
 
 	e = lock->entry;
 
@@ -1726,10 +1715,9 @@ static int FbxDeleteObject(struct FbxFS *fs, struct FbxLock *lock, const char *n
 }
 
 static void FbxUpdatePaths(struct FbxFS *fs, const char *oldpath, const char *newpath) {
+	struct Library *SysBase = fs->sysbase;
 	char *tstr = fs->pathbuf[4];
 	struct MinNode *chain, *succ;
-
-	GetSysBase
 
 	// TODO: unresolve+tryresolve notify for affected entries..
 
@@ -1769,6 +1757,7 @@ static BOOL FbxIsParent(struct FbxFS *fs, const char *parent, const char *child)
 static int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	struct FbxLock *lock2, const char *name2)
 {
+	struct Library *SysBase = fs->sysbase;
 	char *fullpath = fs->pathbuf[0];
 	char *fullpath2 = fs->pathbuf[1];
 	struct FbxEntry *e;
@@ -1797,8 +1786,6 @@ static int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *n
 
 	CHECKSTRING(name, DOSFALSE);
 	CHECKSTRING(name2, DOSFALSE);
-
-	GetSysBase
 
 	if (!FbxLockName2Path(fs, lock, name, fullpath) ||
 		!FbxLockName2Path(fs, lock2, name2, fullpath2))
@@ -2335,11 +2322,10 @@ static int FbxChangeMode(struct FbxFS *fs, struct FbxLock *lock, int mode) {
 static int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int len,
 	int type, struct ExAllControl *ctrl)
 {
+	struct Library *SysBase = fs->sysbase;
 	struct FbxExAllState *exallstate;
 
 	PDEBUGF("FbxExamineAllEnd(%#p, %#p, %#p, %d, %d, %#p)\n", fs, lock, buffer, len, type, ctrl);
-
-	GetSysBase
 
 	if (ctrl != NULL) {
 		exallstate = (struct FbxExAllState *)ctrl->eac_LastKey;
@@ -2361,10 +2347,9 @@ static int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer,
 static int dir_fill_func(void *udata, const char *name, const struct fbx_stat *stat, fbx_off_t offset) {
 	struct FbxLock *lock = udata;
 	struct FbxFS *fs = lock->fs;
+	struct Library *SysBase = fs->sysbase;
 	struct FbxDirData *ed;
 	size_t len;
-
-	GetSysBase
 
 	if (name == NULL) return 2;
 
@@ -2439,9 +2424,8 @@ static int FbxReadDir(struct FbxFS *fs, struct FbxLock *lock) {
 	int error;
 
 	if (FSOP opendir != FSOP open) {
+		struct Library *SysBase = fs->sysbase;
 		struct fuse_file_info *fi;
-
-		GetSysBase
 
 		fi = AllocFuseFileInfo(fs);
 		if (fi == NULL) {
@@ -2480,6 +2464,9 @@ static int FbxReadDir(struct FbxFS *fs, struct FbxLock *lock) {
 static int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,
 	int type, struct ExAllControl *ctrl)
 {
+	struct Library *SysBase     = fs->sysbase;
+	struct Library *DOSBase     = fs->dosbase;
+	struct Library *UtilityBase = fs->utilitybase;
 	struct FbxDirData *ed = NULL;
 	int error, iptrs;
 	struct FbxExAllState *exallstate;
@@ -2497,10 +2484,6 @@ static int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SI
 		fs->r2 = ERROR_NO_DISK;
 		return DOSFALSE;
 	}
-
-	GetSysBase
-	GetDOSBase
-	GetUtilityBase
 
 	ctrl->eac_Entries = 0;
 
@@ -2729,6 +2712,7 @@ static int FbxExamineObject(struct FbxFS *fs, struct FbxLock *lock, struct FileI
 }
 
 static int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock *fib) {
+	struct Library *SysBase = fs->sysbase;
 	struct FbxDirData *ed;
 	struct fbx_stat statbuf;
 	int error;
@@ -2744,8 +2728,6 @@ static int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInf
 		fs->r2 = ERROR_NO_DISK;
 		return DOSFALSE;
 	}
-
-	GetSysBase
 
 	if (!lock->dirscan) {
 		if (!FbxReadDir(fs, lock)) {
@@ -2779,6 +2761,7 @@ static int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInf
 }
 
 static int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify) {
+	struct Library *SysBase = fs->sysbase;
 	struct fbx_stat statbuf;
 	struct FbxEntry *e;
 	struct FbxNotifyNode *nn;
@@ -2789,8 +2772,6 @@ static int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify) {
 	PDEBUGF("FbxAddNotify(%#p, %#p)\n", fs, notify);
 
 	CHECKVOLUME(DOSFALSE);
-
-	GetSysBase
 
 	notify->nr_notifynode = (IPTR)NULL;
 	notify->nr_MsgCount = 0;
@@ -2863,11 +2844,10 @@ static int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify) {
 }
 
 static int FbxRemoveNotify(struct FbxFS *fs, struct NotifyRequest *nr) {
+	struct Library *SysBase = fs->sysbase;
 	struct FbxNotifyNode *nn;
 
 	PDEBUGF("action_rem_notify(%#p, %#p)\n", fs, nr);
-
-	GetSysBase
 
 	if (nr->nr_Handler != fs->fsport) {
 		fs->r2 = 0;
@@ -3282,10 +3262,9 @@ static SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
 }
 
 static void FbxReturnPacket(struct FbxFS *fs, struct DosPacket *pkt, SIPTR r1, SIPTR r2) {
+	struct Library *SysBase = fs->sysbase;
 	struct Message *msg;
 	struct MsgPort *replyport;
-
-	GetSysBase
 
 	pkt->dp_Res1 = r1;  
 	pkt->dp_Res2 = r2;
@@ -3296,13 +3275,12 @@ static void FbxReturnPacket(struct FbxFS *fs, struct DosPacket *pkt, SIPTR r1, S
 }
 
 void FbxHandlePackets(struct FbxFS *fs) {
+	struct Library *SysBase = fs->sysbase;
 	struct Message *msg;
 	struct DosPacket *pkt;
 	SIPTR r1;
 
 	DEBUGF("FbxHandlePackets(%#p)\n", fs);
-
-	GetSysBase
 
 	while ((msg = GetMsg(fs->fsport)) != NULL) {
 		pkt = (struct DosPacket *)msg->mn_Node.ln_Name;
@@ -3312,12 +3290,11 @@ void FbxHandlePackets(struct FbxFS *fs) {
 }
 
 void FbxHandleNotifyReplies(struct FbxFS *fs) {
+	struct Library *SysBase = fs->sysbase;
 	struct NotifyMessage *nm;
 	struct NotifyRequest *nr;
 
 	NDEBUGF("FbxHandleNotifyReplies(%#p)\n", fs);
-
-	GetSysBase
 
 	while ((nm = (struct NotifyMessage *)GetMsg(fs->notifyreplyport)) != NULL) {
 		nr = nm->nm_NReq;
@@ -3333,14 +3310,13 @@ void FbxHandleNotifyReplies(struct FbxFS *fs) {
 }
 
 static void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE class) {
+	struct Library *SysBase = fs->sysbase;
 	struct MsgPort *inputmp;
 	struct IOStdReq *inputio;
 	struct InputEvent ie;
 	struct timeval tv;
 
 	DEBUGF("FbxNotifyDiskChange(%#p, %#x)\n", fs, class);
-
-	GetSysBase
 
 	inputmp = CreateMsgPort();
 	inputio = CreateIORequest(inputmp, sizeof(struct IOStdReq));
@@ -3369,6 +3345,10 @@ static void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE class) {
 }
 
 struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
+	struct Library *SysBase = fs->sysbase;
+#ifndef NODEBUG
+	struct Library *DOSBase = fs->dosbase;
+#endif
 	struct fuse_conn_info *conn = &fs->conn;
 	APTR initret;
 	int error, i, rc;
@@ -3385,11 +3365,6 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 	if (fs->inhibit) {
 		return fs->currvol = NULL;
 	}
-
-	GetSysBase
-#ifndef NODEBUG
-	GetDOSBase
-#endif
 
 	bzero(conn, sizeof(*conn));
 
@@ -3481,6 +3456,7 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 }
 
 void FbxCleanupVolume(struct FbxFS *fs) {
+	struct Library *SysBase = fs->sysbase;
 	struct FbxVolume *vol = fs->currvol;
 
 	// do nothing if we don't have a volume
@@ -3488,8 +3464,6 @@ void FbxCleanupVolume(struct FbxFS *fs) {
 		fs->currvol = NULL;
 		return;
 	}
-
-	GetSysBase
 
 	// only notify about disk removal if we have a bad volume.
 	if (BADVOLUME(vol)) {
@@ -3541,12 +3515,11 @@ void FbxCleanupVolume(struct FbxFS *fs) {
 }
 
 struct timerequest *FbxSetupTimerIO(struct FbxFS *fs) {
+	struct Library *SysBase = fs->sysbase;
 	struct MsgPort *mp;
 	struct timerequest *tr;
 
 	DEBUGF("FbxSetupTimerIO(%#p)\n", fs);
-
-	GetSysBase
 
 	mp = CreateMsgPort();
 	tr = CreateIORequest(mp, sizeof(*tr));
@@ -3572,10 +3545,9 @@ void FbxCleanupTimerIO(struct FbxFS *fs) {
 	DEBUGF("FbxCleanupTimerIO(%#p)\n", fs);
 
 	if (fs->timerbase != NULL) {
+		struct Library *SysBase = fs->sysbase;
 		struct timerequest *tr = fs->timerio;
 		struct MsgPort *mp = tr->tr_node.io_Message.mn_ReplyPort;
-
-		GetSysBase
 
 		CloseDevice((struct IORequest *)tr);
 		DeleteIORequest(tr);
@@ -3585,8 +3557,9 @@ void FbxCleanupTimerIO(struct FbxFS *fs) {
 
 void FbxStopTimer(struct FbxFS *fs) {
 	if (fs->timerbusy) {
+		struct Library *SysBase = fs->sysbase;
 		struct timerequest *tr = fs->timerio;
-		GetSysBase
+
 		AbortIO((struct IORequest *)tr);
 		WaitIO((struct IORequest *)tr);
 		fs->timerbusy = FALSE;
@@ -3595,8 +3568,9 @@ void FbxStopTimer(struct FbxFS *fs) {
 
 void FbxStartTimer(struct FbxFS *fs) {
 	if (!fs->timerbusy) {
+		struct Library *SysBase = fs->sysbase;
 		struct timerequest *tr = fs->timerio;
-		GetSysBase
+
 		tr->tr_node.io_Command = TR_ADDREQUEST;
 		tr->tr_time.tv_secs = 0;
 		tr->tr_time.tv_micro = FBX_TIMER_MICROS;
@@ -3606,11 +3580,10 @@ void FbxStartTimer(struct FbxFS *fs) {
 }
 
 void FbxHandleTimerEvent(struct FbxFS *fs) {
+	struct Library *SysBase = fs->sysbase;
 	struct Message *msg;
 
 	//DEBUGF("FbxHandleTimerEvent(%#p)\n", fs);
-
-	GetSysBase
 
 	msg = GetMsg(fs->timerio->tr_node.io_Message.mn_ReplyPort);
 	if (msg != NULL) {

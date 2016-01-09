@@ -156,14 +156,13 @@ struct Process *StartDosListProc(struct FileSysBoxBase *libBase) {
 }
 
 static int FbxAsyncDosListCmd(struct FbxFS *fs, struct FbxVolume *vol, int cmd, const char *name) {
+	struct Library *SysBase = fs->sysbase;
+	struct Library *DOSBase = fs->dosbase;
 	struct DosList *dl = NULL;
 	int i, res;
 
 	if (vol == NULL)
 		return FALSE;
-
-	GetSysBase
-	GetDOSBase
 
 	if (IsListEmpty(&fs->dlproc_port->mp_MsgList)) {
 		for (i = 0; i < 10; i++) {

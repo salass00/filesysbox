@@ -25,9 +25,8 @@ void FbxCleanupFS(
 	ADEBUGF("FbxCleanupFS(%#p)\n", fs);
 
 	if (fs != NULL) {
+		struct Library *SysBase = fs->sysbase;
 		struct MinNode *chain;
-
-		GetSysBase
 
 		// clear msgport in device node.
 		if (fs->devnode != NULL) fs->devnode->dn_Task = NULL;

@@ -18,7 +18,7 @@ static int dumopfunc(void) { return -ENOSYS; }
 static int dumopfunc2(void) { return 0; }
 
 static void FbxDiskChangeHandler(struct FbxFS *fs) {
-	GetSysBase
+	struct Library *SysBase = fs->sysbase;
 	fs->dosetup = TRUE;
 	Signal(&fs->thisproc->pr_Task, 1UL << fs->diskchangesig);
 }
@@ -251,10 +251,9 @@ static void HexToLong(CONST_STRPTR str, ULONG *res) {
 }
 
 void FbxReadDebugFlags(struct FbxFS *fs) {
+	struct Library *DOSBase = fs->dosbase;
 	TEXT flagbuf[32];
 	ULONG flags = 0;
-
-	GetDOSBase
 
 	if (GetVar((CONST_STRPTR)"FBX_DBGFLAGS", flagbuf, sizeof(flagbuf), 0) > 0) {
 		HexToLong(flagbuf, &flags);

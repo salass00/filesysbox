@@ -22,9 +22,10 @@ void FbxSignalDiskChange(
 	REG(a6, struct FileSysBoxBase *libBase))
 {
 #endif
+	struct Library *SysBase = fs->sysbase;
+
 	ADEBUGF("FbxSignalDiskChange(%#p)\n", fs);
 
-	GetSysBase
 	fs->dosetup = TRUE;
 	Signal(&fs->thisproc->pr_Task, 1UL << fs->diskchangesig);
 
