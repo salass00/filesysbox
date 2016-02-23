@@ -34,12 +34,12 @@ LONG FbxEventLoop(
 
 	fs->dosetup = TRUE;
 
-	const ULONG packsig = 1UL << fs->fsport->mp_SigBit;
-	const ULONG notrepsig = 1UL << fs->notifyreplyport->mp_SigBit;
-	const ULONG timesig = 1UL << fs->timerio->tr_node.io_Message.mn_ReplyPort->mp_SigBit;
-	const ULONG dbgflagssig = 1UL << fs->dbgflagssig;
+	const ULONG packsig       = 1UL << fs->fsport->mp_SigBit;
+	const ULONG notrepsig     = 1UL << fs->notifyreplyport->mp_SigBit;
+	const ULONG timesig       = 1UL << fs->timerio->tr_node.io_Message.mn_ReplyPort->mp_SigBit;
+	const ULONG dbgflagssig   = 1UL << fs->dbgflagssig;
 	const ULONG diskchangesig = 1UL << fs->diskchangesig;
-	const ULONG wsigs = packsig|notrepsig|timesig|dbgflagssig|diskchangesig;
+	const ULONG wsigs         = packsig | notrepsig | timesig | dbgflagssig | diskchangesig;
 
 	FbxStartTimer(fs);
 
@@ -59,7 +59,7 @@ LONG FbxEventLoop(
 		}
 
 		const ULONG usigs = fs->signalcallbacksignals;
-		const ULONG rsigs = Wait(wsigs|usigs);
+		const ULONG rsigs = Wait(wsigs | usigs);
 
 		if (rsigs & dbgflagssig) FbxReadDebugFlags(fs);
 		if (rsigs & packsig) FbxHandlePackets(fs);

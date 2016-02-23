@@ -66,7 +66,7 @@ struct FileSysBoxBase {
 	struct Library        *aroscbase;
 #endif
 	struct Process        *dlproc;
-	ULONG                  dlproc_refcount;
+	volatile ULONG         dlproc_refcount;
 	struct SignalSemaphore dlproc_sem;
 };
 

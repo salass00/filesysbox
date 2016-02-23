@@ -44,7 +44,6 @@ static int FbxDosListProc(void) {
 	struct Message *msg;
 #endif
 	struct FbxAsyncMsg *async_msg;
-	ULONG signals;
 
 	proc = (struct Process *)FindTask(NULL);
 	port = &proc->pr_MsgPort;
@@ -59,7 +58,7 @@ static int FbxDosListProc(void) {
 	DOSBase = libBase->dosbase;
 
 	for (;;) {
-		signals = Wait(SIGBREAKF_CTRL_C|(1UL << port->mp_SigBit));
+		Wait(SIGBREAKF_CTRL_C | (1UL << port->mp_SigBit));
 
 		if (!IsListEmpty(&port->mp_MsgList)) {
 			LockDosList(LDF_ALL|LDF_WRITE);
@@ -90,7 +89,7 @@ static int FbxDosListProc(void) {
 			UnLockDosList(LDF_ALL|LDF_WRITE);
 		}
 
-		if (signals & SIGBREAKF_CTRL_C) {
+		if (libBase->dlproc_refcount == 0) {
 			ObtainSemaphore(&libBase->dlproc_sem);
 			if (libBase->dlproc_refcount == 0)
 				break;
@@ -101,9 +100,8 @@ static int FbxDosListProc(void) {
 	while ((async_msg = (struct FbxAsyncMsg *)GetMsg(port)) != NULL)
 		FreeMem(async_msg, async_msg->msg.mn_Length);
 
-	libBase->dlproc = NULL;
-
 	Forbid();
+	libBase->dlproc = NULL;
 	ReleaseSemaphore(&libBase->dlproc_sem);
 	return 0;
 
