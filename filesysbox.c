@@ -111,15 +111,12 @@ struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskCh
 	interrupt->is_Node.ln_Type = NT_INTERRUPT;
 #ifdef __AROS__
 	interrupt->is_Node.ln_Name = (char *)AROS_BSTR_ADDR(fs->devnode->dn_Name);
+	interrupt->is_Code         = (void (*)())FbxDiskChangeInterrupt;
 #else
 	interrupt->is_Node.ln_Name = (char *)BADDR(fs->devnode->dn_Name) + 1;
+	interrupt->is_Code         = (void (*)())ENTRY(FbxDiskChangeInterrupt);
 #endif
 	interrupt->is_Data = fs;
-#ifdef __AROS__
-	interrupt->is_Code = (void (*)())FbxDiskChangeInterrupt;
-#else
-	interrupt->is_Code = (void (*)())ENTRY(FbxDiskChangeInterrupt);
-#endif
 
 	io->io_Command = TD_ADDCHANGEINT;
 	io->io_Data    = interrupt;
@@ -332,7 +329,7 @@ static struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mo
 		return NULL;
 	}
 
-	lock = AllocFbxLock(fs);
+	lock = AllocFbxLock();
 	if (lock == NULL) {
 		fs->r2 = ERROR_NO_FREE_STORE;
 		return NULL;
@@ -341,21 +338,22 @@ static struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mo
 	if (mode == EXCLUSIVE_LOCK)
 		e->xlock = TRUE;
 
-	lock->link = ZERO;
-	lock->diskid = (IPTR)e->diskkey;
-	lock->access = mode;
-	lock->taskmp = fs->fsport;
+	lock->link       = ZERO;
+	lock->diskid     = (IPTR)e->diskkey;
+	lock->access     = mode;
+	lock->taskmp     = fs->fsport;
 	lock->volumebptr = MKBADDR(fs->currvol);
-	lock->entry = e;
-	lock->info = NULL;
-	lock->dostype = fs->dostype;
-	lock->fsvol = fs->currvol;
-	lock->fs = fs;
-	lock->fh = NULL;
+	lock->entry      = e;
+	lock->info       = NULL;
+	lock->dostype    = fs->dostype;
+	lock->fsvol      = fs->currvol;
+	lock->fs         = fs;
+	lock->fh         = NULL;
+	lock->dirscan    = FALSE;
+	lock->filepos    = 0;
+	lock->flags      = 0;
+
 	NEWLIST(&lock->dirdatalist);
-	lock->dirscan = FALSE;
-	lock->filepos = 0;
-	lock->flags = 0;
 
 	AddTail((struct List *)&e->locklist, (struct Node *)&lock->entrychain);
 	AddTail((struct List *)&lock->fsvol->locklist, (struct Node *)&lock->volumechain);
@@ -414,7 +412,7 @@ static void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock) {
 		FreeFbxVolume(lock->fsvol);
 	}
 
-	FreeFbxLock(fs, lock);
+	FreeFbxLock(lock);
 }
 
 static void FbxAddEntry(struct FbxFS *fs, struct FbxEntry *e) {
