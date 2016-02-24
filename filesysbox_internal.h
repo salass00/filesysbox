@@ -65,9 +65,10 @@ struct FileSysBoxBase {
 #ifdef __AROS__
 	struct Library        *aroscbase;
 #endif
+
 	struct Process        *dlproc;
-	volatile ULONG         dlproc_refcount;
 	struct SignalSemaphore dlproc_sem;
+	volatile ULONG         dlproc_refcount;
 };
 
 #ifdef NODEBUG
@@ -304,6 +305,7 @@ struct FbxDiskChangeHandler {
 struct FbxFS {
 	struct FileSysBoxBase       *libbase;
 	struct MsgPort              *dlproc_port;
+	struct MsgPort              *lhproc_port;
 	struct Library              *sysbase;
 	struct Library              *dosbase;
 	struct Library              *utilitybase;
@@ -438,8 +440,8 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 #define AllocFbxEntry(fs) AllocStructurePooled(fs, FbxEntry)
 #define FreeFbxEntry(fs, e) FreeStructurePooled(fs, e, FbxEntry)
 
-#define AllocFbxLock() AllocStructureNoClear(FbxLock)
-#define FreeFbxLock(lock) FreeStructure(lock, FbxLock)
+#define AllocFbxLock(fs) AllocStructurePooled(fs, FbxLock)
+#define FreeFbxLock(fs, lock) FreeStructurePooled(fs, lock, FbxLock)
 
 #define AllocFbxNotifyNode() AllocStructure(FbxNotifyNode)
 #define FreeFbxNotifyNode(nn) FreeStructure(nn, FbxNotifyNode)

@@ -103,7 +103,7 @@ static int FbxDosListProc(void) {
 	Forbid();
 	libBase->dlproc = NULL;
 	ReleaseSemaphore(&libBase->dlproc_sem);
-	return 0;
+	return RETURN_OK;
 
 #ifdef __AROS__
 	AROS_USERFUNC_EXIT
@@ -111,10 +111,6 @@ static int FbxDosListProc(void) {
 }
 
 struct Process *StartDosListProc(struct FileSysBoxBase *libBase) {
-#ifndef __AROS__
-	struct Library *SysBase = libBase->sysbase;
-	static struct Message msg;
-#endif
 	struct Library *DOSBase = libBase->dosbase;
 	struct Process *dlproc;
 
@@ -142,6 +138,9 @@ struct Process *StartDosListProc(struct FileSysBoxBase *libBase) {
 
 #ifndef __AROS__
 	if (dlproc != NULL) {
+		struct Library *SysBase = libBase->sysbase;
+		static struct Message msg;
+
 		bzero(&msg, sizeof(msg));
 		msg.mn_Node.ln_Type = NT_MESSAGE;
 		msg.mn_Node.ln_Name = (STRPTR)libBase;

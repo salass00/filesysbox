@@ -31,6 +31,7 @@ void FbxCleanupFS(
 		// clear msgport in device node.
 		if (fs->devnode != NULL) fs->devnode->dn_Task = NULL;
 
+		// doslist process
 		if (fs->dlproc_port != NULL) {
 			ObtainSemaphore(&libBase->dlproc_sem);
 			if (--libBase->dlproc_refcount == 0)

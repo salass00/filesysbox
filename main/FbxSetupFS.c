@@ -194,15 +194,14 @@ struct FbxFS *FbxSetupFS(
 		if (FbxAddDiskChangeHandler(fs, FbxDiskChangeHandler) == NULL) goto error;
 	}
 
+	// doslist process
 	ObtainSemaphore(&libBase->dlproc_sem);
-	if (libBase->dlproc == NULL)
-		libBase->dlproc = StartDosListProc(libBase);
+	if (libBase->dlproc == NULL) libBase->dlproc = StartDosListProc(libBase);
 	if (libBase->dlproc != NULL) {
 		libBase->dlproc_refcount++;
 		fs->dlproc_port = &libBase->dlproc->pr_MsgPort;
 	}
 	ReleaseSemaphore(&libBase->dlproc_sem);
-
 	if (libBase->dlproc == NULL) goto error;
 
 	FbxReadDebugFlags(fs);

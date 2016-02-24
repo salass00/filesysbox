@@ -329,7 +329,7 @@ static struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mo
 		return NULL;
 	}
 
-	lock = AllocFbxLock();
+	lock = AllocFbxLock(fs);
 	if (lock == NULL) {
 		fs->r2 = ERROR_NO_FREE_STORE;
 		return NULL;
@@ -412,7 +412,7 @@ static void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock) {
 		FreeFbxVolume(lock->fsvol);
 	}
 
-	FreeFbxLock(lock);
+	FreeFbxLock(fs, lock);
 }
 
 static void FbxAddEntry(struct FbxFS *fs, struct FbxEntry *e) {
@@ -3260,15 +3260,13 @@ static SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
 }
 
 static void FbxReturnPacket(struct FbxFS *fs, struct DosPacket *pkt, SIPTR r1, SIPTR r2) {
-	struct Library *SysBase = fs->sysbase;
-	struct Message *msg;
-	struct MsgPort *replyport;
+	struct Library *SysBase   = fs->sysbase;
+	struct Message *msg       = pkt->dp_Link;
+	struct MsgPort *replyport = pkt->dp_Port;
 
-	pkt->dp_Res1 = r1;  
+	pkt->dp_Res1 = r1;
 	pkt->dp_Res2 = r2;
-	replyport = pkt->dp_Port; 
-	msg = pkt->dp_Link;  
-	msg->mn_Node.ln_Name = (char *)pkt;  
+
 	PutMsg(replyport, msg);
 }
 

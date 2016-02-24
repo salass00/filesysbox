@@ -26,12 +26,11 @@ void FbxReturnMountMsg(
 	REG(a6, struct FileSysBoxBase *libBase))
 {
 #endif
-	struct Library *SysBase = libBase->sysbase;
+	struct Library   *SysBase   = libBase->sysbase;
+	struct DosPacket *pkt       = (struct DosPacket *)msg->mn_Node.ln_Name;
+	struct MsgPort   *replyport = pkt->dp_Port;
 
 	ADEBUGF("FbxReturnMountMsg(%#p, %#p, %#p)\n", msg, (APTR)r1, (APTR)r2);
-
-	struct DosPacket *pkt = (struct DosPacket *)msg->mn_Node.ln_Name;
-	struct MsgPort *replyport = pkt->dp_Port;
 
 	pkt->dp_Res1 = r1;
 	pkt->dp_Res2 = r2;
