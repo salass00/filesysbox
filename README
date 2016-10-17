@@ -1,10 +1,3 @@
-Short:        A FUSE compatible file system layer
-Author:       Leif Salomonsson, Fredrik Wikstrom
-Uploader:     Fredrik Wikstrom <fredrik@a500.org>
-Type:         util/libs
-Version:      xx.xx
-Architecture: xxx
-
 Filesysbox.library is a FUSE compatible file system layer originally developed
 by Leif Salomonsson. It manages locks, notifications, file handles, packets,
 update timeouts and more, freeing the file system of these jobs. Version 0.730
