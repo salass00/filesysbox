@@ -8,7 +8,7 @@ RM := rm -f
 TARGET  := filesysbox.library
 VERSION := 53
 
-CFLAGS  := -O2 -s -Wall -Werror -Wwrite-strings -Iinclude -D__NOLIBBASE__
+CFLAGS  := -O2 -s -Wall -Wwrite-strings -Werror -Iinclude -D__NOLIBBASE__
 LDFLAGS := -nostartfiles
 LIBS    := -ldebug
 

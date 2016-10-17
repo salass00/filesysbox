@@ -20,7 +20,7 @@ struct Library *__UtilityBase;
 struct Library *aroscbase;
 #endif
 
-static inline void SetSysBase(struct Library *sysbase) {
+static inline void SetGlobalSysBase(struct Library *sysbase) {
 	SysBase = sysbase;
 }
 
@@ -68,7 +68,7 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 	}
 #endif
 
-	SetSysBase(SysBase);
+	SetGlobalSysBase(SysBase);
 #ifdef libnix
 	__UtilityBase = libBase->utilitybase;
 #endif
@@ -81,8 +81,8 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 	return libBase;
 
 error:
-	CloseLibrary(libBase->utilitybase);
-	CloseLibrary(libBase->dosbase);
+	if (libBase->utilitybase != NULL) CloseLibrary(libBase->utilitybase);
+	if (libBase->dosbase != NULL) CloseLibrary(libBase->dosbase);
 
 	FreeMem((BYTE *)libBase - libBase->libnode.lib_NegSize,
 		libBase->libnode.lib_NegSize + libBase->libnode.lib_PosSize);
