@@ -1714,7 +1714,7 @@ static int FbxDeleteObject(struct FbxFS *fs, struct FbxLock *lock, const char *n
 
 static void FbxUpdatePaths(struct FbxFS *fs, const char *oldpath, const char *newpath) {
 	struct Library *SysBase = fs->sysbase;
-	char *tstr = fs->pathbuf[4];
+	char *tstr = fs->pathbuf[3];
 	struct MinNode *chain, *succ;
 
 	// TODO: unresolve+tryresolve notify for affected entries..

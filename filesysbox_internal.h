@@ -344,7 +344,7 @@ struct FbxFS {
 	struct MinList               timercallbacklist;
 	const char                  *xattr_amiga_comment;
 	const char                  *xattr_amiga_protection;
-	char                         pathbuf[3][MAXPATHLEN];
+	char                         pathbuf[4][MAXPATHLEN];
 };
 
 #define FBX_TIMER_MICROS 100000
