@@ -45,7 +45,7 @@ filesysbox.library 53.6 (26.12.2015)
 - Removed the now useless path comparison in FbxSameLock().
 
 
-filesysbox.library 53.7 (xx.xx.2018)
+filesysbox.library 53.7 (26.4.2018)
 
 - Got rid of all the GetXxxBase macros.
 
