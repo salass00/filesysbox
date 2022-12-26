@@ -101,12 +101,21 @@ AROS_LD3(void, FbxCopyStringCToBSTR,
 	AROS_LDA(ULONG, size, D0),
 	struct FileSysBoxBase *, libBase, 17, FileSysBox);
 
+AROS_LD2(void, FbxQueryFS,
+	AROS_LDA(struct FbxFS *, fs, A0),
+	AROS_LDA(const struct TagItem *, tags, A1),
+	struct FileSysBoxBase *, libBase, 18, FileSysBox);
+
+AROS_LD2(void, FbxGetSysTime,
+	AROS_LDA(struct FbxFS *, fs, A0),
+	AROS_LDA(struct timeval *, tv, A1),
+	struct FileSysBoxBase *, libBase, 19, FileSysBox);
+
 #else
 
 #include <SDI/SDI_compiler.h>
 
 struct FileSysBoxBase *LibOpen(
-	REG(d0, ULONG version),
 	REG(a6, struct FileSysBoxBase *libBase));
 
 BPTR LibClose(
@@ -182,6 +191,16 @@ void FbxCopyStringCToBSTR(
 	REG(a0, CONST_STRPTR src),
 	REG(a1, BSTR dst),
 	REG(d0, ULONG size),
+	REG(a6, struct FileSysBoxBase *libBase));
+
+void FbxQueryFS(
+	REG(a0, struct FbxFS *fs),
+	REG(a1, const struct TagItem *tags),
+	REG(a6, struct FileSysBoxBase *libBase));
+
+void FbxGetSysTime(
+	REG(a0, struct FbxFS *fs),
+	REG(a1, struct timeval *tv),
 	REG(a6, struct FileSysBoxBase *libBase));
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2015 Fredrik Wikstrom
+ * Copyright (c) 2013-2019 Fredrik Wikstrom
  *
  * This code is released under AROS PUBLIC LICENSE 1.1
  * See the file LICENSE.APL
@@ -8,6 +8,43 @@
 #include <libraries/filesysbox.h>
 #include "../filesysbox_vectors.h"
 #include "../filesysbox_internal.h"
+
+/****** filesysbox.library/FbxInstallTimerCallback **************************
+*
+*   NAME
+*      FbxInstallTimerCallback -- Install timer callback. (V53.23)
+*
+*   SYNOPSIS
+*      struct FbxTimerCallbackData * FbxInstallTimerCallback(
+*          struct FbxFS * fs, FbxTimerCallbackFunc func, ULONG period);
+*
+*   FUNCTION
+*       Adds a callback function that will get called as often as specified by
+*       the period parameter.
+*
+*   INPUTS
+*       fs - The result of FbxSetupFS().
+*       func - Callback function.
+*       period - Period value in milliseconds.
+*
+*   RESULT
+*       A pointer to a private data structure that can be passed to
+*       FbxUninstallTimerCallback() when the callback is no longer
+*       needed or NULL for failure.
+*
+*   EXAMPLE
+*
+*   NOTES
+*
+*   BUGS
+*
+*   SEE ALSO
+*       FbxUninstallTimerCallback()
+*       
+*
+*****************************************************************************
+*
+*/
 
 #ifdef __AROS__
 AROS_LH3(struct FbxTimerCallbackData *, FbxInstallTimerCallback,
@@ -37,7 +74,10 @@ struct FbxTimerCallbackData *FbxInstallTimerCallback(
 			cb->lastcall = FbxGetUpTimeMillis(fs);
 			cb->period = period;
 			cb->func = func;
+
+			ObtainSemaphore(&fs->fssema);
 			AddTail((struct List *)&fs->timercallbacklist, (struct Node *)&cb->fschain);
+			ReleaseSemaphore(&fs->fssema);
 		}
 	}
 

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008-2011 Leif Salomonsson
- * Copyright (c) 2013-2018 Fredrik Wikstrom
+ * Copyright (c) 2013-2019 Fredrik Wikstrom
  *
  * This code is released under AROS PUBLIC LICENSE 1.1
  * See the file LICENSE.APL
@@ -9,6 +9,34 @@
 #include <libraries/filesysbox.h>
 #include "../filesysbox_vectors.h"
 #include "../filesysbox_internal.h"
+
+/****** filesysbox.library/FbxVersion ***************************************
+*
+*   NAME
+*      FbxVersion -- Get Filesysbox version.
+*
+*   SYNOPSIS
+*      LONG FbxVersion(void);
+*
+*   FUNCTION
+*
+*   INPUTS
+*
+*   RESULT
+*       Version number.
+*
+*   EXAMPLE
+*
+*   NOTES
+*
+*   BUGS
+*
+*   SEE ALSO
+*       FbxFuseVersion()
+*
+*****************************************************************************
+*
+*/
 
 #ifdef __AROS__
 AROS_LH0(LONG, FbxVersion,

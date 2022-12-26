@@ -1,12 +1,48 @@
 /*********************************************************************/
-/* Filesysbox filesystem layer/framework *****************************/
+/* Filesysbox filesystem layer/framework                             */
 /*********************************************************************/
-/* Copyright (c) 2008-2011 Leif Salomonsson [dev blubbedev net] ******/
-/* Copyright (c) 2013-2018 Fredrik Wikstrom [fredrik a500 org] *******/
-/*********************************************************************/ 
-/* This library is released under AROS PUBLIC LICENSE 1.1 ************/
-/* See the file LICENSE.APL ******************************************/
+/* Copyright (c) 2008-2011 Leif Salomonsson [dev blubbedev net]      */
+/* Copyright (c) 2013-2019 Fredrik Wikstrom [fredrik a500 org]       */
 /*********************************************************************/
+/* This library is released under AROS PUBLIC LICENSE 1.1            */
+/* See the file LICENSE.APL                                          */
+/*********************************************************************/
+
+/****** filesysbox.library/--about-handlers-- *******************************
+*
+*   A filesysbox handler leaves all the work of managing
+*   locks, notifications, file handles, packets, update
+*   timeouts, etc. to the filesysbox.library.
+*
+****************************************************************************/
+
+/****** filesysbox.library/--copyright-- ************************************
+*
+*   LIBRARY
+*       Copyright (c) 2008-2011 Leif Salomonsson.
+*       Copyright (c) 2013-2019 Fredrik Wikstrom.
+*       This library is released under AROS PUBLIC LICENSE v.1.1.
+*       See the file LICENSE.APL.
+*
+*   AUTODOC
+*       Copyright (c) 2011 Leif Salomonsson.
+*       Copyright (c) 2013-2019 Fredrik Wikstrom.
+*       This material has been released under and is subject to
+*       the terms of the Common Documentation License, v.1.0.
+*       See the file LICENSE.CDL.
+*
+****************************************************************************/
+
+/****** filesysbox.library/--env-variables-- ********************************
+*
+*   FBX_DBGFLAGS
+*       This environment variable is a hexadecimal mask that enables the
+*       various types of debug output in the library.
+*
+*       To enable all debug output:
+*       SetEnv FBX_DBGFLAGS 0xffffffff
+*
+****************************************************************************/
 
 #include "filesysbox_internal.h"
 #include <devices/input.h>
@@ -19,10 +55,10 @@
 #define DOS_OWNER_ROOT 65535
 #define DOS_OWNER_NONE 0
 
-#ifdef __AROS__
+//#ifdef __AROS__
 #define ts_sec  tv_sec
 #define ts_nsec tv_nsec
-#endif
+//#endif
 
 #ifdef __AROS__
 #define ID_BUSY_DISK AROS_MAKE_ID('B','U','S','Y')
@@ -524,6 +560,7 @@ static int FbxFuseErrno2Error(int error) {
 	case EMLINK:    /* Too many links */            return -1;
 	case EPIPE:     /* Broken pipe */               return -1;
 	case ENOTEMPTY: /* Directory not empty */       return ERROR_DIRECTORY_NOT_EMPTY;
+	case EOPNOTSUPP: /* Operation not supported on socket */ return ERROR_ACTION_NOT_KNOWN;
 	default:     
 		debugf("FbxFuseErrno2Error: unknown fuse error %ld\n", error);
 		return -1;
@@ -609,7 +646,11 @@ static struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int ty
 	NEWLIST(&e->notifylist);
 	e->xlock = FALSE;
 	e->type = type;
-	e->diskkey = id;
+
+	if (fs->fsflags & FBXF_USE_INO)
+		e->diskkey = id;
+	else
+		e->diskkey = FbxHashPath(fs, path);
 
 	FbxAddEntry(fs, e); // add to hash
 
@@ -1892,6 +1933,9 @@ static void FbxDS2TimeSpec(struct FbxFS *fs, const struct DateStamp *ds, struct 
 	// add 8 years of seconds to adjust for different epoch.
 	sec += UNIXTIMEOFFSET;
 
+	/* convert to GMT */
+	sec += fs->gmtoffset * 60;
+
 	ts->ts_sec = sec;
 	ts->ts_nsec = nsec;
 }
@@ -1904,6 +1948,9 @@ static void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct D
 
 	// subtract 8 years of seconds to adjust for different epoch.
 	sec -= UNIXTIMEOFFSET;
+
+	/* convert to local time */
+	sec -= fs->gmtoffset * 60;
 
 	// check for overflow (if date was < 1.1.1978)
 	if (sec > (ULONG)ts->ts_sec) {
@@ -2016,7 +2063,7 @@ static int FbxSetProtection(struct FbxFS *fs, struct FbxLock *lock, const char *
 	}
 
 	error = FbxSetAmigaProtectionFlags(fs, fullpath, prot);
-	if (error && error != -EOPNOTSUPP) {
+	if (error && (error != -ENOSYS && error != -EOPNOTSUPP)) {
 		fs->r2 = FbxFuseErrno2Error(error);
 		return DOSFALSE;
 	}
@@ -2133,8 +2180,11 @@ static int FbxSameLock(struct FbxFS *fs, struct FbxLock *lock, struct FbxLock *l
 			return DOSTRUE;
 
 		/* Compare inodes (if valid) */
-		if (entry->diskkey != 0 && entry->diskkey == entry2->diskkey)
-			return DOSTRUE;
+		if (fs->fsflags & FBXF_USE_INO)
+		{
+			if (entry->diskkey != 0 && entry->diskkey == entry2->diskkey)
+				return DOSTRUE;
+		}
 	}
 	return DOSFALSE;
 }
@@ -2360,6 +2410,14 @@ static int dir_fill_func(void *udata, const char *name, const struct fbx_stat *s
 			ed->name = (char *)(ed + 1);
 			ed->comment = NULL;
 			FbxStrlcpy(fs, ed->name, name, len);
+			if (stat != NULL)
+			{
+				ed->stat = *stat;
+			}
+			else
+			{
+				ed->stat.st_ino = 0;
+			}
 
 			AddTail((struct List *)&lock->dirdatalist, (struct Node *)ed);
 		}
@@ -2568,11 +2626,15 @@ static int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SI
 				return DOSFALSE;
 			}
 
-			error = Fbx_getattr(fs, fullpath, &statbuf);
-			if (error) {
-				FreeFbxDirData(fs, ed);
-				fs->r2 = FbxFuseErrno2Error(error);
-				return DOSFALSE;
+			if (fs->fsflags & FBXF_USE_FILL_DIR_STAT) {
+				statbuf = ed->stat;
+			} else {
+				error = Fbx_getattr(fs, fullpath, &statbuf);
+				if (error) {
+					FreeFbxDirData(fs, ed);
+					fs->r2 = FbxFuseErrno2Error(error);
+					return DOSFALSE;
+				}
 			}
 		}
 
@@ -2671,7 +2733,10 @@ static void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath,
 	fib->fib_Protection = FbxMode2Protection(stat->st_mode);
 	fib->fib_Protection |= FbxGetAmigaProtectionFlags(fs, fullpath);
 	fib->fib_NumBlocks = stat->st_blocks;
-	fib->fib_DiskKey = (IPTR)stat->st_ino;
+	if (fs->fsflags & FBXF_USE_INO)
+		fib->fib_DiskKey = (IPTR)stat->st_ino;
+	else
+		fib->fib_DiskKey = (IPTR)FbxHashPath(fs, fullpath);
 	FbxTimeSpec2DS(fs, &stat->st_mtim, &fib->fib_Date);
 	fib->fib_OwnerUID = FbxUnix2AmigaOwner(stat->st_uid);
 	fib->fib_OwnerGID = FbxUnix2AmigaOwner(stat->st_gid);
@@ -2746,10 +2811,14 @@ static int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInf
 		return DOSFALSE;
 	}
 
-	error = Fbx_getattr(fs, fullpath, &statbuf);
-	if (error) {
-		fs->r2 = FbxFuseErrno2Error(error);
-		return DOSFALSE;
+	if (fs->fsflags & FBXF_USE_FILL_DIR_STAT) {
+		statbuf = ed->stat;
+	} else {
+		error = Fbx_getattr(fs, fullpath, &statbuf);
+		if (error) {
+			fs->r2 = FbxFuseErrno2Error(error);
+			return DOSFALSE;
+		}
 	}
 
 	FbxPathStat2FIB(fs, ed->name, &statbuf, fib);
@@ -2870,39 +2939,55 @@ static int FbxRemoveNotify(struct FbxFS *fs, struct NotifyRequest *nr) {
 
 static void FbxFillInfoData(struct FbxFS *fs, struct InfoData *info) {
 	struct FbxVolume *vol = fs->currvol;
-	struct statvfs st;
 
 	bzero(info, sizeof(*info));
-	bzero(&st, sizeof(st));
-
-	if (OKVOLUME(vol)) {
-		Fbx_statfs(fs, "", &st);
-	}
 
 	info->id_UnitNumber = fs->fssm ? fs->fssm->fssm_Unit : -1;
-	info->id_DiskState = ID_WRITE_PROTECTED;
-	info->id_NumBlocks = st.f_blocks;
-	info->id_NumBlocksUsed = st.f_blocks - st.f_bfree;
-	info->id_BytesPerBlock = st.f_frsize;
-	info->id_DiskType = ID_NO_DISK_PRESENT;
 
 	if (OKVOLUME(vol)) {
-		if (!vol->writeprotect && !(st.f_flag & ST_RDONLY))
+		struct statvfs st;
+
+		bzero(&st, sizeof(st));
+
+		Fbx_statfs(fs, "/", &st);
+
+		if (vol->writeprotect || (st.f_flag & ST_RDONLY))
+			info->id_DiskState = ID_WRITE_PROTECTED;
+		else
 			info->id_DiskState = ID_VALIDATED;
+
+		info->id_NumBlocks = st.f_blocks;
+		info->id_NumBlocksUsed = st.f_blocks - st.f_bfree;
+		info->id_BytesPerBlock = st.f_frsize;
 		info->id_DiskType = fs->dostype;
 		info->id_VolumeNode = MKBADDR(vol);
+
 		if (!IsMinListEmpty(&vol->locklist) ||
 			!IsMinListEmpty(&vol->notifylist) ||
 			!IsMinListEmpty(&vol->unres_notifys))
 		{
 			info->id_InUse = DOSTRUE;
 		}
-	} else if (fs->inhibit) {
-		info->id_DiskType = ID_BUSY_DISK;
-		info->id_InUse = DOSTRUE;
-	} else if (BADVOLUME(vol)) {
-		info->id_DiskState = ID_VALIDATING;
-		info->id_DiskType = ID_NOT_REALLY_DOS;
+	}
+	else
+	{
+		info->id_DiskState     = ID_VALIDATING;
+		info->id_BytesPerBlock = 512;
+
+		if (BADVOLUME(vol))
+		{
+			//info->id_NumSoftErrors = -1;
+			info->id_DiskType       = ID_NOT_REALLY_DOS;
+		}
+		else if (fs->inhibit)
+		{
+			info->id_DiskType       = ID_BUSY_DISK;
+			info->id_InUse         = DOSTRUE;
+		}
+		else
+		{
+			info->id_DiskType       = ID_NO_DISK_PRESENT;
+		}
 	}
 }
 
@@ -3260,14 +3345,9 @@ static SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
 }
 
 static void FbxReturnPacket(struct FbxFS *fs, struct DosPacket *pkt, SIPTR r1, SIPTR r2) {
-	struct Library *SysBase   = fs->sysbase;
-	struct Message *msg       = pkt->dp_Link;
-	struct MsgPort *replyport = pkt->dp_Port;
+	struct Library *DOSBase   = fs->dosbase;
 
-	pkt->dp_Res1 = r1;
-	pkt->dp_Res2 = r2;
-
-	PutMsg(replyport, msg);
+	ReplyPkt(pkt, r1, r2);
 }
 
 void FbxHandlePackets(struct FbxFS *fs) {
@@ -3380,7 +3460,7 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 	DEBUGF("FbxSetupVolume: conn.volume_name '%s'\n", conn->volume_name);
 
 	// if statfs fails, abort.
-	error = Fbx_statfs(fs, "", &st);
+	error = Fbx_statfs(fs, "/", &st);
 	if (error) {
 		DEBUGF("FbxSetupVolume: statfs failed (not formatted ?) err %d\n", error);
 		Fbx_destroy(fs, fs->initret);
@@ -3585,8 +3665,21 @@ void FbxHandleTimerEvent(struct FbxFS *fs) {
 	if (msg != NULL) {
 		fs->timerbusy = FALSE;
 
+		if (fs->localebase != NULL) {
+			struct Library *LocaleBase = fs->localebase;
+			struct Locale *locale;
+			// TODO cache the locale
+			if ((locale = OpenLocale(NULL))) {
+				fs->gmtoffset = (int)locale->loc_GMTOffset;
+				CloseLocale(locale);
+			}
+		}
+
 		if (!IsMinListEmpty(&fs->timercallbacklist)) {
 			struct MinNode *chain, *succ;
+
+			ObtainSemaphore(&fs->fssema);
+
 			chain = fs->timercallbacklist.mlh_Head;
 			while ((succ = chain->mln_Succ) != NULL) {
 				struct FbxTimerCallbackData *cb = FSTIMERCALLBACKDATAFROMFSCHAIN(chain);
@@ -3598,9 +3691,13 @@ void FbxHandleTimerEvent(struct FbxFS *fs) {
 				}
 				chain = succ;
 			}
+
+			ReleaseSemaphore(&fs->fssema);
 		}
 
 		if (fs->aut != 0 || fs->iaut != 0) {
+			ObtainSemaphore(&fs->fssema);
+
 			if (OKVOLUME(fs->currvol) && fs->firstmodify) {
 				QUAD currtime = FbxGetUpTimeMillis(fs);
 				QUAD x = currtime - fs->firstmodify;
@@ -3611,6 +3708,8 @@ void FbxHandleTimerEvent(struct FbxFS *fs) {
 					FbxFlushAll(fs);
 				}
 			}
+
+			ReleaseSemaphore(&fs->fssema);
 		}
 
 		FbxStartTimer(fs);
@@ -3618,11 +3717,37 @@ void FbxHandleTimerEvent(struct FbxFS *fs) {
 }
 
 void FbxHandleUserEvent(struct FbxFS *fs, ULONG signals) {
+	struct Library *SysBase = fs->sysbase;
+
 	//DEBUGF("FbxHandleUserEvent(%#p, %#lx)\n", fs, signals);
+
+	ObtainSemaphore(&fs->fssema);
 
 	signals &= fs->signalcallbacksignals;
 	if (signals != 0 && fs->signalcallbackfunc != NULL) {
 		fs->signalcallbackfunc(signals);
 	}
+
+	ReleaseSemaphore(&fs->fssema);
+}
+
+struct FileSysStartupMsg *FbxGetFSSM(struct Library *sysbase, struct DeviceNode *devnode) {
+	struct Library *SysBase = sysbase;
+	if (IS_VALID_BPTR(devnode->dn_Startup)) {
+		struct FileSysStartupMsg *fssm = BADDR(devnode->dn_Startup);
+
+		if (TypeOfMem(fssm)) {
+			if (IS_VALID_BPTR(fssm->fssm_Device) && IS_VALID_BPTR(fssm->fssm_Environ)) {
+				UBYTE           *device  = BADDR(fssm->fssm_Device);
+				struct DosEnvec *environ = BADDR(fssm->fssm_Environ);
+
+				if (TypeOfMem(device) && TypeOfMem(environ)) {
+					return fssm;
+				}
+			}
+		}
+	}
+
+	return NULL;
 }
 

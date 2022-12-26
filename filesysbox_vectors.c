@@ -25,6 +25,8 @@
 #define FbxSignalDiskChange AROS_SLIB_ENTRY(FbxSignalDiskChange,FileSysBox,15)
 #define FbxCopyStringBSTRToC AROS_SLIB_ENTRY(FbxCopyStringBSTRToC,FileSysBox,16)
 #define FbxCopyStringCToBSTR AROS_SLIB_ENTRY(FbxCopyStringCToBSTR,FileSysBox,17)
+#define FbxQueryFS AROS_SLIB_ENTRY(FbxQueryFS,FileSysBox,18)
+#define FbxGetSysTime AROS_SLIB_ENTRY(FbxGetSysTime,FileSysBox,19)
 #endif
 
 static const CONST_APTR LibVectors[] = {
@@ -45,6 +47,8 @@ static const CONST_APTR LibVectors[] = {
 	FbxSignalDiskChange,
 	FbxCopyStringBSTRToC,
 	FbxCopyStringCToBSTR,
+	FbxQueryFS,
+	FbxGetSysTime,
 	(APTR)-1
 };
 

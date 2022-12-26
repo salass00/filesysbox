@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#ifndef __AROS__
+#if !defined(__AROS__) && !defined(_FSBLKCNT_T_DECLARED)
 typedef unsigned long fsblkcnt_t;
 typedef unsigned long fsfilcnt_t;
 #endif

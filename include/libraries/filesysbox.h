@@ -40,9 +40,27 @@ struct fbx_stat {
 	uid_t           st_uid;
 	gid_t           st_gid;
 	dev_t           st_rdev;
-	struct timespec st_atim;
-	struct timespec st_mtim;
-	struct timespec st_ctim;
+	union {
+		struct {
+			time_t       st_atime;
+			unsigned int st_atimensec;
+		};
+		struct timespec  st_atim;
+	};
+	union {
+		struct {
+			time_t       st_mtime;
+			unsigned int st_mtimensec;
+		};
+		struct timespec  st_mtim;
+	};
+	union {
+		struct {
+			time_t       st_ctime;
+			unsigned int st_ctimensec;
+		};
+		struct timespec  st_ctim;
+	};
 	fbx_off_t       st_size;
 	QUAD            st_blocks;
 	LONG            st_blksize;
@@ -57,7 +75,7 @@ struct fbx_stat {
 #define XATTR_CREATE  0x1 /* set the value, fail if attr already exists */
 #define XATTR_REPLACE 0x2 /* set the value, fail if attr does not exist */
 
-#define FILESYSBOX_VERSION 53
+#define FILESYSBOX_VERSION 54
 #define FILESYSBOX_NAME "filesysbox.library"
 
 #define FUSE_VERSION 26
@@ -100,6 +118,8 @@ struct fuse_file_info {
 // flags  for SFST_FSFLAGS
 #define FBXF_ENABLE_UTF8_NAMES            1 // set to enable utf8 names for FS
 #define FBXF_ENABLE_DISK_CHANGE_DETECTION 2 // set to enable disk change detection
+#define FBXF_USE_INO                      8 // (V54) filesystem sets st_ino
+#define FBXF_USE_FILL_DIR_STAT            16 // (V54) valid stat data passed to readdir() callback
 
 // tags for FbxSetupFS()
 #define FBXT_FSFLAGS                 (TAG_USER + 1)
@@ -108,6 +128,9 @@ struct fuse_file_info {
 #define FBXT_GET_CONTEXT             (TAG_USER + 4)
 #define FBXT_ACTIVE_UPDATE_TIMEOUT   (TAG_USER + 5) // default: 10000 ms
 #define FBXT_INACTIVE_UPDATE_TIMEOUT (TAG_USER + 6) // default: 500 ms
+
+/* tags for FbxQueryFS() */
+#define FBXT_GMT_OFFSET              (TAG_USER + 101) /* equivalent to TZA_UTCOffset */
 
 typedef int (*fuse_fill_dir_t) (void *udata, const char *fsname, const struct fbx_stat *stbuf, fbx_off_t off);
 

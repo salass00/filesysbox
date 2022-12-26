@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008-2011 Leif Salomonsson
- * Copyright (c) 2013-2018 Fredrik Wikstrom
+ * Copyright (c) 2013-2019 Fredrik Wikstrom
  *
  * This code is released under AROS PUBLIC LICENSE 1.1
  * See the file LICENSE.APL
@@ -12,6 +12,39 @@
 #include <string.h>
 
 void FbxReadDebugFlags(struct FbxFS *fs);
+
+/****** filesysbox.library/FbxEventLoop *************************************
+*
+*   NAME
+*      FbxEventLoop -- Enter filesystem event loop.
+*
+*   SYNOPSIS
+*      LONG FbxEventLoop(struct FbxFS *fs);
+*
+*   FUNCTION
+*       Starts up the filesystem and makes it visible to the 
+*       operating system. Handles incoming packets and calls 
+*       the appropriate methods in the fuse_operations table. 
+*
+*   INPUTS
+*       fs - The result of FbxSetupFS().
+*
+*   RESULT
+*       0 for success. no errorcodes are defined for now.
+*
+*   EXAMPLE
+*
+*   NOTES
+*       When this function returns, the handler should cleanup any 
+*       resources and exit.
+*
+*   BUGS
+*
+*   SEE ALSO
+*
+*****************************************************************************
+*
+*/
 
 #ifdef __AROS__
 AROS_LH1(LONG, FbxEventLoop,
@@ -53,9 +86,11 @@ LONG FbxEventLoop(
 
 	while (run) {
 		if (fs->dosetup) {
+			ObtainSemaphore(&fs->fssema);
 			FbxCleanupVolume(fs);
 			fs->dosetup = FALSE;
 			FbxSetupVolume(fs);
+			ReleaseSemaphore(&fs->fssema);
 		}
 
 		const ULONG usigs = fs->signalcallbacksignals;
