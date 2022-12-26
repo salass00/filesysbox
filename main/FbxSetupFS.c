@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008-2011 Leif Salomonsson
- * Copyright (c) 2013-2018 Fredrik Wikstrom
+ * Copyright (c) 2013-2019 Fredrik Wikstrom
  *
  * This code is released under AROS PUBLIC LICENSE 1.1
  * See the file LICENSE.APL
@@ -13,6 +13,87 @@
 #include <errno.h>
 #include <string.h>
 #include <stdarg.h>
+
+/****** filesysbox.library/FbxSetupFS ***************************************
+*
+*   NAME
+*      FbxSetupFS -- Create a filesystem handle.
+*      FbxSetupFSTags -- Vararg stub
+*
+*   SYNOPSIS
+*      struct FbxFS * FbxSetupFS(struct Message *msg, 
+*          const struct TagItem *tags, struct fuse_operations *ops, 
+*          LONG opssize, APTR udata);
+*
+*   FUNCTION
+*       Creates a filesystem handle and initialises it.
+*       If "msg" is given, it will get replied with either success or failure.
+*
+*   INPUTS
+*       msg - mount message, or NULL if no mesage is available.
+*       tags - taglist for additional parameters.
+*       ops - pointer to fuse_operations table.
+*       opssize - size of above table.
+*       udata - this value will get inserted into fuse_context.private_data.
+*
+*   TAGS
+*       FBXT_FSFLAGS (ULONG)
+*           Filesystem flags:
+*
+*           FBXF_ENABLE_UTF8_NAMES
+*               Must be given if filesystem uses UTF-8 encoded filenames.
+*               This will tell filesysbox to open needed resources for
+*               character conversion.
+*
+*           FBXF_ENABLE_DISK_CHANGE_DETECTION
+*               Enables disk change detection by using TD_ADDCHANGEINT.
+*               Only usable with trackdisk device based filesystems
+*               (fssm required).
+*
+*           FBXF_USE_INO (V54)
+*               Indicates that st_ino is set by the filesystem. If this
+*               flag is not set filesysbox will generate a hash from the
+*               path string and use this instead of st_ino for the
+*               ObjectID.
+*
+*       FBXT_FSSM (struct FileSysStartupMsg *)
+*           Overrides the one in msg.
+*           A NULL fssm is OK and will disable ACTION_GET_DISK_FSSM.
+*
+*       FBXT_DOSTYPE (ULONG)
+*           Overrides the dostype from fssm->fssm_Environ.
+*           Must be given if there is no msg.
+*
+*       FBXT_GET_CONTEXT (struct fuse_context **)
+*           Puts the address of filesystem context in the pointer
+*           variable given by reference.
+*
+*       FBXT_ACTIVE_UPDATE_TIMEOUT (ULONG)
+*           Active update timeout in milliseconds. Defaults to 10000.
+*           Setting this timeout to zero disables it.
+*
+*       FBXT_INACTIVE_UPDATE_TIMEOUT (ULONG)
+*           Inactive update timeout in milliseconds. Defaults to 500.
+*           Setting this timeout to zero disables it.
+*
+*   RESULT
+*       A filesystem handle or NULL if setup failed.
+*
+*   EXAMPLE
+*
+*   NOTES
+*       It should be noted that in the varargs version the tagitem list is
+*       at the end while in the non-varargs version it is only the second
+*       parameter (third if you count the hidden interface pointer).
+*
+*   BUGS
+*
+*   SEE ALSO
+*       FbxCleanupFS()
+*
+*****************************************************************************
+*
+*/
 
 static int dumopfunc(void) { return -ENOSYS; }
 static int dumopfunc2(void) { return 0; }
@@ -64,6 +145,7 @@ struct FbxFS *FbxSetupFS(
 	struct Library *SysBase     = libBase->sysbase;
 	struct Library *DOSBase     = libBase->dosbase;
 	struct Library *UtilityBase = libBase->utilitybase;
+	struct Library *LocaleBase  = libBase->localebase;
 	struct FbxFS *fs;
 	struct TagItem *tstate;
 	const struct TagItem *tag;
@@ -81,6 +163,7 @@ struct FbxFS *FbxSetupFS(
 	fs->sysbase     = SysBase;
 	fs->dosbase     = DOSBase;
 	fs->utilitybase = UtilityBase;
+	fs->localebase  = LocaleBase;
 
 	fs->thisproc = (struct Process *)FindTask(NULL);
 
@@ -94,18 +177,29 @@ struct FbxFS *FbxSetupFS(
 
 	if (msg != NULL) {
 		struct DosPacket *pkt = (struct DosPacket *)msg->mn_Node.ln_Name;
+
 		fs->devnode = BADDR(pkt->dp_Arg3);
-		fs->fssm = BADDR(fs->devnode->dn_Startup);
-		if (fs->fssm && TypeOfMem(fs->fssm)) {
+
+		fs->fssm = FbxGetFSSM(SysBase, fs->devnode);
+		if (fs->fssm) {
 			struct DosEnvec *de = BADDR(fs->fssm->fssm_Environ);
-			if (de && TypeOfMem(de)) {
-				if (de->de_TableSize >= DE_DOSTYPE)
-					fs->dostype = de->de_DosType;
-			}
+
+			if (de->de_TableSize >= DE_DOSTYPE)
+				fs->dostype = de->de_DosType;
+		}
+	}
+
+	if (LocaleBase != NULL) {
+		struct Locale *locale;
+		if ((locale = OpenLocale(NULL))) {
+			fs->gmtoffset = (int)locale->loc_GMTOffset;
+			CloseLocale(locale);
 		}
 	}
 
 	if (FbxSetupTimerIO(fs) == NULL) goto error;
+
+	InitSemaphore(&fs->fssema);
 
 	FbxInitUpTime(fs);
 

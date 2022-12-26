@@ -52,3 +52,38 @@ filesysbox.library 53.7 (26.4.2018)
 - Fixed an out of bounds array access in FbxUpdatePaths() which would result
   in memory after the FbxFS struct being trashed.
 
+filesysbox.library 54.0 (22.12.2022)
+
+- Added timezone conversion code using locale.library.
+
+- Calculate a path hash for fib_DiskKey unless FBXF_USE_INO flag is set.
+
+- Added FBXF_USE_FILL_DIR_STAT flag to avoid unnecessary getattr() calls for
+  filesystems like ssh2-handler that already provide all the stat data in
+  readdir(). 
+
+- Don't treat ENOSYS return value from FbxSetAmigaProtectionFlags() as an
+  error.
+
+- Rewrote the FbxFillInfoData() function and made it set id_BytesPerBlock to
+  512 instead of zero if a volume is not available.
+
+- Modified path handling for Ext2FileSystem which only accepts "/" as path
+  argument for the file system root directory and not "".
+
+- Rewrote FbxReturnMountMsg() using ReplyPkt() and added a NULL msg safety
+  check.
+
+- Added some more validity checks when reading FSSM from device node in
+  FbxSetupFS().
+
+- Added validity checks in code for getting FSSM in FbxQueryMountMsg().
+
+- Changed CHECKVOLUME() macro to return ERROR_NOT_A_DOS_DISK instead of
+  ERROR_OBJECT_IN_USE when the filesystem is inhibited.
+
+- Added semaphore protection in FbxHandleTimerEvent().
+
+- Added the FbxQueryFS() and FbxQueryFSTags() functions.
+
+- Added the FbxGetSysTime() function.

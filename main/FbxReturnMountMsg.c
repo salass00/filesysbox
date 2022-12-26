@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008-2011 Leif Salomonsson
- * Copyright (c) 2013-2018 Fredrik Wikstrom
+ * Copyright (c) 2013-2019 Fredrik Wikstrom
  *
  * This code is released under AROS PUBLIC LICENSE 1.1
  * See the file LICENSE.APL
@@ -9,6 +9,39 @@
 #include <libraries/filesysbox.h>
 #include "../filesysbox_vectors.h"
 #include "../filesysbox_internal.h"
+
+/****** filesysbox.library/FbxReturnMountMsg ********************************
+*
+*   NAME
+*      FbxReturnMountMsg -- Return mount message
+*
+*   SYNOPSIS
+*      void FbxReturnMountMsg(struct Message *msg, LONG r1, LONG r2);
+*
+*   FUNCTION
+*       Returns mount message given to filesystem at startup.
+*       Should never be called by filesystem unless there is a 
+*       valid msg AND FbxSetupFS() was never called.
+*
+*   INPUTS
+*       msg - mount message
+*       r1 - DOSTRUE for success, DOSFALSE for failure.
+*       r2 - error code if failure, else 0.
+*
+*   RESULT
+*       This function does not return a result
+*
+*   EXAMPLE
+*
+*   NOTES
+*
+*   BUGS
+*
+*   SEE ALSO
+*
+*****************************************************************************
+*
+*/
 
 #ifdef __AROS__
 AROS_LH3(void, FbxReturnMountMsg,
@@ -26,16 +59,16 @@ void FbxReturnMountMsg(
 	REG(a6, struct FileSysBoxBase *libBase))
 {
 #endif
-	struct Library   *SysBase   = libBase->sysbase;
-	struct DosPacket *pkt       = (struct DosPacket *)msg->mn_Node.ln_Name;
-	struct MsgPort   *replyport = pkt->dp_Port;
+	struct Library   *DOSBase   = libBase->dosbase;
 
 	ADEBUGF("FbxReturnMountMsg(%#p, %#p, %#p)\n", msg, (APTR)r1, (APTR)r2);
 
-	pkt->dp_Res1 = r1;
-	pkt->dp_Res2 = r2;
+	if (msg != NULL)
+	{
+		struct DosPacket *pkt = (struct DosPacket *)msg->mn_Node.ln_Name;
 
-	PutMsg(replyport, msg);
+		ReplyPkt(pkt, r1, r2);
+	}
 
 #ifdef __AROS__
 	AROS_LIBFUNC_EXIT

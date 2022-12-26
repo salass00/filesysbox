@@ -143,7 +143,7 @@ struct Process *StartDosListProc(struct FileSysBoxBase *libBase) {
 
 		bzero(&msg, sizeof(msg));
 		msg.mn_Node.ln_Type = NT_MESSAGE;
-		msg.mn_Node.ln_Name = (STRPTR)libBase;
+		msg.mn_Node.ln_Name = (char *)libBase;
 		msg.mn_Length = sizeof(msg);
 		PutMsg(&dlproc->pr_MsgPort, &msg);
 	}

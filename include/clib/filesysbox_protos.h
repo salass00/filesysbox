@@ -1,20 +1,21 @@
-/* Automatically generated header (sfdc 1.4)! Do not edit! */
+/* Automatically generated header (sfdc 1.11e)! Do not edit! */
 
 #ifndef CLIB_FILESYSBOX_PROTOS_H
 #define CLIB_FILESYSBOX_PROTOS_H
 
 /*
-**	$VER: filesysbox_protos.h 1.0 (07.12.2014)
+**   $VER: filesysbox_protos.h $Id$ $Id$
 **
-**	C prototypes. For use with 32 bit integers only.
+**   C prototypes. For use with 32 bit integers only.
 **
-**	Copyright © 2001 Amiga, Inc.
-**	    All Rights Reserved
+**   Copyright (c) 2001 Amiga, Inc.
+**       All Rights Reserved
 */
 
 #include <exec/types.h>
 #include <dos/dos.h>
 #include <utility/tagitem.h>
+#include <devices/timer.h>
 #include <libraries/filesysbox.h>
 
 #ifdef __cplusplus
@@ -36,6 +37,9 @@ void FbxUninstallTimerCallback(struct FbxFS * fs, struct FbxTimerCallbackData * 
 void FbxSignalDiskChange(struct FbxFS * fs);
 void FbxCopyStringBSTRToC(BSTR src, STRPTR dst, ULONG size);
 void FbxCopyStringCToBSTR(CONST_STRPTR src, BSTR dst, ULONG size);
+void FbxQueryFS(struct FbxFS * fs, const struct TagItem * tags);
+void FbxQueryFSTags(struct FbxFS * fs, Tag tags, ...);
+void FbxGetSysTime(struct FbxFS * fs, struct timeval * tv);
 
 #ifdef __cplusplus
 }

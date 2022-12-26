@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008-2011 Leif Salomonsson
- * Copyright (c) 2013-2018 Fredrik Wikstrom
+ * Copyright (c) 2013-2019 Fredrik Wikstrom
  *
  * This code is released under AROS PUBLIC LICENSE 1.1
  * See the file LICENSE.APL
@@ -9,6 +9,53 @@
 #include <libraries/filesysbox.h>
 #include "../filesysbox_vectors.h"
 #include "../filesysbox_internal.h"
+
+/****** filesysbox.library/FbxQueryMountMsg *********************************
+*
+*   NAME
+*      FbxQueryMountMsg -- Get information from mount message
+*
+*   SYNOPSIS
+*      APTR FbxQueryMountMsg(struct Message *msg, LONG attr);
+*
+*   FUNCTION
+*       Returns information from a mount message (normally
+*       the first message passed to a filesystems port).
+*
+*       The following attributes can be queried:
+*
+*       FBXQMM_MOUNT_NAME (STRPTR)
+*           Device name ("DH3", "USB1").
+*
+*       FBXQMM_MOUNT_CONTROL (STRPTR)
+*           Control string if specified during mount.
+*
+*       FBXQMM_FSSM (struct FileSysStartupMsg *)
+*           File system startup message.
+*
+*       FBXQMM_ENVIRON (struct DosEnvec *)
+*           Disk environment structure.
+*
+*   INPUTS
+*       msg - mount message
+*       attr - attribute number
+*
+*   RESULT
+*       The attributes value. If value is pointer to something,
+*       do not assume it will be valid after mount message has
+*       been returned.
+*
+*   EXAMPLE
+*
+*   NOTES
+*
+*   BUGS
+*
+*   SEE ALSO
+*
+*****************************************************************************
+*
+*/
 
 #ifdef __AROS__
 AROS_LH2(APTR, FbxQueryMountMsg,
@@ -39,20 +86,25 @@ APTR FbxQueryMountMsg(
 		return BADDR(devnode->dn_Name) + 1;
 #endif
 	case FBXQMM_MOUNT_CONTROL:
-		fssm = BADDR(devnode->dn_Startup);
-		de = BADDR(fssm->fssm_Environ);
+		fssm = FbxGetFSSM(libBase->sysbase, devnode);
+		if (fssm != NULL) {
+			de = BADDR(fssm->fssm_Environ);
+			if (IS_VALID_BPTR(de->de_Control) && de->de_Control > 4095)
 #ifdef __AROS__
-		return (de->de_Control > 4095) ? AROS_BSTR_ADDR(de->de_Control) : NULL;
+				return AROS_BSTR_ADDR(de->de_Control);
 #else
-		return (de->de_Control > 4095) ? (BADDR(de->de_Control) + 1) : NULL;
+				return BADDR(de->de_Control) + 1;
 #endif
+		}
+		return NULL;
 	case FBXQMM_FSSM:
-		fssm = BADDR(devnode->dn_Startup);
+		fssm = FbxGetFSSM(libBase->sysbase, devnode);
 		return fssm;
 	case FBXQMM_ENVIRON:
-		fssm = BADDR(devnode->dn_Startup);
-		de = BADDR(fssm->fssm_Environ);
-		return de;
+		fssm = FbxGetFSSM(libBase->sysbase, devnode);
+		if (fssm != NULL) {
+			return BADDR(fssm->fssm_Environ);
+		}
 	default:
 		return NULL;
 	}

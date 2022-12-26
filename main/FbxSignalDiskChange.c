@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008-2011 Leif Salomonsson
- * Copyright (c) 2013-2018 Fredrik Wikstrom
+ * Copyright (c) 2013-2019 Fredrik Wikstrom
  *
  * This code is released under AROS PUBLIC LICENSE 1.1
  * See the file LICENSE.APL
@@ -9,6 +9,37 @@
 #include <libraries/filesysbox.h>
 #include "../filesysbox_vectors.h"
 #include "../filesysbox_internal.h"
+
+/****** filesysbox.library/FbxSignalDiskChange ******************************
+*
+*   NAME
+*      FbxSignalDiskChange -- Signal diskchange to filesystem process. (V53.35)
+*
+*   SYNOPSIS
+*      void FbxSignalDiskChange(struct FbxFS * fs);
+*
+*   FUNCTION
+*       Only needed if the standard trackdisk.device method of disk change
+*       detection (through FBXF_ENABLE_DISK_CHANGE_DETECTION) does not suit
+*       your filesystem for some reason.
+*
+*   INPUTS
+*       fs - filesystem handle.
+*
+*   RESULT
+*       This function does not return a result
+*
+*   EXAMPLE
+*
+*   NOTES
+*
+*   BUGS
+*
+*   SEE ALSO
+*
+*****************************************************************************
+*
+*/
 
 #ifdef __AROS__
 AROS_LH1(void, FbxSignalDiskChange,

@@ -14,7 +14,8 @@ static const char USED_VAR verstag[] = VERSTAG;
 
 struct Library *SysBase;
 #ifdef libnix
-struct Library *__UtilityBase;
+//struct Library *__UtilityBase;
+struct Library *UtilityBase;
 #endif
 #ifdef __AROS__
 struct Library *aroscbase;
@@ -60,6 +61,8 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 		goto error;
 	}
 
+	libBase->localebase = OpenLibrary((CONST_STRPTR)"locale.library", 39);
+
 #ifdef __AROS__
 	libBase->aroscbase = OpenLibrary((CONST_STRPTR)"arosc.library", 41);
 	if (libBase->aroscbase == NULL) {
@@ -70,7 +73,8 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 
 	SetGlobalSysBase(SysBase);
 #ifdef libnix
-	__UtilityBase = libBase->utilitybase;
+	//__UtilityBase = libBase->utilitybase;
+	UtilityBase = libBase->utilitybase;
 #endif
 #ifdef __AROS__
 	aroscbase = libBase->aroscbase;
@@ -81,6 +85,7 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 	return libBase;
 
 error:
+	if (libBase->localebase != NULL) CloseLibrary(libBase->localebase);
 	if (libBase->utilitybase != NULL) CloseLibrary(libBase->utilitybase);
 	if (libBase->dosbase != NULL) CloseLibrary(libBase->dosbase);
 
@@ -102,13 +107,13 @@ AROS_LH1(struct FileSysBoxBase *, LibOpen,
 	AROS_LIBFUNC_INIT
 #else
 struct FileSysBoxBase *LibOpen(
-	REG(d0, ULONG version),
 	REG(a6, struct FileSysBoxBase *libBase))
 {
 #endif
 
+#ifdef __AROS__
 	if (version > VERSION) return NULL;
-
+#endif
 	/* Add any specific open code here
 	   Return 0 before incrementing OpenCnt to fail opening */
 
@@ -165,6 +170,9 @@ BPTR LibExpunge(
 #ifdef __AROS__
 		CloseLibrary(libBase->aroscbase);
 #endif
+		if (libBase->localebase) {
+			CloseLibrary(libBase->localebase);
+		}
 		CloseLibrary(libBase->utilitybase);
 		CloseLibrary(libBase->dosbase);
 
@@ -217,8 +225,13 @@ static const struct Resident USED_VAR lib_res = {
 	VERSION,
 	NT_LIBRARY,
 	0,
+#ifdef __AROS__
 	(STRPTR)"filesysbox.library",
 	(STRPTR)VSTRING,
+#else
+	(char *)"filesysbox.library",
+	(char *)VSTRING,
+#endif
 	(APTR)LibInitTab
 };
 

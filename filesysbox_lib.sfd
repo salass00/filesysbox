@@ -1,4 +1,4 @@
-==id $Id: filesysbox_lib.sfd,v 1.0 2014/12/07 21:22:00 salass00 Exp $
+==id $Id$
 * "filesysbox.library"
 ==base _FileSysBoxBase
 ==basetype struct Library *
@@ -8,6 +8,7 @@
 ==include <exec/types.h>
 ==include <dos/dos.h>
 ==include <utility/tagitem.h>
+==include <devices/timer.h>
 ==include <libraries/filesysbox.h>
 APTR FbxQueryMountMsg(struct Message * msg, LONG attr) (a0,d0)
 struct FbxFS * FbxSetupFS(struct Message * msg, const struct TagItem * tags, const struct fuse_operations * ops, LONG opssize, APTR udata) (a0,a1,a2,d0,a3)
@@ -22,5 +23,9 @@ void FbxUninstallTimerCallback(struct FbxFS * fs, struct FbxTimerCallbackData * 
 void FbxSignalDiskChange(struct FbxFS * fs) (a0)
 void FbxCopyStringBSTRToC(BSTR src, STRPTR dst, ULONG size) (a0,a1,d0)
 void FbxCopyStringCToBSTR(CONST_STRPTR src, BSTR dst, ULONG size) (a0,a1,d0)
+void FbxQueryFS(struct FbxFS * fs, const struct TagItem * tags) (a0,a1)
+==varargs
+void FbxQueryFSTags(struct FbxFS * fs, Tag tags, ...) (a0,a1)
+void FbxGetSysTime(struct FbxFS * fs, struct timeval * tv) (a0,a1)
 ==end
 

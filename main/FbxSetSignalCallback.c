@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2015 Fredrik Wikstrom
+ * Copyright (c) 2013-2019 Fredrik Wikstrom
  *
  * This code is released under AROS PUBLIC LICENSE 1.1
  * See the file LICENSE.APL
@@ -8,6 +8,40 @@
 #include <libraries/filesysbox.h>
 #include "../filesysbox_vectors.h"
 #include "../filesysbox_internal.h"
+
+/****** filesysbox.library/FbxSetSignalCallback *****************************
+*
+*   NAME
+*      FbxSetSignalCallback -- Set callback function for custom signals.
+*                              (V53.23)
+*
+*   SYNOPSIS
+*      void FbxSetSignalCallback(struct FbxFS * fs, 
+*          FbxSignalCallbackFunc func, ULONG signals);
+*
+*   FUNCTION
+*       Adds a callback function that will get called when the main filesystem
+*       process receives one or more of the specified signals.
+*
+*   INPUTS
+*       fs - The result of FbxSetupFS().
+*       func - Callback function.
+*       signals - Signals to call on.
+*
+*   RESULT
+*       This function does not return a result
+*
+*   EXAMPLE
+*
+*   NOTES
+*
+*   BUGS
+*
+*   SEE ALSO
+*
+*****************************************************************************
+*
+*/
 
 #ifdef __AROS__
 AROS_LH3(void, FbxSetSignalCallback,
@@ -28,8 +62,14 @@ void FbxSetSignalCallback(
 	ADEBUGF("FbxSetSignalCallback(%#p, %#p, 0x%lx)\n", fs, func, signals);
 
 	if (fs != NULL) {
+		struct Library *SysBase = fs->sysbase;
+
+		ObtainSemaphore(&fs->fssema);
+
 		fs->signalcallbackfunc = func;
 		fs->signalcallbacksignals = signals;
+
+		ReleaseSemaphore(&fs->fssema);
 	}
 
 #ifdef __AROS__

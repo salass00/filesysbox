@@ -21,11 +21,14 @@
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <proto/utility.h>
+#include <proto/locale.h>
 #include <proto/timer.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <SDI/SDI_compiler.h>
+
+#define IS_VALID_BPTR(bptr) (((bptr) & 0xC0000000) == 0 && (bptr) > 64)
 
 #ifndef NEWLIST
 #define NEWLIST(list) \
@@ -65,6 +68,7 @@ struct FileSysBoxBase {
 #ifdef __AROS__
 	struct Library        *aroscbase;
 #endif
+	struct Library        *localebase;
 
 	struct Process        *dlproc;
 	struct SignalSemaphore dlproc_sem;
@@ -182,7 +186,7 @@ int vdebugf(const char *fmt, va_list args);
 #define MAXPATHLEN 1024
 
 #define ACCESS_PERMS (S_IRWXU|S_IRWXG|S_IRWXO) /* 0777 */
-#define DEFAULT_PERMS (S_IRWXU) /* 0700 */
+#define DEFAULT_PERMS (S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH) /* 0775 */
 
 #ifdef __GNUC__
 #define container_of(ptr, type, member) ({ \
@@ -309,6 +313,7 @@ struct FbxFS {
 	struct Library              *sysbase;
 	struct Library              *dosbase;
 	struct Library              *utilitybase;
+	struct Library              *localebase;
 	struct Device               *timerbase;
 	struct timerequest          *timerio;
 	UQUAD                        eclock_initial;
@@ -317,6 +322,7 @@ struct FbxFS {
 	struct Process              *thisproc;
 	struct MsgPort              *fsport;
 	struct MsgPort              *notifyreplyport;
+	struct SignalSemaphore       fssema;
 	APTR                         mempool;
 	struct FbxVolume            *currvol;
 	struct MinList               volumelist;
@@ -345,6 +351,7 @@ struct FbxFS {
 	const char                  *xattr_amiga_comment;
 	const char                  *xattr_amiga_protection;
 	char                         pathbuf[4][MAXPATHLEN];
+	LONG                         gmtoffset;
 };
 
 #define FBX_TIMER_MICROS 100000
@@ -354,7 +361,7 @@ struct FbxFS {
 #define CHECKVOLUME(errbool) \
 	if (NOVOLUME(fs->currvol)) { \
 		if (fs->inhibit) \
-			fs->r2 = ERROR_OBJECT_IN_USE; \
+			fs->r2 = ERROR_NOT_A_DOS_DISK; \
 		else \
 			fs->r2 = ERROR_NO_DISK; \
 		return errbool; \
@@ -421,6 +428,7 @@ struct FbxDirData {
 	struct MinNode  node;
 	char           *name;
 	char           *comment;
+	struct fbx_stat stat;
 };
 
 #define FSDIRDATAFROMNODE(chain) container_of(chain, struct FbxDirData, node)
@@ -471,6 +479,7 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 #define OneInMinList(list) ((list)->mlh_Head == (list)->mlh_TailPred)
 
 /* filesysbox.c */
+struct FileSysStartupMsg *FbxGetFSSM(struct Library *sysbase, struct DeviceNode *devnode);
 void CopyStringBSTRToC(BSTR bstr, char *cstr, size_t size);
 void CopyStringCToBSTR(const char *cstr, BSTR bstr, size_t size);
 struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskChangeHandlerFunc func);

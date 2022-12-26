@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2008-2011 Leif Salomonsson
- * Copyright (c) 2013-2018 Fredrik Wikstrom
+ * Copyright (c) 2013-2019 Fredrik Wikstrom
  *
  * This code is released under AROS PUBLIC LICENSE 1.1
  * See the file LICENSE.APL
@@ -9,6 +9,38 @@
 #include <libraries/filesysbox.h>
 #include "../filesysbox_vectors.h"
 #include "../filesysbox_internal.h"
+
+/****** filesysbox.library/FbxCleanupFS *************************************
+*
+*   NAME
+*      FbxCleanupFS -- Delete a filesystem handle
+*
+*   SYNOPSIS
+*      void FbxCleanupFS(struct FbxFS *fs);
+*
+*   FUNCTION
+*       Cleans up any resources managed by the filesystem handle and
+*       frees the handle itself.
+*
+*   INPUTS
+*       fs - filesystem handle.
+*
+*   RESULT
+*       This function does not return a result.
+*
+*   EXAMPLE
+*
+*   NOTES
+*       Passing a NULL pointer as fs is safe and will do nothing.
+*
+*   BUGS
+*
+*   SEE ALSO
+*       FbxSetupFS()
+*
+*****************************************************************************
+*
+*/
 
 #ifdef __AROS__
 AROS_LH1(void, FbxCleanupFS,
@@ -29,7 +61,10 @@ void FbxCleanupFS(
 		struct MinNode *chain;
 
 		// clear msgport in device node.
-		if (fs->devnode != NULL) fs->devnode->dn_Task = NULL;
+		if (fs->devnode != NULL) {
+			fs->devnode->dn_Task = NULL;
+			fs->devnode = NULL;
+		}
 
 		// doslist process
 		if (fs->dlproc_port != NULL) {
@@ -56,6 +91,8 @@ void FbxCleanupFS(
 		DeletePool(fs->mempool);
 
 		FbxCleanupTimerIO(fs);
+
+		bzero(fs, sizeof(*fs));
 
 		FreeFbxFS(fs);
 	}

@@ -1,6 +1,6 @@
-#define VERSION		53
-#define REVISION	7
-#define DATE		"26.4.2018"
-#define VERS		"filesysbox.library 53.7"
-#define VSTRING		"filesysbox.library 53.7 (26.4.2018)\r\n"
-#define VERSTAG		"\0$VER: filesysbox.library 53.7 (26.4.2018)"
+#define VERSION		54
+#define REVISION	0
+#define DATE		"22.12.2022"
+#define VERS		"filesysbox.library 54.0"
+#define VSTRING		"filesysbox.library 54.0 (22.12.2022)\r\n"
+#define VERSTAG		"\0$VER: filesysbox.library 54.0 (22.12.2022)"
