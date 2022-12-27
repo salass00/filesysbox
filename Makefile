@@ -15,7 +15,7 @@ LIBS    := -ldebug
 STRIPFLAGS = 
 
 ifeq ($(HOST),m68k-amigaos)
-	CFLAGS  := -noixemul -m68020 -fno-common $(CFLAGS)
+	CFLAGS  := -noixemul -m68020 -fno-common -fomit-frame-pointer $(CFLAGS)
 	LDFLAGS := -noixemul -m68020 $(LDFLAGS)
 	LIBS    := $(LIBS)
 endif
