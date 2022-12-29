@@ -1,0 +1,22 @@
+* "filesysbox.library"
+* Automatically generated FD (sfdc 1.11e)! Do not edit!
+##base _FileSysBoxBase
+##bias 30
+##public
+* "filesysbox.library"
+FbxQueryMountMsg(msg,attr)(a0,d0)
+FbxSetupFS(msg,tags,ops,opssize,udata)(a0,a1,a2,d0,a3)
+FbxEventLoop(fs)(a0)
+FbxCleanupFS(fs)(a0)
+FbxReturnMountMsg(msg,r1,r2)(a0,d0,d1)
+FbxFuseVersion()()
+FbxVersion()()
+FbxSetSignalCallback(fs,func,signals)(a0,a1,d0)
+FbxInstallTimerCallback(fs,func,period)(a0,a1,d0)
+FbxUninstallTimerCallback(fs,cb)(a0,a1)
+FbxSignalDiskChange(fs)(a0)
+FbxCopyStringBSTRToC(src,dst,size)(a0,a1,d0)
+FbxCopyStringCToBSTR(src,dst,size)(a0,a1,d0)
+FbxQueryFS(fs,tags)(a0,a1)
+FbxGetSysTime(fs,tv)(a0,a1)
+##end
