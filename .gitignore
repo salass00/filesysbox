@@ -3,5 +3,7 @@
 # Ignore generated exe file
 filesysbox.library
 filesysbox.library.debug
+# Ignore generated autodoc file
+filesysbox.doc
 # Ignore release archives
 *.7z

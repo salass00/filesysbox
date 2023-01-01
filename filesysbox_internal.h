@@ -159,6 +159,26 @@ int vdebugf(const char *fmt, va_list args);
 
 #endif /* NODEBUG */
 
+/****** filesysbox.library/--env-variables-- ********************************
+*
+*   FBX_DBGFLAGS
+*       This environment variable is a hexadecimal mask that enables the
+*       various types of debug output in the library.
+*
+*       To enable all debug output:
+*       SetEnv FBX_DBGFLAGS 0xff
+*
+*       The types of debug output that are currently defined are:
+*       0x01 - general
+*       0x02 - packets
+*       0x04 - notify
+*       0x08 - resolve
+*       0x10 - dir
+*       0x20 - cconv
+*       0x40 - fsops
+*
+****************************************************************************/
+
 #define FBXDB_GENERAL 0
 #define FBXDB_PACKETS 1
 #define FBXDB_NOTIFY  2

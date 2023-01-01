@@ -7,7 +7,7 @@ HOST="${1:-i386-aros}"
 
 make HOST=${HOST} clean
 
-make HOST=${HOST}
+make HOST=${HOST} all autodoc
 
 DESTDIR='tmp'
 FULLVERS=`version filesysbox.library`
@@ -15,6 +15,7 @@ NUMVERS=`echo "${FULLVERS}" | cut -d' ' -f2`
 
 rm -rf ${DESTDIR}
 mkdir -p ${DESTDIR}/filesysbox-${NUMVERS}/Libs
+mkdir -p ${DESTDIR}/filesysbox-${NUMVERS}/Developer/AutoDocs
 mkdir -p ${DESTDIR}/filesysbox-${NUMVERS}/Developer/include/clib
 mkdir -p ${DESTDIR}/filesysbox-${NUMVERS}/Developer/include/defines
 mkdir -p ${DESTDIR}/filesysbox-${NUMVERS}/Developer/include/inline
@@ -25,6 +26,7 @@ mkdir -p ${DESTDIR}/filesysbox-${NUMVERS}/Developer/include/sys
 cp -p LICENSE.APL ${DESTDIR}/filesysbox-${NUMVERS}
 cp -p releasenotes ${DESTDIR}/filesysbox-${NUMVERS}
 cp -p filesysbox.library ${DESTDIR}/filesysbox-${NUMVERS}/Libs
+cp -p filesysbox.doc ${DESTDIR}/filesysbox-${NUMVERS}/Developer/AutoDocs
 cp -p include/clib/filesysbox_protos.h ${DESTDIR}/filesysbox-${NUMVERS}/Developer/include/clib
 cp -p include/defines/filesysbox.h ${DESTDIR}/filesysbox-${NUMVERS}/Developer/include/defines
 cp -p include/inline/filesysbox.h ${DESTDIR}/filesysbox-${NUMVERS}/Developer/include/inline

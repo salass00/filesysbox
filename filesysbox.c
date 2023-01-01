@@ -33,17 +33,6 @@
 *
 ****************************************************************************/
 
-/****** filesysbox.library/--env-variables-- ********************************
-*
-*   FBX_DBGFLAGS
-*       This environment variable is a hexadecimal mask that enables the
-*       various types of debug output in the library.
-*
-*       To enable all debug output:
-*       SetEnv FBX_DBGFLAGS 0xffffffff
-*
-****************************************************************************/
-
 #include "filesysbox_internal.h"
 #include <devices/input.h>
 #include <devices/inputevent.h>

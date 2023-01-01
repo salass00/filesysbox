@@ -50,3 +50,7 @@ dist-clean:
 revision:
 	bumprev $(VERSION) $(TARGET)
 
+.PHONY: autodoc
+autodoc:
+	autodoc -l100 filesysbox_internal.h $(SRCS) $(main_SRCS) >filesysbox.doc
+
