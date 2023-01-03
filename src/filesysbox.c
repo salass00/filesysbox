@@ -2,7 +2,7 @@
 /* Filesysbox filesystem layer/framework                             */
 /*********************************************************************/
 /* Copyright (c) 2008-2011 Leif Salomonsson [dev blubbedev net]      */
-/* Copyright (c) 2013-2019 Fredrik Wikstrom [fredrik a500 org]       */
+/* Copyright (c) 2013-2023 Fredrik Wikstrom [fredrik a500 org]       */
 /*********************************************************************/
 /* This library is released under AROS PUBLIC LICENSE 1.1            */
 /* See the file LICENSE.APL                                          */
@@ -20,13 +20,13 @@
 *
 *   LIBRARY
 *       Copyright (c) 2008-2011 Leif Salomonsson.
-*       Copyright (c) 2013-2019 Fredrik Wikstrom.
+*       Copyright (c) 2013-2023 Fredrik Wikstrom.
 *       This library is released under AROS PUBLIC LICENSE v.1.1.
 *       See the file LICENSE.APL.
 *
 *   AUTODOC
 *       Copyright (c) 2011 Leif Salomonsson.
-*       Copyright (c) 2013-2019 Fredrik Wikstrom.
+*       Copyright (c) 2013-2023 Fredrik Wikstrom.
 *       This material has been released under and is subject to
 *       the terms of the Common Documentation License, v.1.0.
 *       See the file LICENSE.CDL.
