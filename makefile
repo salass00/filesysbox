@@ -1,4 +1,4 @@
-HOST = i386-aros
+HOST ?= i386-aros
 
 CC    = $(HOST)-gcc
 STRIP = $(HOST)-strip
@@ -83,5 +83,5 @@ revision:
 
 .PHONY: autodoc
 autodoc:
-	autodoc -l100 filesysbox_internal.h $(SRCS) $(main_SRCS) >filesysbox.doc
+	autodoc -l100 src/filesysbox_internal.h $(SRCS) $(main_SRCS) >filesysbox.doc
 
