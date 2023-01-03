@@ -2,7 +2,9 @@
 *.[oa]
 # Ignore generated exe file
 filesysbox.library
-filesysbox.library.debug
+filesysbox.library.000
+filesysbox.library.020
+*.debug
 # Ignore generated autodoc file
 filesysbox.doc
 # Ignore release archives
