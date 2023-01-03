@@ -1788,7 +1788,7 @@ static int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *n
 	struct Library *SysBase = fs->sysbase;
 	char *fullpath = fs->pathbuf[0];
 	char *fullpath2 = fs->pathbuf[1];
-	struct FbxEntry *e;
+	struct FbxEntry *e, *e2;
 	struct fbx_stat statbuf;
 	int error;
 
@@ -1833,19 +1833,44 @@ static int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *n
 		return DOSFALSE;
 	}
 
-	e = FbxFindEntry(fs, fullpath2);
-	if (e != NULL) {
-		fs->r2 = ERROR_OBJECT_EXISTS;
-		return DOSFALSE;
+	/* Make sure that the object to be renamed exists */
+	e = FbxFindEntry(fs, fullpath);
+	if (e == NULL)
+	{
+		error = Fbx_getattr(fs, fullpath, &statbuf);
+		if (error)
+		{
+			fs->r2 = FbxFuseErrno2Error(error);
+			return DOSFALSE;
+		}
 	}
 
-	error = Fbx_getattr(fs, fullpath2, &statbuf);
-	if (error == 0) {
-		fs->r2 = ERROR_OBJECT_EXISTS;
-		return DOSFALSE;
-	} else if (error != -ENOENT) {
-		fs->r2 = FbxFuseErrno2Error(error);
-		return DOSFALSE;
+	/* Check if source and destination are the same object */
+	if (FbxStrcmp(fs, fullpath, fullpath2) == 0)
+	{
+		if ((fs->currvol->vflags & FBXVF_CASE_SENSITIVE) || strcmp(fullpath, fullpath2) == 0)
+		{
+			/* Nothing to do here */
+			fs->r2 = 0;
+			return DOSTRUE;
+		}
+	}
+	else
+	{
+		/* Check if destination already exists */
+		e2 = FbxFindEntry(fs, fullpath2);
+		if (e2 != NULL) {
+			fs->r2 = ERROR_OBJECT_EXISTS;
+			return DOSFALSE;
+		}
+		error = Fbx_getattr(fs, fullpath2, &statbuf);
+		if (error == 0) {
+			fs->r2 = ERROR_OBJECT_EXISTS;
+			return DOSFALSE;
+		} else if (error != -ENOENT) {
+			fs->r2 = FbxFuseErrno2Error(error);
+			return DOSFALSE;
+		}
 	}
 
 	error = Fbx_rename(fs, fullpath, fullpath2);
@@ -1856,7 +1881,7 @@ static int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *n
 
 	FbxDoNotify(fs, fullpath);
 
-	e = FbxFindEntry(fs, fullpath);
+	//e = FbxFindEntry(fs, fullpath); /* Already done in code above */
 	if (e != NULL) {
 		FbxUnResolveNotifys(fs, e);
 		FbxSetEntryPath(fs, e, fullpath2);

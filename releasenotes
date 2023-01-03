@@ -88,3 +88,14 @@ filesysbox.library 54.0 (22.12.2022)
 - Added the FbxQueryFS() and FbxQueryFSTags() functions.
 
 - Added the FbxGetSysTime() function.
+
+
+filesysbox.library 54.1 (d.m.2023)
+
+- A rename operation with exactly the same source and destination is now
+  treated as a no-op and returns success rather than ERROR_OBJECT_EXISTS.
+
+- Rename operations where the the only change is in letter casing (e.g.
+  "rename tmp TMP") no longer fail with ERROR_OBJECT_EXISTS on case
+  insensitive file system implementations.
+
