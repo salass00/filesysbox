@@ -10,7 +10,7 @@ CFLAGS  = -O2 -g -fomit-frame-pointer -fno-strict-aliasing -Wall -Wwrite-strings
           -Wno-attributes -Werror -I./include -I. -D__NOLIBBASE__
 LDFLAGS = -nostartfiles
 LIBS    = -ldebug
-STRIPFLAGS = 
+STRIPFLAGS = -R.comment
 
 ifeq ($(HOST),m68k-amigaos)
 	ARCH_000 = -m68000
