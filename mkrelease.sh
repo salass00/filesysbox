@@ -15,12 +15,14 @@ DESTDIR='tmp'
 rm -rf ${DESTDIR}
 mkdir -p ${DESTDIR}/filesysbox/Libs
 mkdir -p ${DESTDIR}/filesysbox/Developer/AutoDocs
-mkdir -p ${DESTDIR}/filesysbox/Developer/include/clib
-mkdir -p ${DESTDIR}/filesysbox/Developer/include/defines
-mkdir -p ${DESTDIR}/filesysbox/Developer/include/inline
-mkdir -p ${DESTDIR}/filesysbox/Developer/include/libraries
-mkdir -p ${DESTDIR}/filesysbox/Developer/include/proto
-mkdir -p ${DESTDIR}/filesysbox/Developer/include/sys
+mkdir -p ${DESTDIR}/filesysbox/Developer/include/sfd
+mkdir -p ${DESTDIR}/filesysbox/Developer/include/fd
+mkdir -p ${DESTDIR}/filesysbox/Developer/include/include_h/clib
+mkdir -p ${DESTDIR}/filesysbox/Developer/include/include_h/defines
+mkdir -p ${DESTDIR}/filesysbox/Developer/include/include_h/inline
+mkdir -p ${DESTDIR}/filesysbox/Developer/include/include_h/libraries
+mkdir -p ${DESTDIR}/filesysbox/Developer/include/include_h/proto
+mkdir -p ${DESTDIR}/filesysbox/Developer/include/include_h/sys
 
 cp -p icons/def_drawer.info ${DESTDIR}/filesysbox.info
 cp -p README ${DESTDIR}/filesysbox
@@ -38,12 +40,14 @@ else
   cp -p filesysbox.library ${DESTDIR}/filesysbox/Libs
 fi;
 cp -p filesysbox.doc ${DESTDIR}/filesysbox/Developer/AutoDocs
-cp -p include/clib/filesysbox_protos.h ${DESTDIR}/filesysbox/Developer/include/clib
-cp -p include/defines/filesysbox.h ${DESTDIR}/filesysbox/Developer/include/defines
-cp -p include/inline/filesysbox.h ${DESTDIR}/filesysbox/Developer/include/inline
-cp -p include/libraries/filesysbox.h ${DESTDIR}/filesysbox/Developer/include/libraries
-cp -p include/proto/filesysbox.h ${DESTDIR}/filesysbox/Developer/include/proto
-cp -p include/sys/statvfs.h ${DESTDIR}/filesysbox/Developer/include/sys
+cp -p filesysbox_lib.sfd ${DESTDIR}/filesysbox/Developer/include/sfd
+cp -p include/fd/filesysbox_lib.fd ${DESTDIR}/filesysbox/Developer/include/fd
+cp -p include/clib/filesysbox_protos.h ${DESTDIR}/filesysbox/Developer/include/include_h/clib
+cp -p include/defines/filesysbox.h ${DESTDIR}/filesysbox/Developer/include/include_h/defines
+cp -p include/inline/filesysbox.h ${DESTDIR}/filesysbox/Developer/include/include_h/inline
+cp -p include/libraries/filesysbox.h ${DESTDIR}/filesysbox/Developer/include/include_h/libraries
+cp -p include/proto/filesysbox.h ${DESTDIR}/filesysbox/Developer/include/include_h/proto
+cp -p include/sys/statvfs.h ${DESTDIR}/filesysbox/Developer/include/include_h/sys
 
 rm -f filesysbox.${HOST}.7z
 7za u filesysbox.${HOST}.7z ./${DESTDIR}/*
