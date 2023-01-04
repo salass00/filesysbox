@@ -178,7 +178,9 @@ int fbx_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg) {
 				break;
 			case 'D':
 			case 'd':
-				uppercase = (ch == 'D') ? TRUE : FALSE;
+			case 'I':
+			case 'i':
+				uppercase = (ch == 'D' || ch == 'I') ? TRUE : FALSE;
 				if (longlong)
 					len = lltoa(va_arg(arg, long long), tmp, 10, TRUE, addplus, uppercase);
 				else
