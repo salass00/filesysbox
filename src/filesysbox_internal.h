@@ -1,12 +1,12 @@
-/*********************************************************************/
-/* Filesysbox filesystem layer/framework *****************************/
-/*********************************************************************/
-/* Copyright (c) 2008-2011 Leif Salomonsson [dev blubbedev net] ******/
-/* Copyright (c) 2013-2023 Fredrik Wikstrom [fredrik a500 org] *******/
-/*********************************************************************/ 
-/* This library is released under AROS PUBLIC LICENSE 1.1 ************/
-/* See the file LICENSE.APL ******************************************/
-/*********************************************************************/
+/*
+ * Filesysbox filesystem layer/framework
+ *
+ * Copyright (c) 2008-2011 Leif Salomonsson [dev blubbedev net]
+ * Copyright (c) 2013-2023 Fredrik Wikstrom [fredrik a500 org]
+ *
+ * This library is released under AROS PUBLIC LICENSE 1.1
+ * See the file LICENSE.APL
+ */
 
 // Internal structures constants and macros.
 
@@ -545,14 +545,14 @@ size_t utf8_strlcat(char *dst, const char *src, size_t dst_size);
 /* ucs4.c */
 ULONG ucs4_toupper(ULONG c);
 
-#ifndef __AROS__
 /* allocvecpooled.c */
+#ifndef __AROS__
 APTR AllocVecPooled(APTR mempool, ULONG size);
 void FreeVecPooled(APTR mempool, APTR ptr);
 #endif
 
-#ifndef __AROS__
 /* strlcpy.c */
+#ifndef __AROS__
 size_t strlcpy(char *dst, const char *src, size_t size);
 size_t strlcat(char *dst, const char *src, size_t size);
 #endif

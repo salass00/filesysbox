@@ -7,9 +7,9 @@
 
 #include "filesysbox_internal.h"
 
+#ifndef __AROS__
 extern struct Library *SysBase;
 
-#ifndef __AROS__
 APTR AllocVecPooled(APTR mempool, ULONG size) {
 	ULONG *pmem;
 

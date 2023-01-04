@@ -1,12 +1,12 @@
-/*********************************************************************/
-/* Filesysbox filesystem layer/framework                             */
-/*********************************************************************/
-/* Copyright (c) 2008-2011 Leif Salomonsson [dev blubbedev net]      */
-/* Copyright (c) 2013-2023 Fredrik Wikstrom [fredrik a500 org]       */
-/*********************************************************************/
-/* This library is released under AROS PUBLIC LICENSE 1.1            */
-/* See the file LICENSE.APL                                          */
-/*********************************************************************/
+/*
+ * Filesysbox filesystem layer/framework
+ *
+ * Copyright (c) 2008-2011 Leif Salomonsson [dev blubbedev net]
+ * Copyright (c) 2013-2023 Fredrik Wikstrom [fredrik a500 org]
+ *
+ * This library is released under AROS PUBLIC LICENSE 1.1
+ * See the file LICENSE.APL
+ */
 
 /****** filesysbox.library/--about-handlers-- *******************************
 *
@@ -34,6 +34,7 @@
 ****************************************************************************/
 
 #include "filesysbox_internal.h"
+#include "fuse_stubs.h"
 #include <devices/input.h>
 #include <devices/inputevent.h>
 #include <devices/trackdisk.h>
@@ -661,214 +662,6 @@ static void FbxCleanupEntry(struct FbxFS *fs, struct FbxEntry *e) {
 			DEBUGF("FbxCleanupEntry: freed entry %#p\n", e);
 		}
 	}
-}
-
-static APTR Fbx_init(struct FbxFS *fs, struct fuse_conn_info *conn) {
-	ODEBUGF("Fbx_init(%#p, %#p)\n", fs, conn);
-
-	if (FSOP init) {
-		fs->initret = FSOP init(conn, &fs->fcntx);
-		return fs->initret;
-	} else {
-		FbxStrlcpy(fs, conn->volume_name, BADDR(fs->devnode->dn_Name) + 1, CONN_VOLUME_NAME_BYTES);
-		return (APTR)TRUE;
-	}
-}
-
-static void Fbx_destroy(struct FbxFS *fs, APTR x) {
-	ODEBUGF("Fbx_destroy(%#p, %#p)\n", fs, x);
-
-	if (FSOP destroy) FSOP destroy(x, &fs->fcntx);
-}
-
-static int Fbx_getattr(struct FbxFS *fs, const char *path, struct fbx_stat *stat) {
-	ODEBUGF("Fbx_getattr(%#p, '%s', %#p)\n", fs, path, stat);
-
-	return FSOP getattr(path, stat, &fs->fcntx);
-}
-
-static int Fbx_readlink(struct FbxFS *fs, const char *path, char *buf, size_t buflen) {
-	ODEBUGF("Fbx_readlink(%#p, '%s', %#p, %lu)\n", fs, path, buf, buflen);
-
-	return FSOP readlink(path, buf, buflen, &fs->fcntx);
-}
-
-static int Fbx_mknod(struct FbxFS *fs, const char *path, mode_t mode, dev_t dev) {
-	ODEBUGF("Fbx_mknod(%#p, '%s', 0%o, %#x)\n", fs, path, mode, dev);
-
-	return FSOP mknod(path, mode, dev, &fs->fcntx);
-}
-
-static int Fbx_mkdir(struct FbxFS *fs, const char *path, mode_t mode) {
-	ODEBUGF("Fbx_mkdir(%#p, '%s', 0%o)\n", fs, path, mode);
-
-	return FSOP mkdir(path, mode, &fs->fcntx);
-}
-
-static int Fbx_unlink(struct FbxFS *fs, const char *path) {
-	ODEBUGF("Fbx_unlink(%#p, '%s')\n", fs, path);
-
-	return FSOP unlink(path, &fs->fcntx);
-}
-
-static int Fbx_rmdir(struct FbxFS *fs, const char *path) {
-	ODEBUGF("Fbx_rmdir(%#p, '%s')\n", fs, path);
-
-	return FSOP rmdir(path, &fs->fcntx);
-}
-
-static int Fbx_symlink(struct FbxFS *fs, const char *dest, const char *path) {
-	ODEBUGF("Fbx_symlink(%#p, '%s', '%s')\n", fs, path, dest);
-
-	return FSOP symlink(dest, path, &fs->fcntx);
-}
-
-static int Fbx_rename(struct FbxFS *fs, const char *path, const char *path2) {
-	ODEBUGF("Fbx_rename(%#p, '%s', '%s')\n", fs, path, path2);
-
-	return FSOP rename(path, path2, &fs->fcntx);
-}
-
-static int Fbx_link(struct FbxFS *fs, const char *dest, const char *path) {
-	ODEBUGF("Fbx_link(%#p, '%s', '%s')\n", fs, dest, path);
-
-	return FSOP link(dest, path, &fs->fcntx);
-}
-
-static int Fbx_read(struct FbxFS *fs, const char *path, char *buf, size_t len,
-	QUAD offset, struct fuse_file_info *fi)
-{
-	ODEBUGF("Fbx_read(%#p, '%s', %#p, %lu, %lld, %#p)\n", fs, path, buf, len, offset, fi);
-
-	return FSOP read(path, buf, len, offset, fi, &fs->fcntx);
-}
-
-static int Fbx_write(struct FbxFS *fs, const char *path, const char *buf, size_t len,
-	QUAD offset, struct fuse_file_info *fi)
-{
-	ODEBUGF("Fbx_write(%#p, '%s', %#p, %lu, %lld, %#p)\n", fs, path, buf, len, offset, fi);
-
-	return FSOP write(path, buf, len, offset, fi, &fs->fcntx);
-}
-
-static int Fbx_statfs(struct FbxFS *fs, const char *name, struct statvfs *stat) {
-	ODEBUGF("Fbx_statfs(%#p, '%s', %#p)\n", fs, name, stat);
-
-	return FSOP statfs(name, stat, &fs->fcntx);
-}
-
-static int Fbx_open(struct FbxFS *fs, const char *path, struct fuse_file_info *fi) {
-	ODEBUGF("Fbx_open(%#p, '%s', %#p)\n", fs, path, fi);
-
-	return FSOP open(path, fi, &fs->fcntx);
-}
-
-static int Fbx_release(struct FbxFS *fs, const char *path, struct fuse_file_info *fi) {
-	ODEBUGF("Fbx_release(%#p, '%s', %#p)\n", fs, path, fi);
-
-	return FSOP release(path, fi, &fs->fcntx);
-}
-
-static int Fbx_fsync(struct FbxFS *fs, const char *path, int x, struct fuse_file_info *fi) {
-	ODEBUGF("Fbx_fsync(%#p, '%s', %d, %#p)\n", fs, path, x, fi);
-
-	return FSOP fsync(path, x, fi, &fs->fcntx);
-}
-
-static int Fbx_readdir(struct FbxFS *fs, const char *path, APTR udata, fuse_fill_dir_t func, QUAD offset, struct fuse_file_info *fi) {
-	ODEBUGF("Fbx_readdir(%#p, '%s', %#p, %#p, %lld, %#p)\n", fs, path, udata, func, offset, fi);
-
-	return FSOP readdir(path, udata, func, offset, fi, &fs->fcntx);
-}
-
-static int Fbx_ftruncate(struct FbxFS *fs, const char *path, QUAD size, struct fuse_file_info *fi) {
-	ODEBUGF("Fbx_ftruncate(%#p, '%s', %lld, %#p)\n", fs, path, size, fi);
-
-	return FSOP ftruncate(path, size, fi, &fs->fcntx);
-}
-
-static int Fbx_truncate(struct FbxFS *fs, const char *path, QUAD size) {
-	ODEBUGF("Fbx_truncate(%#p, '%s', %lld)\n", fs, path, size);
-
-	return FSOP truncate(path, size, &fs->fcntx);
-}
-
-static int Fbx_fgetattr(struct FbxFS *fs, const char *path, struct fbx_stat *stat, struct fuse_file_info *fi) {
-	ODEBUGF("Fbx_fgetattr(%#p, '%s', %#p, %#p)\n", fs, path, stat, fi);
-
-	return FSOP fgetattr(path, stat, fi, &fs->fcntx);
-}
-
-static int Fbx_utimens(struct FbxFS *fs, const char *path, const struct timespec *tv) {
-	ODEBUGF("Fbx_utimens(%#p, '%s', %#p)\n", fs, path, tv);
-
-	return FSOP utimens(path, tv, &fs->fcntx);
-}
-
-static int Fbx_utime(struct FbxFS *fs, const char *path, struct utimbuf *ubuf) {
-	ODEBUGF("Fbx_utime(%#p, '%s', %#p)\n", fs, path, ubuf);
-
-	return FSOP utime(path, ubuf, &fs->fcntx);
-}
-
-static int Fbx_chmod(struct FbxFS *fs, const char *path, mode_t mode) {
-	ODEBUGF("Fbx_chmod(%#p, '%s', 0%o)\n", fs, path, mode);
-
-	return FSOP chmod(path, mode, &fs->fcntx);
-}
-
-static int Fbx_chown(struct FbxFS *fs, const char *path, uid_t uid, gid_t gid) {
-	ODEBUGF("Fbx_chown(%#p, '%s', %#x, %#x)\n", fs, path, uid, gid);
-
-	return FSOP chown(path, uid, gid, &fs->fcntx);
-}
-
-static int Fbx_format(struct FbxFS *fs, const char *volname, ULONG dostype) {
-	ODEBUGF("Fbx_format(%#p, '%s', %#lx)\n", fs, volname, dostype);
-
-	return FSOP format(volname, dostype, &fs->fcntx);
-}
-
-static int Fbx_relabel(struct FbxFS *fs, const char *volname) {
-	ODEBUGF("Fbx_relabel(%#p, '%s')\n", fs, volname);
-
-	return FSOP relabel(volname, &fs->fcntx);
-}
-
-static int Fbx_create(struct FbxFS *fs, const char *path, mode_t mode, struct fuse_file_info *fi) {
-	ODEBUGF("Fbx_create(%#p, '%s', 0%o, %#p)\n", fs, path, mode, fi);
-
-	return FSOP create(path, mode, fi, &fs->fcntx);
-}
-
-static int Fbx_opendir(struct FbxFS *fs, const char *path, struct fuse_file_info *fi) {
-	ODEBUGF("Fbx_opendir(%#p, '%s', %#p)\n", fs, path, fi);
-
-	return FSOP opendir(path, fi, &fs->fcntx);
-}
-
-static int Fbx_releasedir(struct FbxFS *fs, const char *path, struct fuse_file_info *fi) {
-	ODEBUGF("Fbx_releasedir(%#p, '%s', %#p)\n", fs, path, fi);
-
-	return FSOP releasedir(path, fi, &fs->fcntx);
-}
-
-static int Fbx_setxattr(struct FbxFS *fs, const char *path, const char *attr, CONST_APTR buf, size_t len, int flags) {
-	ODEBUGF("Fbx_setxattr(%#p, '%s', '%s', %#p, %lu, %d)\n", fs, path, attr, buf, len, flags);
-
-	return FSOP setxattr(path, attr, buf, len, flags, &fs->fcntx);
-}
-
-static int Fbx_getxattr(struct FbxFS *fs, const char *path, const char *attr, APTR buf, size_t len) {
-	ODEBUGF("Fbx_getxattr(%#p, '%s', '%s', %#p, %lu)\n", fs, path, attr, buf, len);
-
-	return FSOP getxattr(path, attr, buf, len, &fs->fcntx);
-}
-
-static int Fbx_removexattr(struct FbxFS *fs, const char *path, const char *attr) {
-	ODEBUGF("Fbx_removexattr(%#p, '%s', '%s')\n", fs, path, attr);
-
-	return FSOP removexattr(path, attr, &fs->fcntx);
 }
 
 static void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e) {
