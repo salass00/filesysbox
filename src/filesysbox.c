@@ -56,6 +56,17 @@
 #define ID_BUSY_DISK (0x42555359L)
 #endif
 
+#ifndef __AROS__
+static size_t strnlen(const char *str, size_t maxlen)
+{
+	const char *s = str;
+
+	while (maxlen && *s++ != '\0') maxlen--;
+
+	return (s - str);
+}
+#endif
+
 void CopyStringBSTRToC(BSTR bstr, char *cstr, size_t size) {
 #if defined(__AROS__) && defined(AROS_FAST_BSTR)
 	strlcpy(cstr, (const char *)bstr, size);
@@ -73,7 +84,7 @@ void CopyStringCToBSTR(const char *cstr, BSTR bstr, size_t size) {
 	strlcpy((char *)bstr, cstr, size);
 #else
 	UBYTE *dst = BADDR(bstr);
-	size_t len = strlen(cstr);
+	size_t len = strnlen(cstr, 255);
 	if (len >= size) len = size-1;
 	*dst++ = len;
 	memcpy(dst, cstr, len);
