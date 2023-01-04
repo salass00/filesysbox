@@ -513,16 +513,12 @@ size_t FbxStrlcat(struct FbxFS *fs, char *dst, const char *src, size_t dst_size)
 void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass);
 struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
 void FbxCleanupTimerIO(struct FbxFS *fs);
-void FbxStopTimer(struct FbxFS *fs);
-void FbxStartTimer(struct FbxFS *fs);
 QUAD FbxGetUpTimeMillis(struct FbxFS *fs);
 void FbxSetModifyState(struct FbxFS *fs, int state);
 void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStamp *ds);
 int FbxFlushAll(struct FbxFS *fs);
-void FbxHandlePackets(struct FbxFS *fs);
+SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt);
 void FbxHandleNotifyReplies(struct FbxFS *fs);
-void FbxHandleTimerEvent(struct FbxFS *fs);
-void FbxHandleUserEvent(struct FbxFS *fs, ULONG signals);
 
 /* uptime.c */
 void FbxInitUpTime(struct FbxFS *fs);
@@ -562,4 +558,7 @@ void FreeVecPooled(APTR mempool, APTR ptr);
 size_t strlcpy(char *dst, const char *src, size_t size);
 size_t strlcat(char *dst, const char *src, size_t size);
 #endif
+
+/* main/FbxSetupFS.c */
+void FbxReadDebugFlags(struct FbxFS *fs);
 

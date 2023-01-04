@@ -2956,7 +2956,7 @@ static int FbxRelabel(struct FbxFS *fs, const char *volname) {
 	return DOSTRUE;
 }
 
-static SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
+SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
 	LONG type;
 	SIPTR r1;
 #if defined(__AROS__) && defined(AROS_FAST_BSTR)
@@ -3149,27 +3149,6 @@ static SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
 	return r1;
 }
 
-static void FbxReturnPacket(struct FbxFS *fs, struct DosPacket *pkt, SIPTR r1, SIPTR r2) {
-	struct Library *DOSBase   = fs->dosbase;
-
-	ReplyPkt(pkt, r1, r2);
-}
-
-void FbxHandlePackets(struct FbxFS *fs) {
-	struct Library *SysBase = fs->sysbase;
-	struct Message *msg;
-	struct DosPacket *pkt;
-	SIPTR r1;
-
-	DEBUGF("FbxHandlePackets(%#p)\n", fs);
-
-	while ((msg = GetMsg(fs->fsport)) != NULL) {
-		pkt = (struct DosPacket *)msg->mn_Node.ln_Name;
-		r1 = FbxDoPacket(fs, pkt);
-		FbxReturnPacket(fs, pkt, r1, fs->r2);
-	}
-}
-
 void FbxHandleNotifyReplies(struct FbxFS *fs) {
 	struct Library *SysBase = fs->sysbase;
 	struct NotifyMessage *nm;
@@ -3264,106 +3243,6 @@ void FbxCleanupTimerIO(struct FbxFS *fs) {
 		DeleteIORequest(tr);
 		DeleteMsgPort(mp);
 	}
-}
-
-void FbxStopTimer(struct FbxFS *fs) {
-	if (fs->timerbusy) {
-		struct Library *SysBase = fs->sysbase;
-		struct timerequest *tr = fs->timerio;
-
-		AbortIO((struct IORequest *)tr);
-		WaitIO((struct IORequest *)tr);
-		fs->timerbusy = FALSE;
-	}
-}
-
-void FbxStartTimer(struct FbxFS *fs) {
-	if (!fs->timerbusy) {
-		struct Library *SysBase = fs->sysbase;
-		struct timerequest *tr = fs->timerio;
-
-		tr->tr_node.io_Command = TR_ADDREQUEST;
-		tr->tr_time.tv_secs = 0;
-		tr->tr_time.tv_micro = FBX_TIMER_MICROS;
-		SendIO((struct IORequest *)tr);
-		fs->timerbusy = TRUE;
-	}
-}
-
-void FbxHandleTimerEvent(struct FbxFS *fs) {
-	struct Library *SysBase = fs->sysbase;
-	struct Message *msg;
-
-	//DEBUGF("FbxHandleTimerEvent(%#p)\n", fs);
-
-	msg = GetMsg(fs->timerio->tr_node.io_Message.mn_ReplyPort);
-	if (msg != NULL) {
-		fs->timerbusy = FALSE;
-
-		if (fs->localebase != NULL) {
-			struct Library *LocaleBase = fs->localebase;
-			struct Locale *locale;
-			// TODO cache the locale
-			if ((locale = OpenLocale(NULL))) {
-				fs->gmtoffset = (int)locale->loc_GMTOffset;
-				CloseLocale(locale);
-			}
-		}
-
-		if (!IsMinListEmpty(&fs->timercallbacklist)) {
-			struct MinNode *chain, *succ;
-
-			ObtainSemaphore(&fs->fssema);
-
-			chain = fs->timercallbacklist.mlh_Head;
-			while ((succ = chain->mln_Succ) != NULL) {
-				struct FbxTimerCallbackData *cb = FSTIMERCALLBACKDATAFROMFSCHAIN(chain);
-				QUAD currtime = FbxGetUpTimeMillis(fs);
-				QUAD x = currtime - cb->lastcall;
-				if (cb->period != 0 && x > cb->period) {
-					cb->lastcall = currtime;
-					cb->func();
-				}
-				chain = succ;
-			}
-
-			ReleaseSemaphore(&fs->fssema);
-		}
-
-		if (fs->aut != 0 || fs->iaut != 0) {
-			ObtainSemaphore(&fs->fssema);
-
-			if (OKVOLUME(fs->currvol) && fs->firstmodify) {
-				QUAD currtime = FbxGetUpTimeMillis(fs);
-				QUAD x = currtime - fs->firstmodify;
-				QUAD y = currtime - fs->lastmodify;
-				if (fs->aut != 0 && x > fs->aut) {
-					FbxFlushAll(fs);
-				} else if (fs->iaut != 0 && y > fs->iaut) {
-					FbxFlushAll(fs);
-				}
-			}
-
-			ReleaseSemaphore(&fs->fssema);
-		}
-
-		FbxStartTimer(fs);
-	}
-}
-
-void FbxHandleUserEvent(struct FbxFS *fs, ULONG signals) {
-	struct Library *SysBase = fs->sysbase;
-
-	//DEBUGF("FbxHandleUserEvent(%#p, %#lx)\n", fs, signals);
-
-	ObtainSemaphore(&fs->fssema);
-
-	signals &= fs->signalcallbacksignals;
-	if (signals != 0 && fs->signalcallbackfunc != NULL) {
-		fs->signalcallbackfunc(signals);
-	}
-
-	ReleaseSemaphore(&fs->fssema);
 }
 
 struct FileSysStartupMsg *FbxGetFSSM(struct Library *sysbase, struct DeviceNode *devnode) {

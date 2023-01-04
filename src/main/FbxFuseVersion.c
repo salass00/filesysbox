@@ -1,8 +1,10 @@
 /*
- * Copyright (c) 2008-2011 Leif Salomonsson
- * Copyright (c) 2013-2023 Fredrik Wikstrom
+ * Filesysbox filesystem layer/framework
  *
- * This code is released under AROS PUBLIC LICENSE 1.1
+ * Copyright (c) 2008-2011 Leif Salomonsson [dev blubbedev net]
+ * Copyright (c) 2013-2023 Fredrik Wikstrom [fredrik a500 org]
+ *
+ * This library is released under AROS PUBLIC LICENSE 1.1
  * See the file LICENSE.APL
  */
 
