@@ -92,10 +92,10 @@ struct FileSysBoxBase {
 #else
 
 #ifndef __AROS__
-int my_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg);
-int my_snprintf(char *buffer, size_t size, const char *fmt, ...);
-#define vsnprintf(buffer,size,fmt,args)   my_vsnprintf(buffer, size, fmt, args)
-#define snprintf(buffer,size,fmt,args...) my_snprintf(buffer, size, fmt, ## args)
+int fbx_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg);
+int fbx_snprintf(char *buffer, size_t size, const char *fmt, ...);
+#define vsnprintf(buffer,size,fmt,args) fbx_vsnprintf(buffer, size, fmt, args)
+#define snprintf(buffer,size,fmt,args...) fbx_snprintf(buffer, size, fmt, ## args)
 #endif
 
 int debugf(const char *fmt, ...);

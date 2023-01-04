@@ -110,7 +110,7 @@ static size_t lltoa(unsigned long long num, char *dst, unsigned base,
 	return len;
 }
 
-int my_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg) {
+int fbx_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg) {
 	struct putchdata putchdata;
 	char ch;
 
@@ -312,10 +312,10 @@ int my_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg) {
 	return putchdata.count;
 }
 
-int my_snprintf(char *buffer, size_t size, const char *fmt, ...) {
+int fbx_snprintf(char *buffer, size_t size, const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
-	int retval = my_vsnprintf(buffer, size, fmt, ap);
+	int retval = fbx_vsnprintf(buffer, size, fmt, ap);
 	va_end(ap);
 	return retval;
 }
