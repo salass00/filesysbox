@@ -512,7 +512,7 @@ static BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char 
 	return TRUE;
 }
 
-static int FbxFuseErrno2Error(int error) {
+int FbxFuseErrno2Error(int error) {
 	switch (-error) {
 	case ENOSYS:    /* Function not implemented */  return ERROR_ACTION_NOT_KNOWN;
 	case EPERM:     /* Operation not permitted */   return -1;
@@ -689,7 +689,7 @@ static void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e) {
 	}
 }
 
-static BOOL FbxCheckLock(struct FbxFS *fs, struct FbxLock *lock) {
+BOOL FbxCheckLock(struct FbxFS *fs, struct FbxLock *lock) {
 	if (lock->fs != fs) {
 		DEBUGF("INVALID LOCK %#p, -> cookie %#p (should be %#p)\n", lock, lock->fs, fs);
 		return FALSE;
@@ -1040,72 +1040,6 @@ static void FbxUnResolveNotifys(struct FbxFS *fs, struct FbxEntry *e) {
 	}
 
 	NDEBUGF("unresolve_notifys: DONE\n");
-}
-
-static int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes) {
-	int res;
-
-	PDEBUGF("FbxReadFile(%#p, %#p, %#p, %d)\n", fs, lock, buffer, bytes);
-
-	CHECKVOLUME(-1);
-
-	CHECKLOCK(lock, -1);
-
-	if (lock->fsvol != fs->currvol) {
-		fs->r2 = ERROR_NO_DISK;
-		return -1;
-	}
-
-	if (bytes == 0) {
-		fs->r2 = 0;
-		return 0;
-	}
-
-	res = Fbx_read(fs, lock->entry->path, buffer, bytes, lock->filepos, lock->info);
-	if (res < 0) {
-		fs->r2 = FbxFuseErrno2Error(res);
-		return -1;
-	}
-
-	lock->filepos += res;
-	fs->r2 = 0;
-	return res;
-}
-
-static int FbxWriteFile(struct FbxFS *fs, struct FbxLock *lock, CONST_APTR buffer, int bytes) {
-	int res;
-
-	PDEBUGF("FbxWriteFile(%#p, %#p, %#p, %d)\n", fs, lock, buffer, bytes);
-
-	CHECKVOLUME(-1);
-	CHECKWRITABLE(-1);
-
-	CHECKLOCK(lock, -1);
-
-	if (lock->fsvol != fs->currvol) {
-		fs->r2 = ERROR_NO_DISK;
-		return -1;
-	}
-
-	if (bytes == 0) {
-		fs->r2 = 0;
-		return 0;
-	}
-
-	res = Fbx_write(fs, lock->entry->path, buffer, bytes, lock->filepos, lock->info);
-	if (res < 0) {
-		fs->r2 = FbxFuseErrno2Error(res);
-		return -1;
-	}
-	if (res == bytes) {
-		lock->filepos += bytes;
-		fs->r2 = 0;
-	}
-
-	lock->flags |= LOCKFLAG_MODIFIED; // for notification
-	FbxSetModifyState(fs, 1);
-
-	return res;
 }
 
 static QUAD FbxSeekFile(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode) {

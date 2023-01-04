@@ -74,22 +74,6 @@ int Fbx_link(struct FbxFS *fs, const char *dest, const char *path)
 	return FSOP link(dest, path, &fs->fcntx);
 }
 
-int Fbx_read(struct FbxFS *fs, const char *path, char *buf, size_t len,
-	QUAD offset, struct fuse_file_info *fi)
-{
-	ODEBUGF("Fbx_read(%#p, '%s', %#p, %lu, %lld, %#p)\n", fs, path, buf, len, offset, fi);
-
-	return FSOP read(path, buf, len, offset, fi, &fs->fcntx);
-}
-
-int Fbx_write(struct FbxFS *fs, const char *path, const char *buf, size_t len,
-	QUAD offset, struct fuse_file_info *fi)
-{
-	ODEBUGF("Fbx_write(%#p, '%s', %#p, %lu, %lld, %#p)\n", fs, path, buf, len, offset, fi);
-
-	return FSOP write(path, buf, len, offset, fi, &fs->fcntx);
-}
-
 int Fbx_statfs(struct FbxFS *fs, const char *name, struct statvfs *stat)
 {
 	ODEBUGF("Fbx_statfs(%#p, '%s', %#p)\n", fs, name, stat);

@@ -17,7 +17,7 @@ struct putchdata {
 	size_t count;
 };
 
-void putchproc(char ch, struct putchdata *putchdata) {
+static void putchproc(char ch, struct putchdata *putchdata) {
 	if (putchdata->size != 0) {
 		if (--putchdata->size != 0)
 			*putchdata->buffer++ = ch;
