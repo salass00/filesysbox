@@ -857,7 +857,7 @@ QUAD FbxGetUpTimeMillis(struct FbxFS *fs) {
 	return (UQUAD)tv.tv_secs * 1000 + tv.tv_micro / 1000;
 }
 
-static void FbxSetModifyState(struct FbxFS *fs, int state) {
+void FbxSetModifyState(struct FbxFS *fs, int state) {
 	if (state) {
 		fs->lastmodify = FbxGetUpTimeMillis(fs);
 		if (fs->firstmodify == 0)
@@ -1747,7 +1747,7 @@ static void FbxDS2TimeSpec(struct FbxFS *fs, const struct DateStamp *ds, struct 
 	ts->ts_nsec = nsec;
 }
 
-static void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStamp *ds) {
+void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStamp *ds) {
 	ULONG sec, nsec;
 
 	sec = ts->ts_sec;
@@ -2832,7 +2832,7 @@ static int FbxInfo(struct FbxFS *fs, struct FbxLock *lock, struct InfoData *info
 	return DOSTRUE;
 }
 
-static int FbxFlushAll(struct FbxFS *fs) {
+int FbxFlushAll(struct FbxFS *fs) {
 	PDEBUGF("FbxFlushAll(%#p)\n", fs);
 
 	if (OKVOLUME(fs->currvol)) {
@@ -2930,8 +2930,6 @@ static int FbxFormat(struct FbxFS *fs, const char *volname, ULONG dostype) {
 	fs->r2 = 0;
 	return DOSTRUE;
 }
-
-static void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE class);
 
 static int FbxRelabel(struct FbxFS *fs, const char *volname) {
 	struct FbxVolume *vol = fs->currvol;
@@ -3192,7 +3190,7 @@ void FbxHandleNotifyReplies(struct FbxFS *fs) {
 	}
 }
 
-static void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE class) {
+void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass) {
 	struct Library *SysBase = fs->sysbase;
 	struct MsgPort *inputmp;
 	struct IOStdReq *inputio;
@@ -3208,7 +3206,7 @@ static void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE class) {
 			FbxGetUpTime(fs, &tv);
 
 			ie.ie_NextEvent = 0;
-			ie.ie_Class = class;
+			ie.ie_Class = ieclass;
 			ie.ie_SubClass = 0;
 			ie.ie_Code = 0;
 			ie.ie_Qualifier = IEQUALIFIER_MULTIBROADCAST;
@@ -3225,176 +3223,6 @@ static void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE class) {
 		DeleteIORequest(inputio);
 	}
 	DeleteMsgPort(inputmp);
-}
-
-struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
-	struct Library *SysBase = fs->sysbase;
-#ifndef NODEBUG
-	struct Library *DOSBase = fs->dosbase;
-#endif
-	struct fuse_conn_info *conn = &fs->conn;
-	APTR initret;
-	int error, i, rc;
-	struct FbxVolume *vol;
-	struct statvfs st;
-	struct fbx_stat statbuf;
-
-	DEBUGF("FbxSetupVolume(%#p)\n", fs);
-
-	if (OKVOLUME(fs->currvol)) {
-		return fs->currvol;
-	}
-
-	if (fs->inhibit) {
-		return fs->currvol = NULL;
-	}
-
-	bzero(conn, sizeof(*conn));
-
-	initret = Fbx_init(fs, conn);
-	if (initret == (APTR)-2) {
-		// error setting up resources for accessing volume
-		debugf("fbx fs failed to open resources for volume\n");
-		return fs->currvol = (APTR)-2;
-	} else if (initret == (APTR)-1) {
-		// broken on-disk layout (or not formatted)
-		return fs->currvol = (APTR)-1;
-	} else if (initret == NULL) {
-		// no disk in drive
-		return fs->currvol = NULL;
-	}
-
-	DEBUGF("FbxSetupVolume: conn.volume_name '%s'\n", conn->volume_name);
-
-	// if statfs fails, abort.
-	error = Fbx_statfs(fs, "/", &st);
-	if (error) {
-		DEBUGF("FbxSetupVolume: statfs failed (not formatted ?) err %d\n", error);
-		Fbx_destroy(fs, fs->initret);
-		return FALSE;
-	}
-
-	error = Fbx_getattr(fs, "/", &statbuf);
-	if (error) {
-		DEBUGF("FbxSetupVolume: stat on root directory failed err %d\n", error);
-		Fbx_destroy(fs, fs->initret);
-		return FALSE;
-	}
-
-	vol = AllocFbxVolume();
-	if (vol == NULL) {
-		Fbx_destroy(fs, fs->initret);
-		return NULL;
-	}
-
-	vol->dl.dl_Type     = DLT_VOLUME;
-	vol->dl.dl_Task     = fs->fsport;
-	vol->dl.dl_DiskType = fs->dostype;
-#if defined(__AROS__) && defined(AROS_FAST_BSTR)
-	vol->dl.dl_Name     = (STRPTR)vol->volname;
-#else
-	vol->dl.dl_Name     = MKBADDR(&vol->volnamelen);
-#endif
-
-	FbxTimeSpec2DS(fs, &statbuf.st_ctim, &vol->dl.dl_VolumeDate);
-	FbxStrlcpy(fs, vol->volname, conn->volume_name, CONN_VOLUME_NAME_BYTES);
-	vol->volnamelen = strlen(vol->volname);
-
-	vol->fs           = fs;
-	vol->writeprotect = FALSE;
-	vol->vflags       = 0;
-
-	NEWLIST(&vol->unres_notifys);
-	NEWLIST(&vol->locklist);
-	NEWLIST(&vol->notifylist);
-	for (i = 0; i < ENTRYHASHSIZE; i++) {
-		NEWLIST(&vol->entrytab[i]);
-	}
-
-	if (st.f_flag & ST_CASE_SENSITIVE) {
-		vol->vflags |= FBXVF_CASE_SENSITIVE;
-	}
-
-	if (st.f_flag & ST_RDONLY) {
-		vol->vflags |= FBXVF_READ_ONLY;
-	}
-
-	// add volume to doslist
-	rc = FbxAsyncAddVolume(fs, vol);
-	if (!rc) {
-		DEBUGF("FbxSetupVolume: NBM_ADDDOSENTRY failed (name collision ?) err %d\n", (int)IoErr());
-		Fbx_destroy(fs, fs->initret);
-		FreeFbxVolume(vol);
-		return NULL;
-	}
-
-	fs->currvol = vol;
-
-	// tell input.device there was a change
-	FbxNotifyDiskChange(fs, IECLASS_DISKINSERTED);
-
-	DEBUGF("FbxSetupVolume: Volume %#p set up OK.\n", vol);
-
-	return vol;
-}
-
-void FbxCleanupVolume(struct FbxFS *fs) {
-	struct Library *SysBase = fs->sysbase;
-	struct FbxVolume *vol = fs->currvol;
-
-	// do nothing if we don't have a volume
-	if (NOVOLUME(vol)) {
-		fs->currvol = NULL;
-		return;
-	}
-
-	// only notify about disk removal if we have a bad volume.
-	if (BADVOLUME(vol)) {
-		fs->currvol = NULL;
-		// notify about disk removal
-		FbxNotifyDiskChange(fs, IECLASS_DISKREMOVED);
-		return;
-	}
-
-	struct MinNode *chain, *succ;
-	chain = vol->locklist.mlh_Head;
-	while ((succ = chain->mln_Succ) != NULL) {
-		struct FbxLock *lock = FSLOCKFROMVOLUMECHAIN(chain);
-
-		if (lock->info != NULL) {
-			struct FbxEntry *e = lock->entry;
-			Fbx_release(fs, e->path, lock->info);
-			FreeFuseFileInfo(fs, lock->info);
-			lock->info = NULL;
-		}
-
-		chain = succ;
-	}
-
-	// Make sure that dirty data is on disk before destroying
-	FbxFlushAll(fs);
-
-	Fbx_destroy(fs, fs->initret);
-
-	if (IsMinListEmpty(&vol->locklist) &&
-		IsMinListEmpty(&vol->notifylist) &&
-		IsMinListEmpty(&vol->unres_notifys))
-	{
-		// Remove and free if no locks are pending
-		FbxAsyncRemFreeVolume(fs, vol);
-	} else {
-		// Remove and add to list if there are locks pending
-		FbxAsyncRemVolume(fs, vol);
-		AddTail((struct List *)&fs->volumelist, (struct Node *)&vol->fschain);
-	}
-
-	fs->currvol = NULL;
-
-	// notify about disk removal
-	FbxNotifyDiskChange(fs, IECLASS_DISKREMOVED);
-
-	// reset update timeouts
-	FbxSetModifyState(fs, 0);
 }
 
 struct timerequest *FbxSetupTimerIO(struct FbxFS *fs) {

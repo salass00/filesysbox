@@ -510,13 +510,15 @@ int FbxStrcmp(struct FbxFS *fs, const char *s1, const char *s2);
 int FbxStrncmp(struct FbxFS *fs, const char *s1, const char *s2, size_t n);
 size_t FbxStrlcpy(struct FbxFS *fs, char *dst, const char *src, size_t dst_size);
 size_t FbxStrlcat(struct FbxFS *fs, char *dst, const char *src, size_t dst_size);
+void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass);
 struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
 void FbxCleanupTimerIO(struct FbxFS *fs);
 void FbxStopTimer(struct FbxFS *fs);
 void FbxStartTimer(struct FbxFS *fs);
 QUAD FbxGetUpTimeMillis(struct FbxFS *fs);
-struct FbxVolume *FbxSetupVolume(struct FbxFS *fs);
-void FbxCleanupVolume(struct FbxFS *fs);
+void FbxSetModifyState(struct FbxFS *fs, int state);
+void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStamp *ds);
+int FbxFlushAll(struct FbxFS *fs);
 void FbxHandlePackets(struct FbxFS *fs);
 void FbxHandleNotifyReplies(struct FbxFS *fs);
 void FbxHandleTimerEvent(struct FbxFS *fs);
@@ -532,6 +534,10 @@ int FbxAsyncAddVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRemVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRemFreeVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRenameVolume(struct FbxFS *fs, struct FbxVolume *vol, const char *name);
+
+/* volume.c */
+struct FbxVolume *FbxSetupVolume(struct FbxFS *fs);
+void FbxCleanupVolume(struct FbxFS *fs);
 
 /* utf8.c */
 LONG utf8_decode_slow(const char **strp);

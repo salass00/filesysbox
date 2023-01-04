@@ -11,8 +11,6 @@
 #ifndef FUSE_STUBS_H
 #define FUSE_STUBS_H 1
 
-APTR Fbx_init(struct FbxFS *fs, struct fuse_conn_info *conn);
-void Fbx_destroy(struct FbxFS *fs, APTR x);
 int Fbx_getattr(struct FbxFS *fs, const char *path, struct fbx_stat *stat);
 int Fbx_readlink(struct FbxFS *fs, const char *path, char *buf, size_t buflen);
 int Fbx_mknod(struct FbxFS *fs, const char *path, mode_t mode, dev_t dev);

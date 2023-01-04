@@ -11,29 +11,6 @@
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
 
-APTR Fbx_init(struct FbxFS *fs, struct fuse_conn_info *conn)
-{
-	ODEBUGF("Fbx_init(%#p, %#p)\n", fs, conn);
-
-	if (FSOP init)
-	{
-		fs->initret = FSOP init(conn, &fs->fcntx);
-		return fs->initret;
-	}
-	else
-	{
-		FbxStrlcpy(fs, conn->volume_name, BADDR(fs->devnode->dn_Name) + 1, CONN_VOLUME_NAME_BYTES);
-		return (APTR)TRUE;
-	}
-}
-
-void Fbx_destroy(struct FbxFS *fs, APTR x)
-{
-	ODEBUGF("Fbx_destroy(%#p, %#p)\n", fs, x);
-
-	if (FSOP destroy) FSOP destroy(x, &fs->fcntx);
-}
-
 int Fbx_getattr(struct FbxFS *fs, const char *path, struct fbx_stat *stat)
 {
 	ODEBUGF("Fbx_getattr(%#p, '%s', %#p)\n", fs, path, stat);
