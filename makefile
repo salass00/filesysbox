@@ -47,6 +47,17 @@ obj/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+$(TARGET): $(OBJS)
+	$(CC) $(LDFLAGS) -o $@.debug $^ $(LIBS)
+	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
+
+init.o: $(TARGET)_rev.h src/filesysbox_vectors.c src/filesysbox_vectors.h
+
+$(main_OBJS): src/filesysbox_vectors.h
+
+$(OBJS): src/filesysbox_internal.h
+
+ifeq ($(HOST),m68k-amigaos)
 obj-000/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(ARCH_000) $(CFLAGS) -c -o $@ $<
@@ -55,11 +66,6 @@ obj-020/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(ARCH_020) $(CFLAGS) -c -o $@ $<
 
-$(TARGET): $(OBJS)
-	$(CC) $(LDFLAGS) -o $@.debug $^ $(LIBS)
-	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
-
-ifeq ($(HOST),m68k-amigaos)
 $(TARGET).000: $(OBJS_000)
 	$(CC) $(ARCH_000) $(LDFLAGS) -o $@.debug $^ $(LIBS)
 	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
@@ -67,13 +73,13 @@ $(TARGET).000: $(OBJS_000)
 $(TARGET).020: $(OBJS_020)
 	$(CC) $(ARCH_020) $(LDFLAGS) -o $@.debug $^ $(LIBS)
 	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
+
+obj-000/init.o: $(TARGET)_rev.h src/filesysbox_vectors.c src/filesysbox_vectors.h
+obj-020/init.o: $(TARGET)_rev.h src/filesysbox_vectors.c src/filesysbox_vectors.h
+
+$(OBJS_000): src/filesysbox_internal.h
+$(OBJS_020): src/filesysbox_internal.h
 endif
-
-init.o: $(TARGET)_rev.h src/filesysbox_vectors.c src/filesysbox_vectors.h
-
-$(main_OBJS): src/filesysbox_vectors.h
-
-$(OBJS): src/filesysbox_internal.h
 
 .PHONY: clean
 clean:
