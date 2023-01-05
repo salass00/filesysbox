@@ -459,7 +459,7 @@ static const char *FbxSkipColon(const char *s) {
 }
 
 static BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf) {
-	if (FbxStrcmp(fs, pathbuf, "/") == 0) {
+	if (strcmp(pathbuf, "/") == 0) {
 		// can't parent root
 		return FALSE;
 	}
@@ -502,7 +502,7 @@ BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, 
 			if (len > sizeof(tname))
 				return FALSE;
 			FbxStrlcpy(fs, tname, name, len);
-			if (FbxStrcmp(fs, fullpathbuf, "/") != 0 && tname[0])
+			if (strcmp(fullpathbuf, "/") != 0 && tname[0])
 				FbxStrlcat(fs, fullpathbuf, "/", MAXPATHLEN);
 			FbxStrlcat(fs, fullpathbuf, tname, MAXPATHLEN);
 			name = p;
@@ -749,7 +749,7 @@ static void FbxClearArchiveFlags(struct FbxFS *fs, const char *fullpath) {
 			prot &= ~FIBF_ARCHIVE;
 			FbxSetAmigaProtectionFlags(fs, pathbuf, prot);
 		}
-	} while (FbxParentPath(fs, pathbuf) && FbxStrcmp(fs, pathbuf, "/") != 0);
+	} while (FbxParentPath(fs, pathbuf) && strcmp(pathbuf, "/") != 0);
 }
 
 static int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock) {
@@ -1426,7 +1426,7 @@ static int FbxDeleteObject(struct FbxFS *fs, struct FbxLock *lock, const char *n
 		return DOSFALSE;
 	}
 
-	if (FbxStrcmp(fs, fullpath, "/") == 0) {
+	if (strcmp(fullpath, "/") == 0) {
 		// can't delete root
 		fs->r2 = ERROR_OBJECT_WRONG_TYPE;
 		return DOSFALSE;
@@ -1483,7 +1483,7 @@ static void FbxUpdatePaths(struct FbxFS *fs, const char *oldpath, const char *ne
 	// global hashtable and compare entry->path
 	int plen = FbxStrlen(fs, oldpath);
 	int a;
-	if (FbxStrcmp(fs, oldpath, "/") == 0) plen = 0;
+	if (strcmp(oldpath, "/") == 0) plen = 0;
 	for (a = 0; a < ENTRYHASHSIZE; a++) {
 		chain = fs->currvol->entrytab[a].mlh_Head;
 		while ((succ = chain->mln_Succ) != NULL) {
@@ -1504,7 +1504,7 @@ static void FbxUpdatePaths(struct FbxFS *fs, const char *oldpath, const char *ne
 
 static BOOL FbxIsParent(struct FbxFS *fs, const char *parent, const char *child) {
 	int plen = FbxStrlen(fs, parent);
-	if (FbxStrcmp(fs, parent, "/") == 0) plen = 0;
+	if (strcmp(parent, "/") == 0) plen = 0;
 	if (FbxStrncmp(fs, parent, child, plen) == 0 && child[plen] == '/')
 		return TRUE;
 	else
@@ -1551,7 +1551,7 @@ static int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *n
 		return DOSFALSE;
 	}
 
-	if (FbxStrcmp(fs, fullpath, "/") == 0) {
+	if (strcmp(fullpath, "/") == 0) {
 		// can't rename root
 		fs->r2 = ERROR_OBJECT_WRONG_TYPE;
 		return DOSFALSE;

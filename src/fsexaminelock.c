@@ -70,7 +70,7 @@ void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *st
 	struct FileInfoBlock *fib)
 {
 	char *comment = fs->pathbuf[2];
-	if (FbxStrcmp(fs, fullpath, "/") == 0) {
+	if (strcmp(fullpath, "/") == 0) {
 		FbxStrlcpy(fs, (char *)fib->fib_FileName + 1, fs->currvol->volname, sizeof(fib->fib_FileName));
 		fib->fib_DirEntryType =
 		fib->fib_EntryType = ST_ROOT;
