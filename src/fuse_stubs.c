@@ -110,20 +110,6 @@ int Fbx_chown(struct FbxFS *fs, const char *path, uid_t uid, gid_t gid)
 	return FSOP chown(path, uid, gid, &fs->fcntx);
 }
 
-int Fbx_format(struct FbxFS *fs, const char *volname, ULONG dostype)
-{
-	ODEBUGF("Fbx_format(%#p, '%s', %#lx)\n", fs, volname, dostype);
-
-	return FSOP format(volname, dostype, &fs->fcntx);
-}
-
-int Fbx_relabel(struct FbxFS *fs, const char *volname)
-{
-	ODEBUGF("Fbx_relabel(%#p, '%s')\n", fs, volname);
-
-	return FSOP relabel(volname, &fs->fcntx);
-}
-
 int Fbx_setxattr(struct FbxFS *fs, const char *path, const char *attr,
 	CONST_APTR buf, size_t len, int flags)
 {

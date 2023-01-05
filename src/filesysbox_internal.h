@@ -581,6 +581,9 @@ int FbxExamineLock(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 int FbxReadDir(struct FbxFS *fs, struct FbxLock *lock);
 int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock *fib);
 
+/* fsformat.c */
+int FbxFormat(struct FbxFS *fs, const char *volname, ULONG dostype);
+
 /* fsinfodata.c */
 int FbxDiskInfo(struct FbxFS *fs, struct InfoData *info);
 int FbxInfo(struct FbxFS *fs, struct FbxLock *lock, struct InfoData *info);
@@ -597,6 +600,9 @@ int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock);
 
 /* fsread.c */
 int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes);
+
+/* fsrelabel.c */
+int FbxRelabel(struct FbxFS *fs, const char *volname);
 
 /* fsrename.c */
 int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *name,

@@ -1535,53 +1535,6 @@ static BPTR FbxCurrentVolume(struct FbxFS *fs, struct FbxLock *lock) {
 	}
 }
 
-static int FbxFormat(struct FbxFS *fs, const char *volname, ULONG dostype) {
-	int error;
-
-	PDEBUGF("FbxFormat(%#p, '%s', %#lx)\n", fs, volname, dostype);
-
-	if (!fs->inhibit) {
-		fs->r2 = ERROR_OBJECT_IN_USE;
-		return DOSFALSE;
-	}
-
-	CHECKSTRING(volname, DOSFALSE);
-
-	error = Fbx_format(fs, volname, dostype);
-	if (error) {
-		fs->r2 = FbxFuseErrno2Error(error);
-		return DOSFALSE;
-	}
-
-	fs->r2 = 0;
-	return DOSTRUE;
-}
-
-static int FbxRelabel(struct FbxFS *fs, const char *volname) {
-	struct FbxVolume *vol = fs->currvol;
-	int error;
-
-	PDEBUGF("FbxRelabel(%#p, '%s')\n", fs, volname);
-
-	CHECKVOLUME(DOSFALSE);
-	CHECKWRITABLE(DOSFALSE);
-
-	CHECKSTRING(volname, DOSFALSE);
-
-	error = Fbx_relabel(fs, volname);
-	if (error) {
-		fs->r2 = FbxFuseErrno2Error(error);
-		return DOSFALSE;
-	}
-
-	FbxAsyncRenameVolume(fs, vol, volname);
-
-	FbxNotifyDiskChange(fs, IECLASS_DISKINSERTED);
-
-	fs->r2 = 0;
-	return DOSTRUE;
-}
-
 SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
 	LONG type;
 	SIPTR r1;
