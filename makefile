@@ -25,8 +25,8 @@ main_OBJS = $(subst src/,obj/,$(main_SRCS:.c=.o))
 
 SRCS = $(addprefix src/, \
        init.c filesysbox.c fuse_stubs.c uptime.c doslist.c fsexamineall.c \
-       fsexamineallend.c fsread.c fswrite.c volume.c utf8.c ucs4.c strlcpy.c \
-       debugf.c kputstr.c snprintf.c allocvecpooled.c)
+       fsexamineallend.c fsexaminenext.c fsread.c fswrite.c volume.c utf8.c \
+       ucs4.c strlcpy.c debugf.c kputstr.c snprintf.c allocvecpooled.c)
 
 OBJS = $(main_OBJS) $(subst src/,obj/,$(SRCS:.c=.o))
 

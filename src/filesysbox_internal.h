@@ -526,7 +526,8 @@ LONG FbxMode2EntryType(const mode_t mode);
 ULONG FbxMode2Protection(const mode_t mode);
 void FbxGetComment(struct FbxFS *fs, const char *fullpath, char *comment, size_t size);
 UWORD FbxUnix2AmigaOwner(const uid_t owner);
-int FbxReadDir(struct FbxFS *fs, struct FbxLock *lock);
+void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath,
+	struct fbx_stat *stat, struct FileInfoBlock *fib);
 int FbxFlushAll(struct FbxFS *fs);
 SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt);
 void FbxHandleNotifyReplies(struct FbxFS *fs);
@@ -549,6 +550,10 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 /* fsexamineallend.c */
 int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,
 	int type, struct ExAllControl *ctrl);
+
+/* fsexaminenext.c */
+int FbxReadDir(struct FbxFS *fs, struct FbxLock *lock);
+int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock *fib);
 
 /* fsread.c */
 int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes);

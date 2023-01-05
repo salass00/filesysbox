@@ -102,14 +102,6 @@ int Fbx_fsync(struct FbxFS *fs, const char *path, int x, struct fuse_file_info *
 	return FSOP fsync(path, x, fi, &fs->fcntx);
 }
 
-int Fbx_readdir(struct FbxFS *fs, const char *path, APTR udata, fuse_fill_dir_t func,
-	QUAD offset, struct fuse_file_info *fi)
-{
-	ODEBUGF("Fbx_readdir(%#p, '%s', %#p, %#p, %lld, %#p)\n", fs, path, udata, func, offset, fi);
-
-	return FSOP readdir(path, udata, func, offset, fi, &fs->fcntx);
-}
-
 int Fbx_ftruncate(struct FbxFS *fs, const char *path, QUAD size, struct fuse_file_info *fi)
 {
 	ODEBUGF("Fbx_ftruncate(%#p, '%s', %lld, %#p)\n", fs, path, size, fi);
@@ -179,20 +171,6 @@ int Fbx_create(struct FbxFS *fs, const char *path, mode_t mode, struct fuse_file
 	ODEBUGF("Fbx_create(%#p, '%s', 0%o, %#p)\n", fs, path, mode, fi);
 
 	return FSOP create(path, mode, fi, &fs->fcntx);
-}
-
-int Fbx_opendir(struct FbxFS *fs, const char *path, struct fuse_file_info *fi)
-{
-	ODEBUGF("Fbx_opendir(%#p, '%s', %#p)\n", fs, path, fi);
-
-	return FSOP opendir(path, fi, &fs->fcntx);
-}
-
-int Fbx_releasedir(struct FbxFS *fs, const char *path, struct fuse_file_info *fi)
-{
-	ODEBUGF("Fbx_releasedir(%#p, '%s', %#p)\n", fs, path, fi);
-
-	return FSOP releasedir(path, fi, &fs->fcntx);
 }
 
 int Fbx_setxattr(struct FbxFS *fs, const char *path, const char *attr,
