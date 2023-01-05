@@ -595,6 +595,10 @@ int FbxInfo(struct FbxFS *fs, struct FbxLock *lock, struct InfoData *info);
 /* fsinhibit.c */
 int FbxInhibit(struct FbxFS *fs, int inhibit);
 
+/* fslock.c */
+struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock,
+	const char *name, int lockmode);
+
 /* fsopen.c */
 int FbxOpenFile(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock,
 	const char *name, int mode);

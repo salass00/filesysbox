@@ -453,11 +453,6 @@ void FbxAddEntry(struct FbxFS *fs, struct FbxEntry *e) {
 	AddTail((struct List *)&fs->currvol->entrytab[i], (struct Node *)&e->hashchain);
 }
 
-static const char *FbxSkipColon(const char *s) {
-	const char *s2 = strrchr(s, ':');
-	return s2 ? (s2 + 1) : s;
-}
-
 BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf) {
 	if (strcmp(pathbuf, "/") == 0) {
 		// can't parent root
@@ -471,6 +466,11 @@ BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf) {
 	}
 	// should never happen
 	return FALSE;
+}
+
+static const char *FbxSkipColon(const char *s) {
+	const char *s2 = strrchr(s, ':');
+	return s2 ? (s2 + 1) : s;
 }
 
 BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, char *fullpathbuf) {
@@ -797,65 +797,6 @@ static int FbxUnLockObject(struct FbxFS *fs, struct FbxLock *lock) {
 
 	fs->r2 = 0;
 	return DOSTRUE;
-}
-
-static struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock, const char *name, int lockmode) {
-	char *fullpath = fs->pathbuf[0];
-	struct fbx_stat statbuf;
-	int error;
-	LONG ntype;
-	struct FbxEntry *e;
-	struct FbxLock *lock2;
-
-	PDEBUGF("FbxLocateObject(%#p, %#p, '%s', %d)\n", fs, lock, name, lockmode);
-
-	CHECKVOLUME(NULL);
-
-	if (lock != NULL) {
-		CHECKLOCK(lock, NULL);
-
-		if (lock->fsvol != fs->currvol) {
-			fs->r2 = ERROR_NO_DISK;
-			return NULL;
-		}
-	}
-
-	CHECKSTRING(name, NULL);
-
-	if (!FbxLockName2Path(fs, lock, name, fullpath)) {
-		fs->r2 = ERROR_OBJECT_NOT_FOUND;
-		return NULL;
-	}
-
-	error = Fbx_getattr(fs, fullpath, &statbuf);
-	if (error) {
-		fs->r2 = FbxFuseErrno2Error(error);
-		return NULL;
-	}
-
-	if (S_ISLNK(statbuf.st_mode)) {
-		fs->r2 = ERROR_IS_SOFT_LINK;
-		return NULL;
-	} else if (S_ISREG(statbuf.st_mode)) {
-		ntype = ETYPE_FILE;
-	} else {
-		ntype = ETYPE_DIR;
-	}
-
-	e = FbxFindEntry(fs, fullpath);
-	if (e == NULL) {
-		e = FbxSetupEntry(fs, fullpath, ntype, statbuf.st_ino);
-		if (e == NULL) return NULL;
-	}
-
-	lock2 = FbxLockEntry(fs, e, lockmode);
-	if (lock2 == NULL) {
-		FbxCleanupEntry(fs, e);
-		return NULL;
-	}
-
-	fs->r2 = 0;
-	return lock2;
 }
 
 static struct FbxLock *FbxDupLock(struct FbxFS *fs, struct FbxLock *lock) {
