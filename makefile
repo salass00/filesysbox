@@ -32,6 +32,8 @@ SRCS = $(addprefix src/, \
 OBJS = $(main_OBJS) $(subst src/,obj/,$(SRCS:.c=.o))
 
 ifeq ($(HOST),m68k-amigaos)
+	main_OBJS_000 = $(subst obj/,obj-000/,$(main_OBJS))
+	main_OBJS_020 = $(subst obj/,obj-020/,$(main_OBJS))
 	OBJS_000 = $(subst obj/,obj-000/,$(OBJS))
 	OBJS_020 = $(subst obj/,obj-020/,$(OBJS))
 endif
@@ -76,6 +78,9 @@ $(TARGET).020: $(OBJS_020)
 
 obj-000/init.o: $(TARGET)_rev.h src/filesysbox_vectors.c src/filesysbox_vectors.h
 obj-020/init.o: $(TARGET)_rev.h src/filesysbox_vectors.c src/filesysbox_vectors.h
+
+$(main_OBJS_000): src/filesysbox_vectors.h
+$(main_OBJS_020): src/filesysbox_vectors.h
 
 $(OBJS_000): src/filesysbox_internal.h
 $(OBJS_020): src/filesysbox_internal.h
