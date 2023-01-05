@@ -519,10 +519,12 @@ struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mode);
 void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd);
 void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list);
 void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock);
+void FbxAddEntry(struct FbxFS *fs, struct FbxEntry *e);
 BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf);
 BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, char *fullpathbuf);
 int FbxFuseErrno2Error(int error);
 void FbxDoNotify(struct FbxFS *fs, const char *path);
+void FbxSetEntryPath(struct FbxFS *fs, struct FbxEntry *e, const char *p);
 struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int type, QUAD id);
 void FbxCleanupEntry(struct FbxFS *fs, struct FbxEntry *e);
 void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e);
@@ -534,6 +536,8 @@ struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
 void FbxCleanupTimerIO(struct FbxFS *fs);
 QUAD FbxGetUpTimeMillis(struct FbxFS *fs);
 void FbxSetModifyState(struct FbxFS *fs, int state);
+void FbxUnResolveNotifys(struct FbxFS *fs, struct FbxEntry *e);
+BOOL FbxIsParent(struct FbxFS *fs, const char *parent, const char *child);
 void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStamp *ds);
 int FbxFlushAll(struct FbxFS *fs);
 SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt);
@@ -593,6 +597,10 @@ int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock);
 
 /* fsread.c */
 int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes);
+
+/* fsrename.c */
+int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *name,
+	struct FbxLock *lock2, const char *name2);
 
 /* fssetcomment.c */
 int FbxSetComment(struct FbxFS *fs, struct FbxLock *lock, const char *name,

@@ -16,7 +16,6 @@ int Fbx_readlink(struct FbxFS *fs, const char *path, char *buf, size_t buflen);
 int Fbx_unlink(struct FbxFS *fs, const char *path);
 int Fbx_rmdir(struct FbxFS *fs, const char *path);
 int Fbx_symlink(struct FbxFS *fs, const char *dest, const char *path);
-int Fbx_rename(struct FbxFS *fs, const char *path, const char *path2);
 int Fbx_link(struct FbxFS *fs, const char *dest, const char *path);
 int Fbx_statfs(struct FbxFS *fs, const char *name, struct statvfs *stat);
 int Fbx_release(struct FbxFS *fs, const char *path, struct fuse_file_info *fi);

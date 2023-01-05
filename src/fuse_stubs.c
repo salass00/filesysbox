@@ -46,13 +46,6 @@ int Fbx_symlink(struct FbxFS *fs, const char *dest, const char *path)
 	return FSOP symlink(dest, path, &fs->fcntx);
 }
 
-int Fbx_rename(struct FbxFS *fs, const char *path, const char *path2)
-{
-	ODEBUGF("Fbx_rename(%#p, '%s', '%s')\n", fs, path, path2);
-
-	return FSOP rename(path, path2, &fs->fcntx);
-}
-
 int Fbx_link(struct FbxFS *fs, const char *dest, const char *path)
 {
 	ODEBUGF("Fbx_link(%#p, '%s', '%s')\n", fs, dest, path);
