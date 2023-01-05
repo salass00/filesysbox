@@ -561,6 +561,10 @@ int FbxCloseFile(struct FbxFS *fs, struct FbxLock *lock);
 /* fscreatedir.c */
 struct FbxLock *FbxCreateDir(struct FbxFS *fs, struct FbxLock *lock, const char *name);
 
+/* fscreatehardlink.c */
+int FbxMakeHardLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
+	struct FbxLock *lock2);
+
 /* fscreatesoftlink.c */
 int FbxMakeSoftLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	const char *softname);

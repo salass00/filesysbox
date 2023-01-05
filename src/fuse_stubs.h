@@ -12,7 +12,6 @@
 #define FUSE_STUBS_H 1
 
 int Fbx_getattr(struct FbxFS *fs, const char *path, struct fbx_stat *stat);
-int Fbx_link(struct FbxFS *fs, const char *dest, const char *path);
 int Fbx_statfs(struct FbxFS *fs, const char *name, struct statvfs *stat);
 int Fbx_release(struct FbxFS *fs, const char *path, struct fuse_file_info *fi);
 int Fbx_fsync(struct FbxFS *fs, const char *path, int x, struct fuse_file_info *fi);

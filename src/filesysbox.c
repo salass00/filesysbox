@@ -1048,60 +1048,6 @@ static int FbxSameLock(struct FbxFS *fs, struct FbxLock *lock, struct FbxLock *l
 	return DOSFALSE;
 }
 
-static int FbxMakeHardLink(struct FbxFS *fs, struct FbxLock *lock, const char *name, struct FbxLock *lock2) {
-	char *fullpath = fs->pathbuf[0];
-	char *fullpath2 = fs->pathbuf[1];
-	int error;
-
-	PDEBUGF("FbxMakeHardlink(%#p, %#p, '%s', %#p)\n", fs, lock, name, lock2);
-
-	CHECKVOLUME(DOSFALSE);
-	CHECKWRITABLE(DOSFALSE);
-
-	if (lock != NULL) {
-		CHECKLOCK(lock, DOSFALSE);
-
-		if (lock->fsvol != fs->currvol) {
-			fs->r2 = ERROR_NO_DISK;
-			return DOSFALSE;
-		}
-	}
-
-	CHECKLOCK(lock2, DOSFALSE);
-
-	CHECKSTRING(name, DOSFALSE);
-
-	if (lock2->fsvol != fs->currvol) {
-		fs->r2 = ERROR_NO_DISK;
-		return DOSFALSE;
-	}
-
-	if (!FbxLockName2Path(fs, lock, name, fullpath) ||
-		!FbxLockName2Path(fs, lock2, "", fullpath2))
-	{
-		fs->r2 = ERROR_OBJECT_NOT_FOUND;
-		return DOSFALSE;
-	}
-
-	if (FbxIsParent(fs, fullpath2, fullpath)) {
-		fs->r2 = ERROR_OBJECT_IN_USE;
-		return DOSFALSE;
-	}
-
-	error = Fbx_link(fs, fullpath2, fullpath);
-	if (error) {
-		fs->r2 = FbxFuseErrno2Error(error);
-		return DOSFALSE;
-	}
-
-	FbxDoNotify(fs, fullpath);
-
-	FbxSetModifyState(fs, 1);
-
-	fs->r2 = 0;
-	return DOSTRUE;
-}
-
 static int FbxChangeMode(struct FbxFS *fs, struct FbxLock *lock, int mode) {
 	PDEBUGF("FbxChangeMode(%#p, %#p, %d)\n", fs, lock, mode);
 
