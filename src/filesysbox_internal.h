@@ -566,6 +566,9 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 int FbxDiskInfo(struct FbxFS *fs, struct InfoData *info);
 int FbxInfo(struct FbxFS *fs, struct FbxLock *lock, struct InfoData *info);
 
+/* fsinhibit.c */
+int FbxInhibit(struct FbxFS *fs, int inhibit);
+
 /* fsread.c */
 int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes);
 
@@ -574,6 +577,9 @@ QUAD FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode)
 
 /* fswrite.c */
 int FbxWriteFile(struct FbxFS *fs, struct FbxLock *lock, CONST_APTR buffer, int bytes);
+
+/* fswriteprotect.c */
+int FbxWriteProtect(struct FbxFS *fs, int on_off, IPTR passkey);
 
 /* volume.c */
 struct FbxVolume *FbxSetupVolume(struct FbxFS *fs);

@@ -2144,58 +2144,6 @@ int FbxFlushAll(struct FbxFS *fs) {
 	return DOSTRUE;
 }
 
-static int FbxInhibit(struct FbxFS *fs, int inhibit) {
-	PDEBUGF("FbxInhibit(%#p, %d)\n", fs, inhibit);
-
-	if (inhibit) {
-		if (fs->inhibit == 0) {
-			FbxCleanupVolume(fs);
-		}
-		fs->inhibit++;
-	} else {
-		if (fs->inhibit) {
-			fs->inhibit--;
-			if (fs->inhibit == 0) {
-				fs->dosetup = TRUE;
-			}
-		}
-	}
-
-	return DOSTRUE;
-}
-
-static int FbxWriteProtect(struct FbxFS *fs, int on_off, IPTR passkey) {
-	PDEBUGF("FbxWriteProtect(%#p, %d, %#p)\n", fs, on_off, (APTR)passkey);
-
-	CHECKVOLUME(DOSFALSE);
-
-	if (on_off) { // protect?
-		if (fs->currvol->writeprotect) {
-			if (fs->currvol->passkey == 0 && passkey == 0) {
-				fs->r2 = 0;
-				return DOSTRUE;
-			} else {
-				fs->r2 = ERROR_WRITE_PROTECTED;
-				return DOSFALSE;
-			}
-		} else {
-			fs->currvol->writeprotect = TRUE;
-			fs->currvol->passkey = passkey;
-			FbxFlushAll(fs);
-		}
-	} else { // unprotect
-		if (fs->currvol->writeprotect) {
-			if (fs->currvol->passkey != 0 && fs->currvol->passkey != passkey) {
-				fs->r2 = ERROR_BAD_NUMBER;
-				return DOSFALSE;
-			}
-			fs->currvol->writeprotect = FALSE;
-		}
-	}
-	fs->r2 = 0;
-	return DOSTRUE;
-}
-
 static BPTR FbxCurrentVolume(struct FbxFS *fs, struct FbxLock *lock) {
 	fs->r2 = fs->fssm ? fs->fssm->fssm_Unit : -1; // yeah..
 	if (lock != NULL) {
