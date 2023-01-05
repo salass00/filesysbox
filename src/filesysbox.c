@@ -42,11 +42,6 @@
 #include <string.h>
 #include <SDI/SDI_interrupt.h>
 
-//#ifdef __AROS__
-#define ts_sec  tv_sec
-#define ts_nsec tv_nsec
-//#endif
-
 #ifndef __AROS__
 static size_t strnlen(const char *str, size_t maxlen)
 {
@@ -849,29 +844,11 @@ static struct FbxLock *FbxLocateParent(struct FbxFS *fs, struct FbxLock *lock) {
 	return lock;
 }
 
-static void FbxDS2TimeSpec(struct FbxFS *fs, const struct DateStamp *ds, struct timespec *ts) {
-	ULONG sec, nsec;
-
-	sec = ds->ds_Days * (60*60*24);
-	sec += ds->ds_Minute * 60;
-	sec += ds->ds_Tick / 50;
-	nsec = (ds->ds_Tick % 50) * (1000*1000*1000/50);
-
-	// add 8 years of seconds to adjust for different epoch.
-	sec += UNIXTIMEOFFSET;
-
-	/* convert to GMT */
-	sec += fs->gmtoffset * 60;
-
-	ts->ts_sec = sec;
-	ts->ts_nsec = nsec;
-}
-
 void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStamp *ds) {
 	ULONG sec, nsec;
 
-	sec = ts->ts_sec;
-	nsec = ts->ts_nsec;
+	sec = ts->tv_sec;
+	nsec = ts->tv_nsec;
 
 	// subtract 8 years of seconds to adjust for different epoch.
 	sec -= UNIXTIMEOFFSET;
@@ -880,7 +857,7 @@ void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStam
 	sec -= fs->gmtoffset * 60;
 
 	// check for overflow (if date was < 1.1.1978)
-	if (sec > (ULONG)ts->ts_sec) {
+	if (sec > (ULONG)ts->tv_sec) {
 		sec = 0;
 		nsec = 0;
 	}
@@ -888,58 +865,6 @@ void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStam
 	ds->ds_Days = sec / (60*60*24);
 	ds->ds_Minute = (sec % (60*60*24)) / 60;
 	ds->ds_Tick = (sec % 60) * 50 + nsec / (1000*1000*1000/50);
-}
-
-static int FbxSetDate(struct FbxFS *fs, struct FbxLock *lock, const char *name, const struct DateStamp *date) {
-	struct timespec tv[2];
-	int error;
-	char *fullpath = fs->pathbuf[0];
-
-	PDEBUGF("FbxSetDate(%#p, %#p, '%s', %#p)\n", fs, lock, name, date);
-
-	CHECKVOLUME(DOSFALSE);
-	CHECKWRITABLE(DOSFALSE);
-
-	if (lock != NULL) {
-		CHECKLOCK(lock, DOSFALSE);
-
-		if (lock->fsvol != fs->currvol) {
-			fs->r2 = ERROR_NO_DISK;
-			return DOSFALSE;
-		}
-	}
-
-	CHECKSTRING(name, DOSFALSE);
-
-	if (!FbxLockName2Path(fs, lock, name, fullpath)) {
-		fs->r2 = ERROR_OBJECT_NOT_FOUND;
-		return DOSFALSE;
-	}
-
-	FbxDS2TimeSpec(fs, date, &tv[0]);
-	FbxDS2TimeSpec(fs, date, &tv[1]);
-
-	if (FSOP utimens) {
-		error = Fbx_utimens(fs, fullpath, tv);
-	} else {
-		struct utimbuf ubuf;
-
-		ubuf.actime  = tv[0].ts_sec;
-		ubuf.modtime = tv[1].ts_sec;
-
-		error = Fbx_utime(fs, fullpath, &ubuf);
-	}
-	if (error) {
-		fs->r2 = FbxFuseErrno2Error(error);
-		return DOSFALSE;
-	}
-
-	FbxDoNotify(fs, fullpath);
-
-	FbxSetModifyState(fs, 1);
-
-	fs->r2 = 0;
-	return DOSTRUE;
 }
 
 static int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify) {

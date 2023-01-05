@@ -47,20 +47,6 @@ int Fbx_fgetattr(struct FbxFS *fs, const char *path, struct fbx_stat *stat,
 	return FSOP fgetattr(path, stat, fi, &fs->fcntx);
 }
 
-int Fbx_utimens(struct FbxFS *fs, const char *path, const struct timespec *tv)
-{
-	ODEBUGF("Fbx_utimens(%#p, '%s', %#p)\n", fs, path, tv);
-
-	return FSOP utimens(path, tv, &fs->fcntx);
-}
-
-int Fbx_utime(struct FbxFS *fs, const char *path, struct utimbuf *ubuf)
-{
-	ODEBUGF("Fbx_utime(%#p, '%s', %#p)\n", fs, path, ubuf);
-
-	return FSOP utime(path, ubuf, &fs->fcntx);
-}
-
 int Fbx_setxattr(struct FbxFS *fs, const char *path, const char *attr,
 	CONST_APTR buf, size_t len, int flags)
 {

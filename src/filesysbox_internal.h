@@ -640,6 +640,10 @@ QUAD FbxSeekFile(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode);
 int FbxSetComment(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	const char *comment);
 
+/* fssetdate.c */
+int FbxSetDate(struct FbxFS *fs, struct FbxLock *lock, const char *name,
+	const struct DateStamp *date);
+
 /* fssetfilesize.c */
 QUAD FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode);
 
