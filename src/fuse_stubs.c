@@ -89,13 +89,6 @@ int Fbx_chmod(struct FbxFS *fs, const char *path, mode_t mode)
 	return FSOP chmod(path, mode, &fs->fcntx);
 }
 
-int Fbx_chown(struct FbxFS *fs, const char *path, uid_t uid, gid_t gid)
-{
-	ODEBUGF("Fbx_chown(%#p, '%s', %#x, %#x)\n", fs, path, uid, gid);
-
-	return FSOP chown(path, uid, gid, &fs->fcntx);
-}
-
 int Fbx_setxattr(struct FbxFS *fs, const char *path, const char *attr,
 	CONST_APTR buf, size_t len, int flags)
 {

@@ -1079,49 +1079,6 @@ static int FbxSetProtection(struct FbxFS *fs, struct FbxLock *lock, const char *
 	return DOSTRUE;
 }
 
-static uid_t FbxAmiga2UnixOwner(const UWORD owner) {
-	if (owner == DOS_OWNER_ROOT) return (uid_t)0;
-	else if (owner == DOS_OWNER_NONE) return (uid_t)-2;
-	else return (uid_t)owner;
-}
-
-static int FbxSetOwnerInfo(struct FbxFS *fs, struct FbxLock *lock, const char *name, UWORD uid, UWORD gid) {
-	int error;
-	char *fullpath = fs->pathbuf[0];
-
-	PDEBUGF("FbxSetOwnerInfo(%#p, %#p, '%s', %#x, %#x)\n", fs, lock, name, uid, gid);
-
-	CHECKVOLUME(DOSFALSE);
-	CHECKWRITABLE(DOSFALSE);
-
-	if (lock != NULL) {
-		CHECKLOCK(lock, DOSFALSE);
-
-		if (lock->fsvol != fs->currvol) {
-			fs->r2 = ERROR_NO_DISK;
-			return DOSFALSE;
-		}
-	}
-
-	CHECKSTRING(name, DOSFALSE);
-
-	if (!FbxLockName2Path(fs, lock, name, fullpath)) {
-		fs->r2 = ERROR_OBJECT_NOT_FOUND;
-		return DOSFALSE;
-	}
-
-	error = Fbx_chown(fs, fullpath, FbxAmiga2UnixOwner(uid), FbxAmiga2UnixOwner(gid));
-	if (error) {
-		fs->r2 = FbxFuseErrno2Error(error);
-		return DOSFALSE;
-	}
-
-	FbxSetModifyState(fs, 1);
-
-	fs->r2 = 0;
-	return DOSTRUE;
-}
-
 static int FbxSameLock(struct FbxFS *fs, struct FbxLock *lock, struct FbxLock *lock2) {
 	PDEBUGF("FbxSameLock(%#p, %#p, %#p)\n", fs, lock, lock2);
 

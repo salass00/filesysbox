@@ -23,7 +23,6 @@ int Fbx_fgetattr(struct FbxFS *fs, const char *path, struct fbx_stat *stat,
 int Fbx_utimens(struct FbxFS *fs, const char *path, const struct timespec *tv);
 int Fbx_utime(struct FbxFS *fs, const char *path, struct utimbuf *ubuf);
 int Fbx_chmod(struct FbxFS *fs, const char *path, mode_t mode);
-int Fbx_chown(struct FbxFS *fs, const char *path, uid_t uid, gid_t gid);
 int Fbx_setxattr(struct FbxFS *fs, const char *path, const char *attr,
 	CONST_APTR buf, size_t len, int flags);
 int Fbx_getxattr(struct FbxFS *fs, const char *path, const char *attr,

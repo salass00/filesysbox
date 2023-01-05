@@ -622,6 +622,10 @@ int FbxSetComment(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 /* fssetfilesize.c */
 QUAD FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode);
 
+/* fssetownerinfo.c */
+int FbxSetOwnerInfo(struct FbxFS *fs, struct FbxLock *lock, const char *name,
+	UWORD uid, UWORD gid);
+
 /* fswrite.c */
 int FbxWriteFile(struct FbxFS *fs, struct FbxLock *lock, CONST_APTR buffer, int bytes);
 
