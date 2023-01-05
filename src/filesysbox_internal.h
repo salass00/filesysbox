@@ -628,6 +628,9 @@ int FbxRelabel(struct FbxFS *fs, const char *volname);
 int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	struct FbxLock *lock2, const char *name2);
 
+/* fssamelock.c */
+int FbxSameLock(struct FbxFS *fs, struct FbxLock *lock, struct FbxLock *lock2);
+
 /* fsseek.c */
 QUAD FbxSeekFile(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode);
 
