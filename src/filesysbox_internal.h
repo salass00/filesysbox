@@ -523,6 +523,7 @@ void FbxAddEntry(struct FbxFS *fs, struct FbxEntry *e);
 BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf);
 BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, char *fullpathbuf);
 int FbxFuseErrno2Error(int error);
+void FbxDoNotifyEntry(struct FbxFS *fs, struct FbxEntry *entry);
 void FbxDoNotify(struct FbxFS *fs, const char *path);
 void FbxSetEntryPath(struct FbxFS *fs, struct FbxEntry *e, const char *p);
 struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int type, QUAD id);
@@ -559,6 +560,9 @@ int FbxCloseFile(struct FbxFS *fs, struct FbxLock *lock);
 
 /* fscreatedir.c */
 struct FbxLock *FbxCreateDir(struct FbxFS *fs, struct FbxLock *lock, const char *name);
+
+/* fsdelete.c */
+int FbxDeleteObject(struct FbxFS *fs, struct FbxLock *lock, const char *name);
 
 /* fsexamineall.c */
 int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,

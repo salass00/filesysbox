@@ -25,20 +25,6 @@ int Fbx_readlink(struct FbxFS *fs, const char *path, char *buf, size_t buflen)
 	return FSOP readlink(path, buf, buflen, &fs->fcntx);
 }
 
-int Fbx_unlink(struct FbxFS *fs, const char *path)
-{
-	ODEBUGF("Fbx_unlink(%#p, '%s')\n", fs, path);
-
-	return FSOP unlink(path, &fs->fcntx);
-}
-
-int Fbx_rmdir(struct FbxFS *fs, const char *path)
-{
-	ODEBUGF("Fbx_rmdir(%#p, '%s')\n", fs, path);
-
-	return FSOP rmdir(path, &fs->fcntx);
-}
-
 int Fbx_symlink(struct FbxFS *fs, const char *dest, const char *path)
 {
 	ODEBUGF("Fbx_symlink(%#p, '%s', '%s')\n", fs, path, dest);
