@@ -18,13 +18,6 @@ int Fbx_getattr(struct FbxFS *fs, const char *path, struct fbx_stat *stat)
 	return FSOP getattr(path, stat, &fs->fcntx);
 }
 
-int Fbx_symlink(struct FbxFS *fs, const char *dest, const char *path)
-{
-	ODEBUGF("Fbx_symlink(%#p, '%s', '%s')\n", fs, path, dest);
-
-	return FSOP symlink(dest, path, &fs->fcntx);
-}
-
 int Fbx_link(struct FbxFS *fs, const char *dest, const char *path)
 {
 	ODEBUGF("Fbx_link(%#p, '%s', '%s')\n", fs, dest, path);
