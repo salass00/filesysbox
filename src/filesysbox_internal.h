@@ -28,6 +28,9 @@
 #include <stddef.h>
 #include <SDI/SDI_compiler.h>
 
+#define DOS_OWNER_ROOT 65535
+#define DOS_OWNER_NONE 0
+
 #define IS_VALID_BPTR(bptr) (((bptr) & 0xC0000000) == 0 && (bptr) > 64)
 
 #ifndef NEWLIST
@@ -510,6 +513,7 @@ int FbxStrcmp(struct FbxFS *fs, const char *s1, const char *s2);
 int FbxStrncmp(struct FbxFS *fs, const char *s1, const char *s2, size_t n);
 size_t FbxStrlcpy(struct FbxFS *fs, char *dst, const char *src, size_t dst_size);
 size_t FbxStrlcat(struct FbxFS *fs, char *dst, const char *src, size_t dst_size);
+unsigned int FbxHashPath(struct FbxFS *fs, const char *str);
 void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd);
 void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list);
 BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, char *fullpathbuf);
@@ -522,12 +526,6 @@ void FbxCleanupTimerIO(struct FbxFS *fs);
 QUAD FbxGetUpTimeMillis(struct FbxFS *fs);
 void FbxSetModifyState(struct FbxFS *fs, int state);
 void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStamp *ds);
-LONG FbxMode2EntryType(const mode_t mode);
-ULONG FbxMode2Protection(const mode_t mode);
-void FbxGetComment(struct FbxFS *fs, const char *fullpath, char *comment, size_t size);
-UWORD FbxUnix2AmigaOwner(const uid_t owner);
-void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath,
-	struct fbx_stat *stat, struct FileInfoBlock *fib);
 int FbxFlushAll(struct FbxFS *fs);
 SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt);
 void FbxHandleNotifyReplies(struct FbxFS *fs);
@@ -550,6 +548,15 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 /* fsexamineallend.c */
 int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,
 	int type, struct ExAllControl *ctrl);
+
+/* fsexaminelock.c */
+void FbxGetComment(struct FbxFS *fs, const char *fullpath, char *comment, size_t size);
+LONG FbxMode2EntryType(const mode_t mode);
+ULONG FbxMode2Protection(const mode_t mode);
+UWORD FbxUnix2AmigaOwner(const uid_t owner);
+void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *stat,
+	struct FileInfoBlock *fib);
+int FbxExamineLock(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock *fib);
 
 /* fsexaminenext.c */
 int FbxReadDir(struct FbxFS *fs, struct FbxLock *lock);
