@@ -572,6 +572,10 @@ int FbxInhibit(struct FbxFS *fs, int inhibit);
 /* fsread.c */
 int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes);
 
+/* fssetcomment.c */
+int FbxSetComment(struct FbxFS *fs, struct FbxLock *lock, const char *name,
+	const char *comment);
+
 /* fssetfilesize.c */
 QUAD FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode);
 
