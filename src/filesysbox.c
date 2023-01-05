@@ -318,7 +318,7 @@ unsigned int FbxHashPath(struct FbxFS *fs, const char *str) {
 		return FbxHashPathNoCase(fs, str);
 }
 
-static struct FbxEntry *FbxFindEntry(struct FbxFS *fs, const char *path) {
+struct FbxEntry *FbxFindEntry(struct FbxFS *fs, const char *path) {
 	ULONG i;
 	struct FbxEntry *e, *succ;
 
@@ -334,7 +334,7 @@ static struct FbxEntry *FbxFindEntry(struct FbxFS *fs, const char *path) {
 	return NULL;
 }
 
-static struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mode) {
+struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mode) {
 	struct Library *SysBase = fs->sysbase;
 	struct FbxLock *lock;
 
@@ -621,7 +621,7 @@ static void FbxSetEntryPath(struct FbxFS *fs, struct FbxEntry *e, const char *p)
 	FbxStrlcpy(fs, e->path, p, MAXPATHLEN);
 }
 
-static struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int type, QUAD id) {
+struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int type, QUAD id) {
 	struct Library *SysBase = fs->sysbase;
 	struct FbxEntry *e;
 
@@ -666,7 +666,7 @@ void FbxCleanupEntry(struct FbxFS *fs, struct FbxEntry *e) {
 	}
 }
 
-static void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e) {
+void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e) {
 	struct Library *SysBase = fs->sysbase;
 	struct FbxNotifyNode *nn;
 	struct MinNode *chain, *succ;
@@ -738,106 +738,6 @@ int FbxSetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath, ULONG pro
 	return error;
 }
 
-static int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock) {
-	struct Library *SysBase = fs->sysbase;
-	int error;
-
-	PDEBUGF("FbxOpenLock(%#p, %#p, %#p)\n", fs, fh, lock);
-
-	CHECKVOLUME(DOSFALSE);
-
-	CHECKLOCK(lock, DOSFALSE);
-
-	if (lock->fsvol != fs->currvol) {
-		fs->r2 = ERROR_NO_DISK;
-		return DOSFALSE;
-	}
-
-	if (lock->entry->type != ETYPE_FILE) {
-		fs->r2 = ERROR_OBJECT_WRONG_TYPE;
-		return DOSFALSE;
-	}
-
-	if (lock->info != NULL) {
-		fs->r2 = ERROR_OBJECT_IN_USE;
-		return DOSFALSE;
-	}
-
-	lock->info = AllocFuseFileInfo(fs);
-	if (lock->info == NULL) {
-		fs->r2 = ERROR_NO_FREE_STORE;
-		return DOSFALSE;
-	}
-
-	if (fs->currvol->vflags & FBXVF_READ_ONLY)
-		lock->info->flags = O_RDONLY;
-	else
-		lock->info->flags = O_RDWR;
-
-	error = Fbx_open(fs, lock->entry->path, lock->info);
-	if (error) {
-		FreeFuseFileInfo(fs, lock->info);
-		lock->info = NULL;
-		fs->r2 = FbxFuseErrno2Error(error);
-		return DOSFALSE;
-	}
-
-	lock->fh = fh;
-	fh->fh_Arg1 = (SIPTR)MKBADDR(lock);
-
-	fs->r2 = 0;
-	return DOSTRUE;
-}
-
-static int FbxCreateOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock, mode_t mode) {
-	struct Library *SysBase = fs->sysbase;
-	int error;
-
-	PDEBUGF("FbxCreateOpenLock(%#p, %#p, %#p, 0%o)\n", fs, fh, lock, mode);
-
-	CHECKLOCK(lock, DOSFALSE);
-
-	if (lock->fsvol != fs->currvol) {
-		fs->r2 = ERROR_NO_DISK;
-		return DOSFALSE;
-	}
-
-	if (lock->entry->type != ETYPE_FILE) {
-		fs->r2 = ERROR_OBJECT_WRONG_TYPE;
-		return DOSFALSE;
-	}
-
-	if (lock->info != NULL) {
-		fs->r2 = ERROR_OBJECT_IN_USE;
-		return DOSFALSE;
-	}
-
-	lock->info = AllocFuseFileInfo(fs);
-	if (lock->info == NULL) {
-		fs->r2 = ERROR_NO_FREE_STORE;
-		return DOSFALSE;
-	}
-
-	if (fs->currvol->vflags & FBXVF_READ_ONLY)
-		lock->info->flags = O_RDONLY;
-	else
-		lock->info->flags = O_RDWR;
-
-	error = Fbx_create(fs, lock->entry->path, mode, lock->info);
-	if (error) {
-		FreeFuseFileInfo(fs, lock->info);
-		lock->info = NULL;
-		fs->r2 = FbxFuseErrno2Error(error);
-		return DOSFALSE;
-	}
-
-	lock->fh = fh;
-	fh->fh_Arg1 = (SIPTR)MKBADDR(lock);
-
-	fs->r2 = 0;
-	return DOSTRUE;
-}
-
 QUAD FbxGetUpTimeMillis(struct FbxFS *fs) {
 	struct timeval tv;
 
@@ -854,159 +754,6 @@ void FbxSetModifyState(struct FbxFS *fs, int state) {
 		fs->firstmodify = 0;
 		fs->lastmodify = 0;
 	}
-}
-
-static int FbxOpenFile(struct FbxFS *fs, struct FileHandle *fh,
-	struct FbxLock *lock, const char *name, int mode)
-{
-	struct FbxEntry *e;
-	int error, truncate = FALSE;
-	int lockmode = SHARED_LOCK;
-	struct fbx_stat statbuf;
-	struct FbxLock *lock2 = NULL;
-	char *fullpath = fs->pathbuf[0];
-	int exists;
-
-	DEBUGF("FbxOpenFile(%#p, %#p, %#p, '%s', %d)\n", fs, fh, lock, name, mode);
-
-	CHECKVOLUME(DOSFALSE);
-
-	if (lock != NULL) {
-		CHECKLOCK(lock, DOSFALSE);
-
-		if (lock->fsvol != fs->currvol) {
-			fs->r2 = ERROR_NO_DISK;
-			return DOSFALSE;
-		}
-	}
-
-	CHECKSTRING(name, DOSFALSE);
-
-	if (!FbxLockName2Path(fs, lock, name, fullpath)) {
-		fs->r2 = ERROR_OBJECT_NOT_FOUND;
-		return DOSFALSE;
-	}
-
-	e = FbxFindEntry(fs, fullpath);
-	if (e != NULL) {
-		if (e->type == ETYPE_DIR) {
-			fs->r2 = ERROR_OBJECT_WRONG_TYPE;
-			return DOSFALSE;
-		}
-		exists = TRUE;
-	} else {
-		error = Fbx_getattr(fs, fullpath, &statbuf);
-		if (error == -ENOENT) {
-			exists = FALSE;
-		} else if (error == 0) {
-			if (S_ISLNK(statbuf.st_mode)) {
-				fs->r2 = ERROR_IS_SOFT_LINK;
-				return DOSFALSE;
-			} else if (!S_ISREG(statbuf.st_mode)) {
-				fs->r2 = ERROR_OBJECT_WRONG_TYPE;
-				return DOSFALSE;
-			}
-			exists = TRUE;
-		} else {
-			fs->r2 = FbxFuseErrno2Error(error);
-			return DOSFALSE;
-		}
-	}
-
-	switch (mode) {
-	case MODE_OLDFILE:
-		if (!exists) {
-			fs->r2 = ERROR_OBJECT_NOT_FOUND;
-			return DOSFALSE;
-		}
-		break;
-	case MODE_NEWFILE:
-		lockmode = EXCLUSIVE_LOCK;
-		if (e != NULL && !IsMinListEmpty(&e->locklist)) {
-			/* locked before, a no go as we need exclusive */
-			fs->r2 = ERROR_OBJECT_IN_USE;
-			return DOSFALSE;
-		}
-		if (exists) {
-			/* existed, lets truncate */
-			truncate = TRUE;
-			break;
-		}
-		/* fall through */
-	case MODE_READWRITE:
-		if (!exists) {
-			/* did not exist, lets create */
-			CHECKWRITABLE(DOSFALSE);
-			if (FSOP mknod) {
-				error = Fbx_mknod(fs, fullpath, DEFAULT_PERMS|S_IFREG, 0);
-				if (error) {
-					fs->r2 = FbxFuseErrno2Error(error);
-					return DOSFALSE;
-				}
-				error = Fbx_getattr(fs, fullpath, &statbuf);
-				if (error) {
-					fs->r2 = FbxFuseErrno2Error(error);
-					return DOSFALSE;
-				}
-			} else {
-				e = FbxSetupEntry(fs, fullpath, ETYPE_FILE, 0);
-				if (e == FALSE) return DOSFALSE;
-				lock2 = FbxLockEntry(fs, e, lockmode);
-				if (lock2 == NULL) {
-					FbxCleanupEntry(fs, e);
-					return DOSFALSE;
-				}
-				if (FbxCreateOpenLock(fs, fh, lock2, DEFAULT_PERMS) == DOSFALSE) {
-					FbxEndLock(fs, lock2);
-					FbxCleanupEntry(fs, e);
-					return DOSFALSE;
-				}
-			}
-			DEBUGF("FbxOpenFile: new file created ok\n");
-		}
-		break;
-	default:
-		fs->r2 = ERROR_BAD_NUMBER;
-		return DOSFALSE;
-	}
-
-	if (truncate) {
-		CHECKWRITABLE(DOSFALSE);
-		error = Fbx_truncate(fs, fullpath, 0);
-		if (error) {
-			fs->r2 = FbxFuseErrno2Error(error);
-			return DOSFALSE;
-		}
-		DEBUGF("FbxOpenFile: cleared ok\n");
-	}
-
-	if (e == NULL) {
-		e = FbxSetupEntry(fs, fullpath, ETYPE_FILE, statbuf.st_ino);
-		if (e == NULL) return DOSFALSE;
-	}
-
-	if (lock2 == NULL) {
-		lock2 = FbxLockEntry(fs, e, lockmode);
-		if (lock2 == NULL) {
-			FbxCleanupEntry(fs, e);
-			return DOSFALSE;
-		}
-
-		if (FbxOpenLock(fs, fh, lock2) == DOSFALSE) {
-			FbxEndLock(fs, lock2);
-			FbxCleanupEntry(fs, e);
-			return DOSFALSE;
-		}
-	}
-
-	if (!exists || truncate) {
-		FbxTryResolveNotify(fs, e);
-		lock2->flags |= LOCKFLAG_MODIFIED;
-		FbxSetModifyState(fs, 1);
-	}
-
-	fs->r2 = 0;
-	return DOSTRUE;
 }
 
 static void FbxUnResolveNotifys(struct FbxFS *fs, struct FbxEntry *e) {

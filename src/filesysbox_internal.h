@@ -514,6 +514,8 @@ int FbxStrncmp(struct FbxFS *fs, const char *s1, const char *s2, size_t n);
 size_t FbxStrlcpy(struct FbxFS *fs, char *dst, const char *src, size_t dst_size);
 size_t FbxStrlcat(struct FbxFS *fs, char *dst, const char *src, size_t dst_size);
 unsigned int FbxHashPath(struct FbxFS *fs, const char *str);
+struct FbxEntry *FbxFindEntry(struct FbxFS *fs, const char *path);
+struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mode);
 void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd);
 void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list);
 void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock);
@@ -521,7 +523,9 @@ BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf);
 BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, char *fullpathbuf);
 int FbxFuseErrno2Error(int error);
 void FbxDoNotify(struct FbxFS *fs, const char *path);
+struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int type, QUAD id);
 void FbxCleanupEntry(struct FbxFS *fs, struct FbxEntry *e);
+void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e);
 BOOL FbxCheckLock(struct FbxFS *fs, struct FbxLock *lock);
 ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath);
 int FbxSetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath, ULONG prot);
@@ -576,6 +580,13 @@ int FbxInfo(struct FbxFS *fs, struct FbxLock *lock, struct InfoData *info);
 
 /* fsinhibit.c */
 int FbxInhibit(struct FbxFS *fs, int inhibit);
+
+/* fsopen.c */
+int FbxOpenFile(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock,
+	const char *name, int mode);
+
+/* fsopenfromlock.c */
+int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock);
 
 /* fsread.c */
 int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes);

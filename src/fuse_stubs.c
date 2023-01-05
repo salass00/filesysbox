@@ -25,13 +25,6 @@ int Fbx_readlink(struct FbxFS *fs, const char *path, char *buf, size_t buflen)
 	return FSOP readlink(path, buf, buflen, &fs->fcntx);
 }
 
-int Fbx_mknod(struct FbxFS *fs, const char *path, mode_t mode, dev_t dev)
-{
-	ODEBUGF("Fbx_mknod(%#p, '%s', 0%o, %#x)\n", fs, path, mode, dev);
-
-	return FSOP mknod(path, mode, dev, &fs->fcntx);
-}
-
 int Fbx_mkdir(struct FbxFS *fs, const char *path, mode_t mode)
 {
 	ODEBUGF("Fbx_mkdir(%#p, '%s', 0%o)\n", fs, path, mode);
@@ -81,13 +74,6 @@ int Fbx_statfs(struct FbxFS *fs, const char *name, struct statvfs *stat)
 	return FSOP statfs(name, stat, &fs->fcntx);
 }
 
-int Fbx_open(struct FbxFS *fs, const char *path, struct fuse_file_info *fi)
-{
-	ODEBUGF("Fbx_open(%#p, '%s', %#p)\n", fs, path, fi);
-
-	return FSOP open(path, fi, &fs->fcntx);
-}
-
 int Fbx_release(struct FbxFS *fs, const char *path, struct fuse_file_info *fi)
 {
 	ODEBUGF("Fbx_release(%#p, '%s', %#p)\n", fs, path, fi);
@@ -100,13 +86,6 @@ int Fbx_fsync(struct FbxFS *fs, const char *path, int x, struct fuse_file_info *
 	ODEBUGF("Fbx_fsync(%#p, '%s', %d, %#p)\n", fs, path, x, fi);
 
 	return FSOP fsync(path, x, fi, &fs->fcntx);
-}
-
-int Fbx_truncate(struct FbxFS *fs, const char *path, QUAD size)
-{
-	ODEBUGF("Fbx_truncate(%#p, '%s', %lld)\n", fs, path, size);
-
-	return FSOP truncate(path, size, &fs->fcntx);
 }
 
 int Fbx_fgetattr(struct FbxFS *fs, const char *path, struct fbx_stat *stat,
@@ -157,13 +136,6 @@ int Fbx_relabel(struct FbxFS *fs, const char *volname)
 	ODEBUGF("Fbx_relabel(%#p, '%s')\n", fs, volname);
 
 	return FSOP relabel(volname, &fs->fcntx);
-}
-
-int Fbx_create(struct FbxFS *fs, const char *path, mode_t mode, struct fuse_file_info *fi)
-{
-	ODEBUGF("Fbx_create(%#p, '%s', 0%o, %#p)\n", fs, path, mode, fi);
-
-	return FSOP create(path, mode, fi, &fs->fcntx);
 }
 
 int Fbx_setxattr(struct FbxFS *fs, const char *path, const char *attr,
