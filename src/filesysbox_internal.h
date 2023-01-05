@@ -609,6 +609,10 @@ int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock);
 /* fsread.c */
 int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes);
 
+/* fsreadlink.c */
+int FbxReadLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
+	char *buffer, int len);
+
 /* fsrelabel.c */
 int FbxRelabel(struct FbxFS *fs, const char *volname);
 

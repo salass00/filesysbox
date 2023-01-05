@@ -12,7 +12,6 @@
 #define FUSE_STUBS_H 1
 
 int Fbx_getattr(struct FbxFS *fs, const char *path, struct fbx_stat *stat);
-int Fbx_readlink(struct FbxFS *fs, const char *path, char *buf, size_t buflen);
 int Fbx_symlink(struct FbxFS *fs, const char *dest, const char *path);
 int Fbx_link(struct FbxFS *fs, const char *dest, const char *path);
 int Fbx_statfs(struct FbxFS *fs, const char *name, struct statvfs *stat);
