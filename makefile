@@ -31,7 +31,7 @@ SRCS = $(addprefix src/, \
        init.c filesysbox.c fuse_stubs.c uptime.c doslist.c fsclose.c \
        fscreatedir.c fsexamineall.c fsexamineallend.c fsexaminelock.c \
        fsexaminenext.c fsinfodata.c fsinhibit.c fsopen.c fsopenfromlock.c \
-       fsread.c fsrename.c fssetcomment.c fssetfilesize.c fswrite.c \
+       fsread.c fsrename.c fsseek.c fssetcomment.c fssetfilesize.c fswrite.c \
        fswriteprotect.c volume.c utf8.c ucs4.c strlcpy.c debugf.c kputstr.c \
        snprintf.c allocvecpooled.c)
 

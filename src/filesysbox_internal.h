@@ -602,6 +602,9 @@ int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes);
 int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	struct FbxLock *lock2, const char *name2);
 
+/* fsseek.c */
+QUAD FbxSeekFile(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode);
+
 /* fssetcomment.c */
 int FbxSetComment(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	const char *comment);
