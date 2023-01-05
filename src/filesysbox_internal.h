@@ -31,7 +31,7 @@
 #define DOS_OWNER_ROOT 65535
 #define DOS_OWNER_NONE 0
 
-#define IS_VALID_BPTR(bptr) (((bptr) & 0xC0000000) == 0 && (bptr) > 64)
+#define IS_VALID_BPTR(bptr) (((bptr) & 0xC0000000) == 0 && (bptr) >= 1024)
 
 #ifndef NEWLIST
 #define NEWLIST(list) \
