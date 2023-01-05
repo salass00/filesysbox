@@ -553,6 +553,9 @@ int FbxAsyncRenameVolume(struct FbxFS *fs, struct FbxVolume *vol, const char *na
 /* fsclose.c */
 int FbxCloseFile(struct FbxFS *fs, struct FbxLock *lock);
 
+/* fscreatedir.c */
+struct FbxLock *FbxCreateDir(struct FbxFS *fs, struct FbxLock *lock, const char *name);
+
 /* fsexamineall.c */
 int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,
 	int type, struct ExAllControl *ctrl);

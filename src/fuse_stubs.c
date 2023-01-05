@@ -25,13 +25,6 @@ int Fbx_readlink(struct FbxFS *fs, const char *path, char *buf, size_t buflen)
 	return FSOP readlink(path, buf, buflen, &fs->fcntx);
 }
 
-int Fbx_mkdir(struct FbxFS *fs, const char *path, mode_t mode)
-{
-	ODEBUGF("Fbx_mkdir(%#p, '%s', 0%o)\n", fs, path, mode);
-
-	return FSOP mkdir(path, mode, &fs->fcntx);
-}
-
 int Fbx_unlink(struct FbxFS *fs, const char *path)
 {
 	ODEBUGF("Fbx_unlink(%#p, '%s')\n", fs, path);
