@@ -562,6 +562,10 @@ int FbxExamineLock(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 int FbxReadDir(struct FbxFS *fs, struct FbxLock *lock);
 int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock *fib);
 
+/* fsinfodata.c */
+int FbxDiskInfo(struct FbxFS *fs, struct InfoData *info);
+int FbxInfo(struct FbxFS *fs, struct FbxLock *lock, struct InfoData *info);
+
 /* fsread.c */
 int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes);
 
