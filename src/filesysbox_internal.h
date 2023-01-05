@@ -510,14 +510,23 @@ int FbxStrcmp(struct FbxFS *fs, const char *s1, const char *s2);
 int FbxStrncmp(struct FbxFS *fs, const char *s1, const char *s2, size_t n);
 size_t FbxStrlcpy(struct FbxFS *fs, char *dst, const char *src, size_t dst_size);
 size_t FbxStrlcat(struct FbxFS *fs, char *dst, const char *src, size_t dst_size);
+void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd);
+void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list);
+BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, char *fullpathbuf);
 int FbxFuseErrno2Error(int error);
 BOOL FbxCheckLock(struct FbxFS *fs, struct FbxLock *lock);
+ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath);
 void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass);
 struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
 void FbxCleanupTimerIO(struct FbxFS *fs);
 QUAD FbxGetUpTimeMillis(struct FbxFS *fs);
 void FbxSetModifyState(struct FbxFS *fs, int state);
 void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStamp *ds);
+LONG FbxMode2EntryType(const mode_t mode);
+ULONG FbxMode2Protection(const mode_t mode);
+void FbxGetComment(struct FbxFS *fs, const char *fullpath, char *comment, size_t size);
+UWORD FbxUnix2AmigaOwner(const uid_t owner);
+int FbxReadDir(struct FbxFS *fs, struct FbxLock *lock);
 int FbxFlushAll(struct FbxFS *fs);
 SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt);
 void FbxHandleNotifyReplies(struct FbxFS *fs);
@@ -532,6 +541,14 @@ int FbxAsyncAddVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRemVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRemFreeVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRenameVolume(struct FbxFS *fs, struct FbxVolume *vol, const char *name);
+
+/* fsexamineall.c */
+int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,
+	int type, struct ExAllControl *ctrl);
+
+/* fsexamineallend.c */
+int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,
+	int type, struct ExAllControl *ctrl);
 
 /* fsread.c */
 int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes);

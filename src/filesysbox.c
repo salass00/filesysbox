@@ -400,7 +400,7 @@ static struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mo
 	return lock;
 }
 
-static void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd) {
+void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd) {
 #ifdef __AROS__
 	struct Library *SysBase = fs->sysbase;
 #endif
@@ -415,7 +415,7 @@ static void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd) {
 	}
 }
 
-static void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list) {
+void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list) {
 	struct MinNode *chain, *succ;
 
 	DEBUGF("FreeFbxDirDataList(%#p, %#p)\n", fs, list);
@@ -482,7 +482,7 @@ static BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf) {
 	return FALSE;
 }
 
-static BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, char *fullpathbuf) {
+BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, char *fullpathbuf) {
 	char tname[256];
 	char *p;
 	size_t len;
@@ -708,7 +708,7 @@ BOOL FbxCheckLock(struct FbxFS *fs, struct FbxLock *lock) {
 	return TRUE;
 }
 
-static ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath) {
+ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath) {
 	char buffer[4];
 	int res, i;
 	ULONG prot = 0;
@@ -2119,31 +2119,6 @@ static int FbxChangeMode(struct FbxFS *fs, struct FbxLock *lock, int mode) {
 	return DOSTRUE;
 }
 
-static int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int len,
-	int type, struct ExAllControl *ctrl)
-{
-	struct Library *SysBase = fs->sysbase;
-	struct FbxExAllState *exallstate;
-
-	PDEBUGF("FbxExamineAllEnd(%#p, %#p, %#p, %d, %d, %#p)\n", fs, lock, buffer, len, type, ctrl);
-
-	if (ctrl != NULL) {
-		exallstate = (struct FbxExAllState *)ctrl->eac_LastKey;
-		if (exallstate) {
-			if (exallstate != (APTR)-1) {
-				FreeFbxDirDataList(fs, &exallstate->freelist);
-				FreeFbxExAllState(fs, exallstate);
-			}
-			ctrl->eac_LastKey = (IPTR)NULL;
-		}
-	}
-
-	if (lock != NULL) FreeFbxDirDataList(fs, &lock->dirdatalist);
-
-	fs->r2 = 0;
-	return DOSTRUE;
-}
-
 static int dir_fill_func(void *udata, const char *name, const struct fbx_stat *stat, fbx_off_t offset) {
 	struct FbxLock *lock = udata;
 	struct FbxFS *fs = lock->fs;
@@ -2178,7 +2153,7 @@ static int dir_fill_func(void *udata, const char *name, const struct fbx_stat *s
 	return 0;
 }
 
-static LONG FbxMode2EntryType(const mode_t mode) {
+LONG FbxMode2EntryType(const mode_t mode) {
 	if (S_ISDIR(mode)) {
 		return ST_USERDIR;
 	} else if (S_ISREG(mode)) {
@@ -2190,7 +2165,7 @@ static LONG FbxMode2EntryType(const mode_t mode) {
 	}
 }
 
-static ULONG FbxMode2Protection(const mode_t mode) {
+ULONG FbxMode2Protection(const mode_t mode) {
 	ULONG prot = FIBF_READ|FIBF_WRITE|FIBF_EXECUTE|FIBF_DELETE;
 
 	if (mode & S_IRUSR) prot &= ~(FIBF_READ);
@@ -2206,7 +2181,7 @@ static ULONG FbxMode2Protection(const mode_t mode) {
 	return prot;
 }
 
-static void FbxGetComment(struct FbxFS *fs, const char *fullpath, char *comment, size_t size) {
+void FbxGetComment(struct FbxFS *fs, const char *fullpath, char *comment, size_t size) {
 	int res;
 
 	res = Fbx_getxattr(fs, fullpath, fs->xattr_amiga_comment, comment, size-1);
@@ -2222,13 +2197,13 @@ static void FbxGetComment(struct FbxFS *fs, const char *fullpath, char *comment,
 	}
 }
 
-static UWORD FbxUnix2AmigaOwner(const uid_t owner) {
+UWORD FbxUnix2AmigaOwner(const uid_t owner) {
 	if (owner == (uid_t)0) return DOS_OWNER_ROOT;
 	else if (owner == (uid_t)-2) return DOS_OWNER_NONE;
 	else return (UWORD)owner;
 }
 
-static int FbxReadDir(struct FbxFS *fs, struct FbxLock *lock) {
+int FbxReadDir(struct FbxFS *fs, struct FbxLock *lock) {
 	int error;
 
 	if (FSOP opendir != FSOP open) {
@@ -2267,196 +2242,6 @@ static int FbxReadDir(struct FbxFS *fs, struct FbxLock *lock) {
 	}
 
 	return DOSTRUE;
-}
-
-static int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,
-	int type, struct ExAllControl *ctrl)
-{
-	struct Library *SysBase     = fs->sysbase;
-	struct Library *DOSBase     = fs->dosbase;
-	struct Library *UtilityBase = fs->utilitybase;
-	struct FbxDirData *ed = NULL;
-	int error, iptrs;
-	struct FbxExAllState *exallstate;
-	IPTR *lptr, *start, *prev;
-	struct DateStamp ds;
-	struct fbx_stat statbuf;
-	char *fullpath = fs->pathbuf[0];
-	char *comment = fs->pathbuf[1];
-
-	CHECKVOLUME(DOSFALSE);
-
-	CHECKLOCK(lock, DOSFALSE);
-
-	if (lock->fsvol != fs->currvol) {
-		fs->r2 = ERROR_NO_DISK;
-		return DOSFALSE;
-	}
-
-	ctrl->eac_Entries = 0;
-
-	if (ctrl->eac_LastKey == (IPTR)NULL) {
-		exallstate = AllocFbxExAllState(fs);
-		if (exallstate == NULL) {
-			fs->r2 = ERROR_NO_FREE_STORE;
-			return DOSFALSE;
-		}
-
-		FreeFbxDirDataList(fs, &lock->dirdatalist);
-		NEWLIST(&exallstate->freelist);
-
-		// read in entries
-		if (!FbxReadDir(fs, lock)) {
-			FreeFbxDirDataList(fs, &lock->dirdatalist);
-			FreeFbxExAllState(fs, exallstate);
-			return DOSFALSE;
-		}
-
-		switch (type) {
-		case ED_NAME:
-			iptrs = 2;
-			break;
-		case ED_TYPE:
-			iptrs = 3;
-			break;
-		case ED_SIZE:
-			iptrs = 4;
-			break;
-		case ED_PROTECTION:
-			iptrs = 5;
-			break;
-		case ED_DATE:
-			iptrs = 8;
-			break;
-		case ED_COMMENT:
-			iptrs = 9;
-			break;
-		case ED_OWNER:
-			iptrs = 10;
-			break;
-		default:
-			FreeFbxDirDataList(fs, &lock->dirdatalist);
-			FreeFbxExAllState(fs, exallstate);
-			fs->r2 = ERROR_BAD_NUMBER; // unsupported ED_XXX
-			return DOSFALSE;
-		}
-
-		exallstate->iptrs = iptrs;
-		ctrl->eac_LastKey = (IPTR)exallstate;
-	} else if (ctrl->eac_LastKey == (IPTR)-1) {
-		fs->r2 = ERROR_NO_MORE_ENTRIES;
-		return DOSFALSE;
-	} else {
-		exallstate = (struct FbxExAllState *)ctrl->eac_LastKey;
-		// free previous exdata
-		FreeFbxDirDataList(fs, &exallstate->freelist);
-	}
-
-	lptr = buffer;
-	start = prev = NULL;
-	*lptr = 0; // clear next pointer
-	iptrs = exallstate->iptrs;
-	while ((char *)&lptr[iptrs] <= ((char *)buffer + len)) {
-		ed = (struct FbxDirData *)RemHead((struct List *)&lock->dirdatalist);
-		if (ed == NULL) break;
-
-		start = lptr;
-		*lptr = (IPTR)NULL; // clear next pointer
-
-		if (ctrl->eac_MatchString != NULL &&
-			ctrl->eac_MatchFunc == NULL &&
-			!MatchPatternNoCase(ctrl->eac_MatchString, (STRPTR)ed->name))
-		{
-			FreeFbxDirData(fs, ed);
-			continue;
-		}
-
-		if (type >= ED_TYPE) {
-			if (!FbxLockName2Path(fs, lock, ed->name, fullpath)) {
-				FreeFbxDirData(fs, ed);
-				fs->r2 = ERROR_INVALID_COMPONENT_NAME;
-				return DOSFALSE;
-			}
-
-			if (fs->fsflags & FBXF_USE_FILL_DIR_STAT) {
-				statbuf = ed->stat;
-			} else {
-				error = Fbx_getattr(fs, fullpath, &statbuf);
-				if (error) {
-					FreeFbxDirData(fs, ed);
-					fs->r2 = FbxFuseErrno2Error(error);
-					return DOSFALSE;
-				}
-			}
-		}
-
-		if (type >= ED_COMMENT) {
-			FbxGetComment(fs, fullpath, comment, MAXPATHLEN);
-
-			if (comment[0] != '\0') {
-				size_t len = strlen(comment) + 1;
-
-				ed->comment = AllocVecPooled(fs->mempool, len);
-				if (ed->comment == NULL) {
-					FreeFbxDirData(fs, ed);
-					fs->r2 = ERROR_NO_FREE_STORE;
-					return DOSFALSE;
-				}
-
-				FbxStrlcpy(fs, ed->comment, comment, len);
-			}
-		}
-
-		lptr++; // skip next pointer
-
-		if (type >= ED_NAME) *lptr++ = (IPTR)ed->name;
-		if (type >= ED_TYPE) *lptr++ = FbxMode2EntryType(statbuf.st_mode);
-		if (type >= ED_SIZE) *lptr++ = (statbuf.st_size > 0xffffffff) ? 0 : statbuf.st_size;
-		if (type >= ED_PROTECTION) {
-			*lptr = FbxMode2Protection(statbuf.st_mode);
-			*lptr++ |= FbxGetAmigaProtectionFlags(fs, fullpath);
-		}
-		if (type >= ED_DATE) {
-			FbxTimeSpec2DS(fs, &statbuf.st_mtim, &ds);
-			*lptr++ = ds.ds_Days;
-			*lptr++ = ds.ds_Minute;
-			*lptr++ = ds.ds_Tick;
-		}
-		if (type >= ED_COMMENT) *lptr++ = (ed->comment != NULL) ? (IPTR)ed->comment : (IPTR)"";
-		if (type >= ED_OWNER) {
-			ULONG uid = FbxUnix2AmigaOwner(statbuf.st_uid);
-			ULONG gid = FbxUnix2AmigaOwner(statbuf.st_gid);
-			*lptr++ = (uid << 16)|gid;
-		}
-
-		if (ctrl->eac_MatchFunc != NULL &&
-			!CallHookPkt(ctrl->eac_MatchFunc, &type, start))
-		{
-			FreeFbxDirData(fs, ed);
-			lptr = start;
-			continue;
-		}
-
-		AddTail((struct List *)&exallstate->freelist, (struct Node *)ed);
-
-		ctrl->eac_Entries++;
-
-		if (prev != NULL) *prev = (IPTR)start; // link us in
-		prev = start;
-	}
-
-	if (IsMinListEmpty(&lock->dirdatalist)) {
-		if (ctrl->eac_Entries == 0) {
-			FreeFbxDirDataList(fs, &lock->dirdatalist);
-			FreeFbxExAllState(fs, exallstate);
-			ctrl->eac_LastKey = (IPTR)-1;
-		}
-		fs->r2 = ERROR_NO_MORE_ENTRIES;
-		return DOSFALSE;
-	} else {
-		fs->r2 = 0;
-		return DOSTRUE;
-	}
 }
 
 static const char *FbxFilePart(const char *path) {
