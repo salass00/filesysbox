@@ -102,13 +102,6 @@ int Fbx_fsync(struct FbxFS *fs, const char *path, int x, struct fuse_file_info *
 	return FSOP fsync(path, x, fi, &fs->fcntx);
 }
 
-int Fbx_ftruncate(struct FbxFS *fs, const char *path, QUAD size, struct fuse_file_info *fi)
-{
-	ODEBUGF("Fbx_ftruncate(%#p, '%s', %lld, %#p)\n", fs, path, size, fi);
-
-	return FSOP ftruncate(path, size, fi, &fs->fcntx);
-}
-
 int Fbx_truncate(struct FbxFS *fs, const char *path, QUAD size)
 {
 	ODEBUGF("Fbx_truncate(%#p, '%s', %lld)\n", fs, path, size);

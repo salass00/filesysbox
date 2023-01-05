@@ -569,6 +569,9 @@ int FbxInfo(struct FbxFS *fs, struct FbxLock *lock, struct InfoData *info);
 /* fsread.c */
 int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes);
 
+/* fssetfilesize.c */
+QUAD FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode);
+
 /* fswrite.c */
 int FbxWriteFile(struct FbxFS *fs, struct FbxLock *lock, CONST_APTR buffer, int bytes);
 
