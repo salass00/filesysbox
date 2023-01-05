@@ -516,10 +516,15 @@ size_t FbxStrlcat(struct FbxFS *fs, char *dst, const char *src, size_t dst_size)
 unsigned int FbxHashPath(struct FbxFS *fs, const char *str);
 void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd);
 void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list);
+void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock);
+BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf);
 BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, char *fullpathbuf);
 int FbxFuseErrno2Error(int error);
+void FbxDoNotify(struct FbxFS *fs, const char *path);
+void FbxCleanupEntry(struct FbxFS *fs, struct FbxEntry *e);
 BOOL FbxCheckLock(struct FbxFS *fs, struct FbxLock *lock);
 ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath);
+int FbxSetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath, ULONG prot);
 void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass);
 struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
 void FbxCleanupTimerIO(struct FbxFS *fs);
@@ -540,6 +545,9 @@ int FbxAsyncAddVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRemVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRemFreeVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRenameVolume(struct FbxFS *fs, struct FbxVolume *vol, const char *name);
+
+/* fsclose.c */
+int FbxCloseFile(struct FbxFS *fs, struct FbxLock *lock);
 
 /* fsexamineall.c */
 int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,

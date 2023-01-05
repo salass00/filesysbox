@@ -420,7 +420,7 @@ void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list) {
 	NEWLIST(list);
 }
 
-static void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock) {
+void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock) {
 	struct Library *SysBase = fs->sysbase;
 
 	DEBUGF("FbxEndLock(%#p, %#p)\n", fs, lock);
@@ -458,7 +458,7 @@ static const char *FbxSkipColon(const char *s) {
 	return s2 ? (s2 + 1) : s;
 }
 
-static BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf) {
+BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf) {
 	if (strcmp(pathbuf, "/") == 0) {
 		// can't parent root
 		return FALSE;
@@ -603,7 +603,7 @@ static void FbxDoNotifyEntry(struct FbxFS *fs, struct FbxEntry *entry) {
 	}
 }
 
-static void FbxDoNotify(struct FbxFS *fs, const char *path) {
+void FbxDoNotify(struct FbxFS *fs, const char *path) {
 	struct FbxEntry *e;
 	char *pathbuf = fs->pathbuf[2];
 
@@ -650,7 +650,7 @@ static struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int ty
 	return e;
 }
 
-static void FbxCleanupEntry(struct FbxFS *fs, struct FbxEntry *e) {
+void FbxCleanupEntry(struct FbxFS *fs, struct FbxEntry *e) {
 	DEBUGF("FbxCleanupEntry(%#p, %#p)\n", fs, e);
 	if (e != NULL) {
 		struct Library *SysBase = fs->sysbase;
@@ -719,7 +719,7 @@ ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath) {
 	return prot;
 }
 
-static int FbxSetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath, ULONG prot) {
+int FbxSetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath, ULONG prot) {
 	int error;
 
 	if (prot & (FIBF_HOLD|FIBF_SCRIPT|FIBF_PURE|FIBF_ARCHIVE)) {
@@ -736,20 +736,6 @@ static int FbxSetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath, UL
 	}
 
 	return error;
-}
-
-static void FbxClearArchiveFlags(struct FbxFS *fs, const char *fullpath) {
-	char *pathbuf = fs->pathbuf[0];
-	ULONG prot;
-
-	FbxStrlcpy(fs, pathbuf, fullpath, MAXPATHLEN);
-	do {
-		prot = FbxGetAmigaProtectionFlags(fs, pathbuf);
-		if (prot & FIBF_ARCHIVE) {
-			prot &= ~FIBF_ARCHIVE;
-			FbxSetAmigaProtectionFlags(fs, pathbuf, prot);
-		}
-	} while (FbxParentPath(fs, pathbuf) && strcmp(pathbuf, "/") != 0);
 }
 
 static int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock) {
@@ -1111,46 +1097,6 @@ static int FbxUnLockObject(struct FbxFS *fs, struct FbxLock *lock) {
 	CHECKLOCK(lock, DOSFALSE);
 
 	e = lock->entry;
-
-	FbxEndLock(fs, lock);
-	FbxCleanupEntry(fs, e);
-
-	fs->r2 = 0;
-	return DOSTRUE;
-}
-
-static int FbxCloseFile(struct FbxFS *fs, struct FbxLock *lock) {
-	struct Library *SysBase = fs->sysbase;
-	struct FbxEntry *e;
-
-	PDEBUGF("FbxCloseFile(%#p, %#p)\n", fs, lock);
-
-	CHECKVOLUME(DOSFALSE);
-
-	CHECKLOCK(lock, DOSFALSE);
-
-	e = lock->entry;
-
-	if (lock->fh == NULL) {
-		// this lock should be ended with FbxUnLockObject()
-		debugf("FbxCloseFile: lock %#p was never opened!\n", lock);
-		fs->r2 = ERROR_INVALID_LOCK;
-		return DOSFALSE;
-	}
-
-	if (lock->info != NULL) {
-		Fbx_release(fs, e->path, lock->info);
-		FreeFuseFileInfo(fs, lock->info);
-		lock->info = NULL;
-	}
-
-	lock->fh = NULL;
-
-	if (lock->fsvol == fs->currvol && (lock->flags & LOCKFLAG_MODIFIED)) {
-		FbxClearArchiveFlags(fs, e->path);
-		FbxDoNotify(fs, e->path);
-		FbxSetModifyState(fs, 1);
-	}
 
 	FbxEndLock(fs, lock);
 	FbxCleanupEntry(fs, e);
