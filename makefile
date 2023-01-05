@@ -6,8 +6,12 @@ STRIP = $(HOST)-strip
 TARGET  = filesysbox.library
 VERSION = 54
 
-CFLAGS  = -O2 -g -fomit-frame-pointer -fno-strict-aliasing -Wall -Wwrite-strings \
-          -Wno-attributes -Werror -I./include -I. -D__NOLIBBASE__
+INCLUDES = -I./include -I.
+DEFINES  = -DNODEBUG -D__NOLIBBASE__
+WARNINGS = -Werror -Wall -Wwrite-strings -Wno-attributes
+
+CFLAGS  = -O2 -g -fomit-frame-pointer -fno-strict-aliasing \
+          $(INCLUDES) $(DEFINES) $(WARNINGS)
 LDFLAGS = -nostartfiles
 LIBS    = -ldebug
 STRIPFLAGS = -R.comment
@@ -15,7 +19,7 @@ STRIPFLAGS = -R.comment
 ifeq ($(HOST),m68k-amigaos)
 	ARCH_000 = -m68000
 	ARCH_020 = -m68020
-	CFLAGS  := -noixemul -fno-common -DNODEBUG $(CFLAGS)
+	CFLAGS  := -noixemul -fno-common $(CFLAGS)
 	LDFLAGS := -noixemul $(LDFLAGS)
 	LIBS    := $(LIBS)
 endif
