@@ -28,10 +28,10 @@ main_SRCS = $(wildcard src/main/*.c)
 main_OBJS = $(subst src/,obj/,$(main_SRCS:.c=.o))
 
 SRCS = $(addprefix src/, \
-       init.c filesysbox.c fuse_stubs.c uptime.c doslist.c fsclose.c \
-       fscreatedir.c fscreatehardlink.c fscreatesoftlink.c fsdelete.c \
-       fsexamineall.c fsexamineallend.c fsexaminelock.c fsexaminenext.c \
-       fsformat.c fsinfodata.c fsinhibit.c fslock.c fsopen.c \
+       init.c filesysbox.c fuse_stubs.c uptime.c doslist.c fschangemode.c \
+       fsclose.c fscreatedir.c fscreatehardlink.c fscreatesoftlink.c \
+       fsdelete.c fsexamineall.c fsexamineallend.c fsexaminelock.c \
+       fsexaminenext.c fsformat.c fsinfodata.c fsinhibit.c fslock.c fsopen.c \
        fsopenfromlock.c fsread.c fsreadlink.c fsrelabel.c fsrename.c \
        fssamelock.c fsseek.c fssetcomment.c fssetfilesize.c fssetownerinfo.c \
        fswrite.c fswriteprotect.c volume.c utf8.c ucs4.c strlcpy.c debugf.c \

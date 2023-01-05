@@ -555,6 +555,9 @@ int FbxAsyncRemVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRemFreeVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRenameVolume(struct FbxFS *fs, struct FbxVolume *vol, const char *name);
 
+/* fschangemode.c */
+int FbxChangeMode(struct FbxFS *fs, struct FbxLock *lock, int mode);
+
 /* fsclose.c */
 int FbxCloseFile(struct FbxFS *fs, struct FbxLock *lock);
 
