@@ -531,7 +531,6 @@ void FbxCleanupEntry(struct FbxFS *fs, struct FbxEntry *e);
 void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e);
 BOOL FbxCheckLock(struct FbxFS *fs, struct FbxLock *lock);
 ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath);
-int FbxSetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath, ULONG prot);
 void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass);
 struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
 void FbxCleanupTimerIO(struct FbxFS *fs);
@@ -647,6 +646,10 @@ QUAD FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode)
 /* fssetownerinfo.c */
 int FbxSetOwnerInfo(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	UWORD uid, UWORD gid);
+
+/* fssetprotection.c */
+int FbxSetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath, ULONG prot);
+int FbxSetProtection(struct FbxFS *fs, struct FbxLock *lock, const char *name, ULONG prot);
 
 /* fswrite.c */
 int FbxWriteFile(struct FbxFS *fs, struct FbxLock *lock, CONST_APTR buffer, int bytes);

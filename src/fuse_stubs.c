@@ -61,13 +61,6 @@ int Fbx_utime(struct FbxFS *fs, const char *path, struct utimbuf *ubuf)
 	return FSOP utime(path, ubuf, &fs->fcntx);
 }
 
-int Fbx_chmod(struct FbxFS *fs, const char *path, mode_t mode)
-{
-	ODEBUGF("Fbx_chmod(%#p, '%s', 0%o)\n", fs, path, mode);
-
-	return FSOP chmod(path, mode, &fs->fcntx);
-}
-
 int Fbx_setxattr(struct FbxFS *fs, const char *path, const char *attr,
 	CONST_APTR buf, size_t len, int flags)
 {
