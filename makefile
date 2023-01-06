@@ -33,8 +33,8 @@ SRCS = $(addprefix src/, \
        fscreatesoftlink.c fscurrentvolume.c fsdelete.c fsexamineall.c \
        fsexamineallend.c fsexaminelock.c fsexaminenext.c fsformat.c \
        fsinfodata.c fsinhibit.c fslock.c fsopen.c fsopenfromlock.c fsread.c \
-       fsreadlink.c fsrelabel.c fsrename.c fssamelock.c fsseek.c \
-       fssetcomment.c fssetdate.c fssetfilesize.c fssetownerinfo.c \
+       fsreadlink.c fsrelabel.c fsremovenotify.c fsrename.c fssamelock.c \
+       fsseek.c fssetcomment.c fssetdate.c fssetfilesize.c fssetownerinfo.c \
        fssetprotection.c fswrite.c fswriteprotect.c volume.c utf8.c ucs4.c \
        strlcpy.c debugf.c kputstr.c snprintf.c allocvecpooled.c)
 

@@ -633,6 +633,9 @@ int FbxReadLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 /* fsrelabel.c */
 int FbxRelabel(struct FbxFS *fs, const char *volname);
 
+/* fsremovenotify.c */
+int FbxRemoveNotify(struct FbxFS *fs, struct NotifyRequest *nr);
+
 /* fsrename.c */
 int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	struct FbxLock *lock2, const char *name2);

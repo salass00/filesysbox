@@ -867,33 +867,6 @@ void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStam
 	ds->ds_Tick = (sec % 60) * 50 + nsec / (1000*1000*1000/50);
 }
 
-static int FbxRemoveNotify(struct FbxFS *fs, struct NotifyRequest *nr) {
-	struct Library *SysBase = fs->sysbase;
-	struct FbxNotifyNode *nn;
-
-	PDEBUGF("action_rem_notify(%#p, %#p)\n", fs, nr);
-
-	if (nr->nr_Handler != fs->fsport) {
-		fs->r2 = 0;
-		return DOSFALSE;
-	}
-
-	nn = (struct FbxNotifyNode *)nr->nr_notifynode;
-
-	Remove((struct Node *)&nn->chain);
-	Remove((struct Node *)&nn->volumechain);
-
-	if (nn->entry != NULL) {
-		FbxCleanupEntry(fs, nn->entry);
-	}
-
-	FreeFbxNotifyNode(nn);
-
-	nr->nr_MsgCount = 0;
-	nr->nr_notifynode = (IPTR)NULL;
-	return DOSTRUE;
-}
-
 int FbxFlushAll(struct FbxFS *fs) {
 	PDEBUGF("FbxFlushAll(%#p)\n", fs);
 
