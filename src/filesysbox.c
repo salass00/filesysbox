@@ -699,13 +699,6 @@ ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath) {
 	return prot;
 }
 
-QUAD FbxGetUpTimeMillis(struct FbxFS *fs) {
-	struct timeval tv;
-
-	FbxGetUpTime(fs, &tv);
-	return (UQUAD)tv.tv_secs * 1000 + tv.tv_micro / 1000;
-}
-
 void FbxSetModifyState(struct FbxFS *fs, int state) {
 	if (state) {
 		fs->lastmodify = FbxGetUpTimeMillis(fs);
@@ -837,47 +830,6 @@ void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass) {
 		DeleteIORequest(inputio);
 	}
 	DeleteMsgPort(inputmp);
-}
-
-struct timerequest *FbxSetupTimerIO(struct FbxFS *fs) {
-	struct Library *SysBase = fs->sysbase;
-	struct MsgPort *mp;
-	struct timerequest *tr;
-
-	DEBUGF("FbxSetupTimerIO(%#p)\n", fs);
-
-	mp = CreateMsgPort();
-	tr = CreateIORequest(mp, sizeof(*tr));
-	if (tr == NULL) {
-		DeleteMsgPort(mp);
-		return NULL;
-	}
-
-	if (OpenDevice((CONST_STRPTR)"timer.device", UNIT_VBLANK, (struct IORequest *)tr, 0) != 0) {
-		DeleteIORequest(tr);
-		DeleteMsgPort(mp);
-		return NULL;
-	}
-
-	fs->timerio   = tr;
-	fs->timerbase = tr->tr_node.io_Device;
-	fs->timerbusy = FALSE;
-
-	return tr;
-}
-
-void FbxCleanupTimerIO(struct FbxFS *fs) {
-	DEBUGF("FbxCleanupTimerIO(%#p)\n", fs);
-
-	if (fs->timerbase != NULL) {
-		struct Library *SysBase = fs->sysbase;
-		struct timerequest *tr = fs->timerio;
-		struct MsgPort *mp = tr->tr_node.io_Message.mn_ReplyPort;
-
-		CloseDevice((struct IORequest *)tr);
-		DeleteIORequest(tr);
-		DeleteMsgPort(mp);
-	}
 }
 
 struct FileSysStartupMsg *FbxGetFSSM(struct Library *sysbase, struct DeviceNode *devnode) {

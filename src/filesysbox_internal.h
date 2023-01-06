@@ -532,9 +532,6 @@ void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e);
 BOOL FbxCheckLock(struct FbxFS *fs, struct FbxLock *lock);
 ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath);
 void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass);
-struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
-void FbxCleanupTimerIO(struct FbxFS *fs);
-QUAD FbxGetUpTimeMillis(struct FbxFS *fs);
 void FbxSetModifyState(struct FbxFS *fs, int state);
 void FbxUnResolveNotifys(struct FbxFS *fs, struct FbxEntry *e);
 BOOL FbxIsParent(struct FbxFS *fs, const char *parent, const char *child);
@@ -542,9 +539,12 @@ void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStam
 int FbxFlushAll(struct FbxFS *fs);
 void FbxHandleNotifyReplies(struct FbxFS *fs);
 
-/* uptime.c */
+/* timer.c */
+struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
+void FbxCleanupTimerIO(struct FbxFS *fs);
 void FbxInitUpTime(struct FbxFS *fs);
 void FbxGetUpTime(struct FbxFS *fs, struct timeval *tv);
+QUAD FbxGetUpTimeMillis(struct FbxFS *fs);
 
 /* dopacket.c */
 SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt);
