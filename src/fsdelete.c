@@ -26,10 +26,13 @@ static int Fbx_rmdir(struct FbxFS *fs, const char *path)
 }
 
 int FbxDeleteObject(struct FbxFS *fs, struct FbxLock *lock, const char *name) {
-	char fullpath[FBX_MAX_PATH];
 	struct FbxEntry *e;
 	int error;
 	struct fbx_stat statbuf;
+	char fullpath[FBX_MAX_PATH];
+#ifdef ENABLE_CHARSET_CONVERSION
+	char fsname[FBX_MAX_NAME];
+#endif
 
 	PDEBUGF("FbxDeleteObject(%#p, %#p, '%s')\n", fs, lock, name);
 
@@ -45,7 +48,17 @@ int FbxDeleteObject(struct FbxFS *fs, struct FbxLock *lock, const char *name) {
 		}
 	}
 
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		if (local_to_utf8(fsname, name, FBX_MAX_NAME, fs->maptable) >= FBX_MAX_NAME) {
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return DOSFALSE;
+		}
+		name = fsname;
+	}
+#else
 	CHECKSTRING(name, DOSFALSE);
+#endif
 
 	if (!FbxLockName2Path(fs, lock, name, fullpath)) {
 		fs->r2 = ERROR_OBJECT_NOT_FOUND;
