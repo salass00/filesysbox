@@ -20,8 +20,12 @@ static int Fbx_symlink(struct FbxFS *fs, const char *dest, const char *path)
 int FbxMakeSoftLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	const char *softname)
 {
-	char fullpath[FBX_MAX_PATH];
 	int error;
+	char fullpath[FBX_MAX_PATH];
+#ifdef ENABLE_CHARSET_CONVERSION
+	char fsname[FBX_MAX_NAME];
+	char fssoftname[FBX_MAX_PATH];
+#endif
 
 	PDEBUGF("FbxMakeSoftlink(%#p, %#p, '%s', '%s')\n", fs, lock, name, softname);
 
@@ -37,8 +41,23 @@ int FbxMakeSoftLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 		}
 	}
 
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		if (local_to_utf8(fsname, name, FBX_MAX_NAME, fs->maptable) >= FBX_MAX_NAME) {
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return DOSFALSE;
+		}
+		name = fsname;
+		if (local_to_utf8(fssoftname, softname, FBX_MAX_PATH, fs->maptable) >= FBX_MAX_PATH) {
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return DOSFALSE;
+		}
+		softname = fssoftname;
+	}
+#else
 	CHECKSTRING(name, DOSFALSE);
 	CHECKSTRING(softname, DOSFALSE);
+#endif
 
 	if (!FbxLockName2Path(fs, lock, name, fullpath)) {
 		fs->r2 = ERROR_OBJECT_NOT_FOUND;
