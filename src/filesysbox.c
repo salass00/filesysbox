@@ -426,9 +426,9 @@ BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, 
 	RDEBUGF("FbxLockName2Path(%#p, '%s', %#p)\n", lock, name, fullpathbuf);
 
 	if (lock != NULL)
-		FbxStrlcpy(fs, fullpathbuf, lock->entry->path, MAXPATHLEN);
+		FbxStrlcpy(fs, fullpathbuf, lock->entry->path, FBX_MAX_PATH);
 	else
-		FbxStrlcpy(fs, fullpathbuf, "/", MAXPATHLEN);
+		FbxStrlcpy(fs, fullpathbuf, "/", FBX_MAX_PATH);
 
 	name = FbxSkipColon(name);
 
@@ -448,8 +448,8 @@ BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, 
 				return FALSE;
 			FbxStrlcpy(fs, tname, name, len);
 			if (strcmp(fullpathbuf, "/") != 0 && tname[0])
-				FbxStrlcat(fs, fullpathbuf, "/", MAXPATHLEN);
-			FbxStrlcat(fs, fullpathbuf, tname, MAXPATHLEN);
+				FbxStrlcat(fs, fullpathbuf, "/", FBX_MAX_PATH);
+			FbxStrlcat(fs, fullpathbuf, tname, FBX_MAX_PATH);
 			name = p;
 			if (*name != '\0') name++;
 		}
@@ -505,7 +505,7 @@ int FbxFuseErrno2Error(int error) {
 }
 
 void FbxSetEntryPath(struct FbxFS *fs, struct FbxEntry *e, const char *p) {
-	FbxStrlcpy(fs, e->path, p, MAXPATHLEN);
+	FbxStrlcpy(fs, e->path, p, FBX_MAX_PATH);
 }
 
 struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int type, QUAD id) {
@@ -546,7 +546,7 @@ void FbxCleanupEntry(struct FbxFS *fs, struct FbxEntry *e) {
 
 		if (IsMinListEmpty(&e->notifylist) && IsMinListEmpty(&e->locklist)) {
 			Remove((struct Node *)&e->hashchain);
-			FbxStrlcpy(fs, e->path, "<<im free!>>", MAXPATHLEN);
+			FbxStrlcpy(fs, e->path, "<<im free!>>", FBX_MAX_PATH);
 			FreeFbxEntry(fs, e);
 			DEBUGF("FbxCleanupEntry: freed entry %#p\n", e);
 		}

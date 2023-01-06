@@ -53,7 +53,7 @@ static const char *FbxFilePart(const char *path) {
 void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *stat,
 	struct FileInfoBlock *fib)
 {
-	char *comment = fs->pathbuf[2];
+	char comment[FBX_MAX_COMMENT];
 	if (strcmp(fullpath, "/") == 0) {
 		FbxStrlcpy(fs, (char *)fib->fib_FileName + 1, fs->currvol->volname, sizeof(fib->fib_FileName));
 		fib->fib_DirEntryType =
@@ -64,7 +64,7 @@ void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *st
 		fib->fib_EntryType = FbxMode2EntryType(stat->st_mode);
 	}
 	fib->fib_FileName[0] = strlen((char *)fib->fib_FileName + 1);
-	FbxGetComment(fs, fullpath, comment, MAXPATHLEN);
+	FbxGetComment(fs, fullpath, comment, FBX_MAX_COMMENT);
 	FbxStrlcpy(fs, (char *)fib->fib_Comment + 1, comment, sizeof(fib->fib_Comment));
 	fib->fib_Comment[0] = strlen((char *)fib->fib_Comment + 1);
 	fib->fib_Size = stat->st_size;

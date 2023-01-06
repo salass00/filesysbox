@@ -20,8 +20,8 @@ static int Fbx_link(struct FbxFS *fs, const char *dest, const char *path)
 int FbxMakeHardLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	struct FbxLock *lock2)
 {
-	char *fullpath = fs->pathbuf[0];
-	char *fullpath2 = fs->pathbuf[1];
+	char fullpath[FBX_MAX_PATH];
+	char fullpath2[FBX_MAX_PATH];
 	int error;
 
 	PDEBUGF("FbxMakeHardlink(%#p, %#p, '%s', %#p)\n", fs, lock, name, lock2);

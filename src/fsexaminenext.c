@@ -113,7 +113,7 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 	struct FbxDirData *ed;
 	struct fbx_stat statbuf;
 	int error;
-	char *fullpath = fs->pathbuf[0];
+	char fullpath[FBX_MAX_PATH];
 
 	PDEBUGF("FbxExamineNext(%#p, %#p, %#p)\n", fs, lock, fib);
 

@@ -56,11 +56,11 @@ void FbxDoNotifyEntry(struct FbxFS *fs, struct FbxEntry *entry) {
 
 void FbxDoNotify(struct FbxFS *fs, const char *path) {
 	struct FbxEntry *e;
-	char *pathbuf = fs->pathbuf[2];
+	char pathbuf[FBX_MAX_PATH];
 
 	NDEBUGF("FbxDoNotify(%#p, '%s')\n", fs, path);
 
-	FbxStrlcpy(fs, pathbuf, path, MAXPATHLEN);
+	FbxStrlcpy(fs, pathbuf, path, FBX_MAX_PATH);
 	do {
 		e = FbxFindEntry(fs, pathbuf);
 		if (e != NULL) FbxDoNotifyEntry(fs, e);
@@ -73,7 +73,7 @@ void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e) {
 	struct FbxNotifyNode *nn;
 	struct MinNode *chain, *succ;
 	struct NotifyRequest *nr;
-	char *fullpath = fs->pathbuf[2];
+	char fullpath[FBX_MAX_PATH];
 
 	NDEBUGF("FbxTryResolveNotify(%#p, %#p)\n", fs, e);
 

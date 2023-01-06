@@ -49,7 +49,7 @@ int FbxSetDate(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 {
 	struct timespec tv[2];
 	int error;
-	char *fullpath = fs->pathbuf[0];
+	char fullpath[FBX_MAX_PATH];
 
 	PDEBUGF("FbxSetDate(%#p, %#p, '%s', %#p)\n", fs, lock, name, date);
 

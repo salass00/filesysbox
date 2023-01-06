@@ -23,8 +23,8 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 	IPTR *lptr, *start, *prev;
 	struct DateStamp ds;
 	struct fbx_stat statbuf;
-	char *fullpath = fs->pathbuf[0];
-	char *comment = fs->pathbuf[1];
+	char fullpath[FBX_MAX_PATH];
+	char comment[FBX_MAX_COMMENT];
 
 	CHECKVOLUME(DOSFALSE);
 
@@ -133,7 +133,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 		}
 
 		if (type >= ED_COMMENT) {
-			FbxGetComment(fs, fullpath, comment, MAXPATHLEN);
+			FbxGetComment(fs, fullpath, comment, FBX_MAX_COMMENT);
 
 			if (comment[0] != '\0') {
 				size_t len = strlen(comment) + 1;

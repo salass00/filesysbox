@@ -20,7 +20,7 @@ static int Fbx_symlink(struct FbxFS *fs, const char *dest, const char *path)
 int FbxMakeSoftLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	const char *softname)
 {
-	char *fullpath = fs->pathbuf[0];
+	char fullpath[FBX_MAX_PATH];
 	int error;
 
 	PDEBUGF("FbxMakeSoftlink(%#p, %#p, '%s', '%s')\n", fs, lock, name, softname);

@@ -90,7 +90,7 @@ int FbxOpenFile(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock,
 	int lockmode = SHARED_LOCK;
 	struct fbx_stat statbuf;
 	struct FbxLock *lock2 = NULL;
-	char *fullpath = fs->pathbuf[0];
+	char fullpath[FBX_MAX_PATH];
 	int exists;
 
 	DEBUGF("FbxOpenFile(%#p, %#p, %#p, '%s', %d)\n", fs, fh, lock, name, mode);

@@ -17,7 +17,7 @@ int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify) {
 	struct fbx_stat statbuf;
 	struct FbxEntry *e;
 	struct FbxNotifyNode *nn;
-	char *fullpath = fs->pathbuf[0];
+	char fullpath[FBX_MAX_PATH];
 	LONG etype;
 	int error;
 

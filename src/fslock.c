@@ -14,7 +14,7 @@
 struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock,
 	const char *name, int lockmode)
 {
-	char *fullpath = fs->pathbuf[0];
+	char fullpath[FBX_MAX_PATH];
 	struct fbx_stat statbuf;
 	int error;
 	LONG ntype;

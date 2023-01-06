@@ -26,7 +26,7 @@ BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf) {
 }
 
 struct FbxLock *FbxLocateParent(struct FbxFS *fs, struct FbxLock *lock) {
-	char *pname = fs->pathbuf[2];
+	char pname[FBX_MAX_PATH];
 	const char *name;
 
 	PDEBUGF("FbxLocateParent(%#p, %#p)\n", fs, lock);
@@ -45,7 +45,7 @@ struct FbxLock *FbxLocateParent(struct FbxFS *fs, struct FbxLock *lock) {
 		return NULL;
 	}
 
-	FbxStrlcpy(fs, pname, lock->entry->path, MAXPATHLEN);
+	FbxStrlcpy(fs, pname, lock->entry->path, FBX_MAX_PATH);
 	if (!FbxParentPath(fs, pname)) {
 		// can't parent root
 		fs->r2 = 0; // yes

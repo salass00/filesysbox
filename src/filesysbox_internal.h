@@ -206,7 +206,9 @@ int vdebugf(const char *fmt, va_list args);
 
 #define FSOP fs->ops.
 
-#define MAXPATHLEN 1024
+#define FBX_MAX_PATH    1024
+#define FBX_MAX_NAME    256
+#define FBX_MAX_COMMENT 256
 
 #define ACCESS_PERMS (S_IRWXU|S_IRWXG|S_IRWXO) /* 0777 */
 #define DEFAULT_PERMS (S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH) /* 0775 */
@@ -221,7 +223,7 @@ int vdebugf(const char *fmt, va_list args);
 
 struct FbxEntry {
 	struct MinNode hashchain;
-	char           path[MAXPATHLEN]; // full path to file (and root = "/")
+	char           path[FBX_MAX_PATH]; // full path to file (and root = "/")
 	struct MinList locklist; // list of locks
 	struct MinList notifylist; // list of notifys
 	BOOL           xlock; // true if exclusively locked
@@ -373,7 +375,6 @@ struct FbxFS {
 	struct MinList               timercallbacklist;
 	const char                  *xattr_amiga_comment;
 	const char                  *xattr_amiga_protection;
-	char                         pathbuf[4][MAXPATHLEN];
 	LONG                         gmtoffset;
 };
 

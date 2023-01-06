@@ -21,8 +21,8 @@ static int Fbx_readlink(struct FbxFS *fs, const char *path, char *buf, size_t bu
 int FbxReadLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	char *buffer, int len)
 {
-	char *fullpath = fs->pathbuf[0];
-	char *softname = fs->pathbuf[1];
+	char fullpath[FBX_MAX_PATH];
+	char softname[FBX_MAX_PATH];
 	struct fbx_stat statbuf;
 	int error;
 
@@ -58,7 +58,7 @@ int FbxReadLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 		return -1;
 	}
 
-	error = Fbx_readlink(fs, fullpath, softname, MAXPATHLEN);
+	error = Fbx_readlink(fs, fullpath, softname, FBX_MAX_PATH);
 	if (error) {
 		fs->r2 = FbxFuseErrno2Error(error);
 		return -1;

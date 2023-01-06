@@ -15,7 +15,7 @@
 int FbxSetComment(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	const char *comment)
 {
-	char *fullpath = fs->pathbuf[0];
+	char fullpath[FBX_MAX_PATH];
 	int error;
 
 	PDEBUGF("FbxSetComment(%#p, %#p, '%s', '%s')\n", fs, lock, name, comment);

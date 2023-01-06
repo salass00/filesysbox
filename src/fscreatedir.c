@@ -19,7 +19,7 @@ static int Fbx_mkdir(struct FbxFS *fs, const char *path, mode_t mode)
 }
 
 struct FbxLock *FbxCreateDir(struct FbxFS *fs, struct FbxLock *lock, const char *name) {
-	char *fullpath = fs->pathbuf[0];
+	char fullpath[FBX_MAX_PATH];
 	struct FbxEntry *e;
 	int error;
 	struct FbxLock *lock2;

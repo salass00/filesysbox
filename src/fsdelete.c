@@ -26,7 +26,7 @@ static int Fbx_rmdir(struct FbxFS *fs, const char *path)
 }
 
 int FbxDeleteObject(struct FbxFS *fs, struct FbxLock *lock, const char *name) {
-	char *fullpath = fs->pathbuf[0];
+	char fullpath[FBX_MAX_PATH];
 	struct FbxEntry *e;
 	int error;
 	struct fbx_stat statbuf;

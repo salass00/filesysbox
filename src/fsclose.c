@@ -12,10 +12,10 @@
 #include "fuse_stubs.h"
 
 static void FbxClearArchiveFlags(struct FbxFS *fs, const char *fullpath) {
-	char *pathbuf = fs->pathbuf[0];
+	char pathbuf[FBX_MAX_PATH];
 	ULONG prot;
 
-	FbxStrlcpy(fs, pathbuf, fullpath, MAXPATHLEN);
+	FbxStrlcpy(fs, pathbuf, fullpath, FBX_MAX_PATH);
 	do {
 		prot = FbxGetAmigaProtectionFlags(fs, pathbuf);
 		if (prot & FIBF_ARCHIVE) {

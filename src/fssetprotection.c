@@ -37,7 +37,7 @@ static mode_t FbxProtection2Mode(ULONG prot) {
 
 int FbxSetProtection(struct FbxFS *fs, struct FbxLock *lock, const char *name, ULONG prot) {
 	int error;
-	char *fullpath = fs->pathbuf[0];
+	char fullpath[FBX_MAX_PATH];
 
 	PDEBUGF("FbxSetProtection(%#p, %#p, '%s', %#lx)\n", fs, lock, name, prot);
 

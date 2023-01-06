@@ -21,7 +21,7 @@ static int Fbx_rename(struct FbxFS *fs, const char *path, const char *path2)
 
 static void FbxUpdatePaths(struct FbxFS *fs, const char *oldpath, const char *newpath) {
 	struct Library *SysBase = fs->sysbase;
-	char *tstr = fs->pathbuf[3];
+	char tstr[FBX_MAX_PATH];
 	struct MinNode *chain, *succ;
 
 	// TODO: unresolve+tryresolve notify for affected entries..
@@ -38,8 +38,8 @@ static void FbxUpdatePaths(struct FbxFS *fs, const char *oldpath, const char *ne
 			struct FbxEntry *e = FSENTRYFROMHASHCHAIN(chain);
 			if (FbxStrncmp(fs, oldpath, e->path, plen) == 0 && e->path[plen] == '/') {
 				// match! let's update path
-				FbxStrlcpy(fs, tstr, newpath, MAXPATHLEN);
-				FbxStrlcat(fs, tstr, e->path + plen, MAXPATHLEN);
+				FbxStrlcpy(fs, tstr, newpath, FBX_MAX_PATH);
+				FbxStrlcat(fs, tstr, e->path + plen, FBX_MAX_PATH);
 				FbxSetEntryPath(fs, e, tstr);
 				// and rehash it
 				Remove((struct Node *)&e->hashchain);
@@ -54,8 +54,8 @@ int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	struct FbxLock *lock2, const char *name2)
 {
 	struct Library *SysBase = fs->sysbase;
-	char *fullpath = fs->pathbuf[0];
-	char *fullpath2 = fs->pathbuf[1];
+	char fullpath[FBX_MAX_PATH];
+	char fullpath2[FBX_MAX_PATH];
 	struct FbxEntry *e, *e2;
 	struct fbx_stat statbuf;
 	int error;

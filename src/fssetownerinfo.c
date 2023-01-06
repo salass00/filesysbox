@@ -27,7 +27,7 @@ int FbxSetOwnerInfo(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	UWORD uid, UWORD gid)
 {
 	int error;
-	char *fullpath = fs->pathbuf[0];
+	char fullpath[FBX_MAX_PATH];
 
 	PDEBUGF("FbxSetOwnerInfo(%#p, %#p, '%s', %#x, %#x)\n", fs, lock, name, uid, gid);
 
