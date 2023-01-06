@@ -41,6 +41,8 @@ int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify) {
 		}
 		fullname = fsfullname;
 	}
+#else
+	CHECKSTRING(fullname, DOSFALSE);
 #endif
 
 	if (!FbxLockName2Path(fs, NULL, fullname, fullpath)) {
