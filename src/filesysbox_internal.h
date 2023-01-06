@@ -540,12 +540,14 @@ void FbxUnResolveNotifys(struct FbxFS *fs, struct FbxEntry *e);
 BOOL FbxIsParent(struct FbxFS *fs, const char *parent, const char *child);
 void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStamp *ds);
 int FbxFlushAll(struct FbxFS *fs);
-SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt);
 void FbxHandleNotifyReplies(struct FbxFS *fs);
 
 /* uptime.c */
 void FbxInitUpTime(struct FbxFS *fs);
 void FbxGetUpTime(struct FbxFS *fs, struct timeval *tv);
+
+/* dopacket.c */
+SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt);
 
 /* doslist.c */
 struct Process *StartDosListProc(struct FileSysBoxBase *libBase);
@@ -579,6 +581,9 @@ BPTR FbxCurrentVolume(struct FbxFS *fs, struct FbxLock *lock);
 
 /* fsdelete.c */
 int FbxDeleteObject(struct FbxFS *fs, struct FbxLock *lock, const char *name);
+
+/* fsduplock.c */
+struct FbxLock *FbxDupLock(struct FbxFS *fs, struct FbxLock *lock);
 
 /* fsexamineall.c */
 int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,
@@ -667,6 +672,9 @@ int FbxSetOwnerInfo(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 /* fssetprotection.c */
 int FbxSetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath, ULONG prot);
 int FbxSetProtection(struct FbxFS *fs, struct FbxLock *lock, const char *name, ULONG prot);
+
+/* fsunlock.c */
+int FbxUnLockObject(struct FbxFS *fs, struct FbxLock *lock);
 
 /* fswrite.c */
 int FbxWriteFile(struct FbxFS *fs, struct FbxLock *lock, CONST_APTR buffer, int bytes);
