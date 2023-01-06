@@ -20,9 +20,12 @@ static int Fbx_link(struct FbxFS *fs, const char *dest, const char *path)
 int FbxMakeHardLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	struct FbxLock *lock2)
 {
+	int error;
 	char fullpath[FBX_MAX_PATH];
 	char fullpath2[FBX_MAX_PATH];
-	int error;
+#ifdef ENABLE_CHARSET_CONVERSION
+	char fsname[FBX_MAX_NAME];
+#endif
 
 	PDEBUGF("FbxMakeHardlink(%#p, %#p, '%s', %#p)\n", fs, lock, name, lock2);
 
@@ -38,7 +41,17 @@ int FbxMakeHardLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 		}
 	}
 
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		if (local_to_utf8(fsname, name, FBX_MAX_NAME, fs->maptable) >= FBX_MAX_NAME) {
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return DOSFALSE;
+		}
+		name = fsname;
+	}
+#else
 	CHECKLOCK(lock2, DOSFALSE);
+#endif
 
 	CHECKSTRING(name, DOSFALSE);
 
