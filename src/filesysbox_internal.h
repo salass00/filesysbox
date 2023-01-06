@@ -376,6 +376,7 @@ struct FbxFS {
 	const char                  *xattr_amiga_comment;
 	const char                  *xattr_amiga_protection;
 	LONG                         gmtoffset;
+	ULONG                       *maptable;
 };
 
 #define FBX_TIMER_MICROS 100000

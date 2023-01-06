@@ -90,8 +90,11 @@ int FbxOpenFile(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock,
 	int lockmode = SHARED_LOCK;
 	struct fbx_stat statbuf;
 	struct FbxLock *lock2 = NULL;
-	char fullpath[FBX_MAX_PATH];
 	int exists;
+	char fullpath[FBX_MAX_PATH];
+#ifdef ENABLE_CHARSET_CONVERSION
+	char fsname[FBX_MAX_NAME];
+#endif
 
 	DEBUGF("FbxOpenFile(%#p, %#p, %#p, '%s', %d)\n", fs, fh, lock, name, mode);
 
@@ -106,7 +109,17 @@ int FbxOpenFile(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock,
 		}
 	}
 
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		if (local_to_utf8(fsname, name, FBX_MAX_NAME, fs->maptable) >= FBX_MAX_NAME) {
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return DOSFALSE;
+		}
+		name = fsname;
+	}
+#else
 	CHECKSTRING(name, DOSFALSE);
+#endif
 
 	if (!FbxLockName2Path(fs, lock, name, fullpath)) {
 		fs->r2 = ERROR_OBJECT_NOT_FOUND;
