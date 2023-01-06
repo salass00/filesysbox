@@ -54,28 +54,64 @@ void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *st
 	struct FileInfoBlock *fib)
 {
 	char comment[FBX_MAX_COMMENT];
+#ifdef ENABLE_CHARSET_CONVERSION
+	char adname[FBX_MAX_NAME];
+	char adcomment[FBX_MAX_COMMENT];
+#endif
+	const char *name, *pcomment;
+	LONG type;
+
 	if (strcmp(fullpath, "/") == 0) {
-		FbxStrlcpy(fs, (char *)fib->fib_FileName + 1, fs->currvol->volname, sizeof(fib->fib_FileName));
-		fib->fib_DirEntryType =
-		fib->fib_EntryType = ST_ROOT;
+		name = fs->currvol->volname;
+		type = ST_ROOT;
 	} else {
-		FbxStrlcpy(fs, (char *)fib->fib_FileName + 1, FbxFilePart(fullpath), sizeof(fib->fib_FileName));
-		fib->fib_DirEntryType =
-		fib->fib_EntryType = FbxMode2EntryType(stat->st_mode);
+		name = FbxFilePart(fullpath);
+		type = FbxMode2EntryType(stat->st_mode);
+#ifdef ENABLE_CHARSET_CONVERSION
+		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+			utf8_to_local(adname, name, FBX_MAX_NAME, fs->maptable);
+			name = adname;
+		}
+#endif
 	}
+
+#ifdef ENABLE_CHARSET_CONVERSION
+	strlcpy((char *)fib->fib_FileName + 1, name, sizeof(fib->fib_FileName));
+#else
+	FbxStrlcpy(fs, (char *)fib->fib_FileName + 1, name, sizeof(fib->fib_FileName));
+#endif
 	fib->fib_FileName[0] = strlen((char *)fib->fib_FileName + 1);
+
+	fib->fib_DirEntryType = fib->fib_EntryType = type;
+
+	pcomment = comment;
 	FbxGetComment(fs, fullpath, comment, FBX_MAX_COMMENT);
-	FbxStrlcpy(fs, (char *)fib->fib_Comment + 1, comment, sizeof(fib->fib_Comment));
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		utf8_to_local(adcomment, comment, FBX_MAX_COMMENT, fs->maptable);
+		pcomment = adcomment;
+	}
+#endif
+
+#ifdef ENABLE_CHARSET_CONVERSION
+	strlcpy((char *)fib->fib_Comment + 1, pcomment, sizeof(fib->fib_Comment));
+#else
+	FbxStrlcpy(fs, (char *)fib->fib_Comment + 1, pcomment, sizeof(fib->fib_Comment));
+#endif
 	fib->fib_Comment[0] = strlen((char *)fib->fib_Comment + 1);
+
 	fib->fib_Size = stat->st_size;
 	fib->fib_Protection = FbxMode2Protection(stat->st_mode);
 	fib->fib_Protection |= FbxGetAmigaProtectionFlags(fs, fullpath);
 	fib->fib_NumBlocks = stat->st_blocks;
+
 	if (fs->fsflags & FBXF_USE_INO)
 		fib->fib_DiskKey = (IPTR)stat->st_ino;
 	else
 		fib->fib_DiskKey = (IPTR)FbxHashPath(fs, fullpath);
+
 	FbxTimeSpec2DS(fs, &stat->st_mtim, &fib->fib_Date);
+
 	fib->fib_OwnerUID = FbxUnix2AmigaOwner(stat->st_uid);
 	fib->fib_OwnerGID = FbxUnix2AmigaOwner(stat->st_gid);
 }
