@@ -35,25 +35,6 @@ static mode_t FbxProtection2Mode(ULONG prot) {
 	return mode;
 }
 
-int FbxSetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath, ULONG prot) {
-	int error;
-
-	if (prot & (FIBF_HOLD|FIBF_SCRIPT|FIBF_PURE|FIBF_ARCHIVE)) {
-		char buffer[4];
-		buffer[0] = (prot & FIBF_HOLD   ) ? 'h' : '-';
-		buffer[1] = (prot & FIBF_SCRIPT ) ? 's' : '-';
-		buffer[2] = (prot & FIBF_PURE   ) ? 'p' : '-';
-		buffer[3] = (prot & FIBF_ARCHIVE) ? 'a' : '-';
-		error = Fbx_setxattr(fs, fullpath, fs->xattr_amiga_protection, buffer, 4, 0);
-	} else {
-		error = Fbx_removexattr(fs, fullpath, fs->xattr_amiga_protection);
-		if (error == -ENODATA)
-			error = 0;
-	}
-
-	return error;
-}
-
 int FbxSetProtection(struct FbxFS *fs, struct FbxLock *lock, const char *name, ULONG prot) {
 	int error;
 	char *fullpath = fs->pathbuf[0];

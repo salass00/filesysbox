@@ -11,22 +11,6 @@
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
 
-void FbxGetComment(struct FbxFS *fs, const char *fullpath, char *comment, size_t size) {
-	int res;
-
-	res = Fbx_getxattr(fs, fullpath, fs->xattr_amiga_comment, comment, size-1);
-	if (res < 0) {
-		comment[0] = '\0';
-		return;
-	}
-
-	comment[min(res, size-1)] = '\0';
-	if (!FbxCheckString(fs, comment)) {
-		comment[0] = '\0';
-		return;
-	}
-}
-
 LONG FbxMode2EntryType(const mode_t mode) {
 	if (S_ISDIR(mode)) {
 		return ST_USERDIR;

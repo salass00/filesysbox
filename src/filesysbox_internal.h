@@ -526,7 +526,6 @@ void FbxSetEntryPath(struct FbxFS *fs, struct FbxEntry *e, const char *p);
 struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int type, QUAD id);
 void FbxCleanupEntry(struct FbxFS *fs, struct FbxEntry *e);
 BOOL FbxCheckLock(struct FbxFS *fs, struct FbxLock *lock);
-ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath);
 void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass);
 void FbxSetModifyState(struct FbxFS *fs, int state);
 BOOL FbxIsParent(struct FbxFS *fs, const char *parent, const char *child);
@@ -595,7 +594,6 @@ int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR 
 	int type, struct ExAllControl *ctrl);
 
 /* fsexaminelock.c */
-void FbxGetComment(struct FbxFS *fs, const char *fullpath, char *comment, size_t size);
 LONG FbxMode2EntryType(const mode_t mode);
 ULONG FbxMode2Protection(const mode_t mode);
 UWORD FbxUnix2AmigaOwner(const uid_t owner);
@@ -671,7 +669,6 @@ int FbxSetOwnerInfo(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	UWORD uid, UWORD gid);
 
 /* fssetprotection.c */
-int FbxSetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath, ULONG prot);
 int FbxSetProtection(struct FbxFS *fs, struct FbxLock *lock, const char *name, ULONG prot);
 
 /* fsunlock.c */
@@ -686,6 +683,11 @@ int FbxWriteProtect(struct FbxFS *fs, int on_off, IPTR passkey);
 /* volume.c */
 struct FbxVolume *FbxSetupVolume(struct FbxFS *fs);
 void FbxCleanupVolume(struct FbxFS *fs);
+
+/* xattrs.c */
+ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath);
+int FbxSetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath, ULONG prot);
+void FbxGetComment(struct FbxFS *fs, const char *fullpath, char *comment, size_t size);
 
 /* utf8.c */
 LONG utf8_decode_slow(const char **strp);

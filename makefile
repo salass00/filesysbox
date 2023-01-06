@@ -36,7 +36,7 @@ SRCS = $(addprefix src/, \
        fsopenfromlock.c fsparentdir.c fsread.c fsreadlink.c fsrelabel.c \
        fsremovenotify.c fsrename.c fssamelock.c fsseek.c fssetcomment.c \
        fssetdate.c fssetfilesize.c fssetownerinfo.c fssetprotection.c \
-       fsunlock.c fswrite.c fswriteprotect.c volume.c utf8.c ucs4.c \
+       fsunlock.c fswrite.c fswriteprotect.c volume.c xattrs.c utf8.c ucs4.c \
        strlcpy.c debugf.c kputstr.c snprintf.c allocvecpooled.c)
 
 OBJS = $(main_OBJS) $(subst src/,obj/,$(SRCS:.c=.o))

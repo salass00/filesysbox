@@ -596,26 +596,6 @@ BOOL FbxCheckLock(struct FbxFS *fs, struct FbxLock *lock) {
 	return TRUE;
 }
 
-ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath) {
-	char buffer[4];
-	int res, i;
-	ULONG prot = 0;
-
-	res = Fbx_getxattr(fs, fullpath, fs->xattr_amiga_protection, buffer, sizeof(buffer));
-	if (res == 4) {
-		for (i = 0; i < 4; i++) {
-			switch (buffer[i]) {
-			case 'h': prot |= FIBF_HOLD; break;
-			case 's': prot |= FIBF_SCRIPT; break;
-			case 'p': prot |= FIBF_PURE; break;
-			case 'a': prot |= FIBF_ARCHIVE; break;
-			}
-		}
-	}
-
-	return prot;
-}
-
 void FbxSetModifyState(struct FbxFS *fs, int state) {
 	if (state) {
 		fs->lastmodify = FbxGetUpTimeMillis(fs);
