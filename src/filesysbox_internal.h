@@ -520,7 +520,6 @@ void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd);
 void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list);
 void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock);
 void FbxAddEntry(struct FbxFS *fs, struct FbxEntry *e);
-BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf);
 BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, char *fullpathbuf);
 int FbxFuseErrno2Error(int error);
 void FbxDoNotifyRequest(struct FbxFS *fs, struct NotifyRequest *nr);
@@ -622,6 +621,10 @@ int FbxOpenFile(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock,
 
 /* fsopenfromlock.c */
 int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock);
+
+/* fsparentdir.c */
+BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf);
+struct FbxLock *FbxLocateParent(struct FbxFS *fs, struct FbxLock *lock);
 
 /* fsread.c */
 int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes);

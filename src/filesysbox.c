@@ -448,21 +448,6 @@ void FbxAddEntry(struct FbxFS *fs, struct FbxEntry *e) {
 	AddTail((struct List *)&fs->currvol->entrytab[i], (struct Node *)&e->hashchain);
 }
 
-BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf) {
-	if (strcmp(pathbuf, "/") == 0) {
-		// can't parent root
-		return FALSE;
-	}
-	char *p = strrchr(pathbuf, '/');
-	if (p != NULL) {
-		if (p == pathbuf) p++; // leave the root '/' alone
-		*p = '\0';
-		return TRUE;
-	}
-	// should never happen
-	return FALSE;
-}
-
 static const char *FbxSkipColon(const char *s) {
 	const char *s2 = strrchr(s, ':');
 	return s2 ? (s2 + 1) : s;
@@ -806,42 +791,6 @@ BOOL FbxIsParent(struct FbxFS *fs, const char *parent, const char *child) {
 		return TRUE;
 	else
 		return FALSE;
-}
-
-static struct FbxLock *FbxLocateParent(struct FbxFS *fs, struct FbxLock *lock) {
-	char *pname = fs->pathbuf[2];
-	const char *name;
-
-	PDEBUGF("FbxLocateParent(%#p, %#p)\n", fs, lock);
-
-	CHECKVOLUME(NULL);
-
-	if (lock == NULL) {
-		fs->r2 = 0; // yes
-		return NULL;
-	}
-
-	CHECKLOCK(lock, NULL);
-
-	if (lock->fsvol != fs->currvol) {
-		fs->r2 = ERROR_NO_DISK;
-		return NULL;
-	}
-
-	FbxStrlcpy(fs, pname, lock->entry->path, MAXPATHLEN);
-	if (!FbxParentPath(fs, pname)) {
-		// can't parent root
-		fs->r2 = 0; // yes
-		return NULL;
-	}
-
-	name = pname;
-	if (*name == '/') name++; // skip preceding slash character
-	lock = FbxLocateObject(fs, NULL, name, SHARED_LOCK);
-	if (lock == NULL) return NULL;
-
-	fs->r2 = 0;
-	return lock;
 }
 
 void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStamp *ds) {
