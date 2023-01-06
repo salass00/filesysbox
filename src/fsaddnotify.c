@@ -17,9 +17,13 @@ int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify) {
 	struct fbx_stat statbuf;
 	struct FbxEntry *e;
 	struct FbxNotifyNode *nn;
-	char fullpath[FBX_MAX_PATH];
 	LONG etype;
 	int error;
+	const char *fullname;
+	char fullpath[FBX_MAX_PATH];
+#ifdef ENABLE_CHARSET_CONVERSION
+	char fsfullname[FBX_MAX_PATH];
+#endif
 
 	PDEBUGF("FbxAddNotify(%#p, %#p)\n", fs, notify);
 
@@ -28,7 +32,18 @@ int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify) {
 	notify->nr_notifynode = (IPTR)NULL;
 	notify->nr_MsgCount = 0;
 
-	if (!FbxLockName2Path(fs, NULL, (char *)notify->nr_FullName, fullpath)) {
+	fullname = (const char *)notify->nr_FullName;
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		if (local_to_utf8(fsfullname, fullname, FBX_MAX_NAME, fs->maptable) >= FBX_MAX_NAME) {
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return DOSFALSE;
+		}
+		fullname = fsfullname;
+	}
+#endif
+
+	if (!FbxLockName2Path(fs, NULL, fullname, fullpath)) {
 		fs->r2 = ERROR_OBJECT_NOT_FOUND;
 		return DOSFALSE;
 	}
