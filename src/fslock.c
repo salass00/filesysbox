@@ -14,12 +14,15 @@
 struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock,
 	const char *name, int lockmode)
 {
-	char fullpath[FBX_MAX_PATH];
 	struct fbx_stat statbuf;
 	int error;
 	LONG ntype;
 	struct FbxEntry *e;
 	struct FbxLock *lock2;
+	char fullpath[FBX_MAX_PATH];
+#ifdef ENABLE_CHARSET_CONVERSION
+	char fsname[FBX_MAX_NAME];
+#endif
 
 	PDEBUGF("FbxLocateObject(%#p, %#p, '%s', %d)\n", fs, lock, name, lockmode);
 
@@ -34,7 +37,17 @@ struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock,
 		}
 	}
 
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		if (local_to_utf8(fsname, name, FBX_MAX_NAME, fs->maptable) >= FBX_MAX_NAME) {
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return NULL;
+		}
+		name = fsname;
+	}
+#else
 	CHECKSTRING(name, NULL);
+#endif
 
 	if (!FbxLockName2Path(fs, lock, name, fullpath)) {
 		fs->r2 = ERROR_OBJECT_NOT_FOUND;
