@@ -42,41 +42,6 @@
 #include <string.h>
 #include <SDI/SDI_interrupt.h>
 
-#ifndef __AROS__
-static size_t strnlen(const char *str, size_t maxlen)
-{
-	const char *s = str;
-
-	while (maxlen && *s++ != '\0') maxlen--;
-
-	return (s - str);
-}
-#endif
-
-void CopyStringBSTRToC(BSTR bstr, char *cstr, size_t size) {
-#if defined(__AROS__) && defined(AROS_FAST_BSTR)
-	strlcpy(cstr, (const char *)bstr, size);
-#else
-	UBYTE *src = BADDR(bstr);
-	size_t len = *src++;
-	if (len >= size) len = size-1;
-	memcpy(cstr, src, len);
-	cstr[len] = '\0';
-#endif
-}
-
-void CopyStringCToBSTR(const char *cstr, BSTR bstr, size_t size) {
-#if defined(__AROS__) && defined(AROS_FAST_BSTR)
-	strlcpy((char *)bstr, cstr, size);
-#else
-	UBYTE *dst = BADDR(bstr);
-	size_t len = strnlen(cstr, 255);
-	if (len >= size) len = size-1;
-	*dst++ = len;
-	memcpy(dst, cstr, len);
-#endif
-}
-
 #ifdef __AROS__
 AROS_UFH5(int, FbxDiskChangeInterrupt,
 	AROS_UFHA(APTR, data, A1),

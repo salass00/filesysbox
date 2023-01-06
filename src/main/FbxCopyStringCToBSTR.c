@@ -12,6 +12,29 @@
 #include "../filesysbox_vectors.h"
 #include "../filesysbox_internal.h"
 
+#ifndef __AROS__
+static size_t strnlen(const char *str, size_t maxlen)
+{
+	const char *s = str;
+
+	while (maxlen && *s++ != '\0') maxlen--;
+
+	return (s - str);
+}
+#endif
+
+void CopyStringCToBSTR(const char *cstr, BSTR bstr, size_t size) {
+#if defined(__AROS__) && defined(AROS_FAST_BSTR)
+	strlcpy((char *)bstr, cstr, size);
+#else
+	UBYTE *dst = BADDR(bstr);
+	size_t len = strnlen(cstr, 255);
+	if (len >= size) len = size-1;
+	*dst++ = len;
+	memcpy(dst, cstr, len);
+#endif
+}
+
 #ifdef __AROS__
 AROS_LH3(void, FbxCopyStringCToBSTR,
 	AROS_LHA(CONST_STRPTR, src, A0),

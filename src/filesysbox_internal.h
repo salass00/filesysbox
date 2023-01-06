@@ -501,10 +501,17 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 
 #define OneInMinList(list) ((list)->mlh_Head == (list)->mlh_TailPred)
 
+/* main/FbxSetupFS.c */
+void FbxReadDebugFlags(struct FbxFS *fs);
+
+/* main/FbxCopyStringBSTRToC.c */
+void CopyStringBSTRToC(BSTR bstr, char *cstr, size_t size);
+
+/* main/FbxCopyStringCToBSTR.c */
+void CopyStringCToBSTR(const char *cstr, BSTR bstr, size_t size);
+
 /* filesysbox.c */
 struct FileSysStartupMsg *FbxGetFSSM(struct Library *sysbase, struct DeviceNode *devnode);
-void CopyStringBSTRToC(BSTR bstr, char *cstr, size_t size);
-void CopyStringCToBSTR(const char *cstr, BSTR bstr, size_t size);
 struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskChangeHandlerFunc func);
 void FbxRemDiskChangeHandler(struct FbxFS *fs);
 BOOL FbxCheckString(struct FbxFS *fs, const char *str);
@@ -712,7 +719,4 @@ void FreeVecPooled(APTR mempool, APTR ptr);
 size_t strlcpy(char *dst, const char *src, size_t size);
 size_t strlcat(char *dst, const char *src, size_t size);
 #endif
-
-/* main/FbxSetupFS.c */
-void FbxReadDebugFlags(struct FbxFS *fs);
 

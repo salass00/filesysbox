@@ -12,6 +12,18 @@
 #include "../filesysbox_vectors.h"
 #include "../filesysbox_internal.h"
 
+void CopyStringBSTRToC(BSTR bstr, char *cstr, size_t size) {
+#if defined(__AROS__) && defined(AROS_FAST_BSTR)
+	strlcpy(cstr, (const char *)bstr, size);
+#else
+	UBYTE *src = BADDR(bstr);
+	size_t len = *src++;
+	if (len >= size) len = size-1;
+	memcpy(cstr, src, len);
+	cstr[len] = '\0';
+#endif
+}
+
 #ifdef __AROS__
 AROS_LH3(void, FbxCopyStringBSTRToC,
 	AROS_LHA(BSTR, src, A0),
