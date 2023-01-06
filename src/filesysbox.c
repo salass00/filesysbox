@@ -554,7 +554,7 @@ int FbxFuseErrno2Error(int error) {
 	}
 }
 
-static void FbxDoNotifyRequest(struct FbxFS *fs, struct NotifyRequest *nr) {
+void FbxDoNotifyRequest(struct FbxFS *fs, struct NotifyRequest *nr) {
 	struct Library *SysBase = fs->sysbase;
 	struct NotifyMessage *notifymsg;
 
@@ -867,89 +867,6 @@ void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStam
 	ds->ds_Tick = (sec % 60) * 50 + nsec / (1000*1000*1000/50);
 }
 
-static int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify) {
-	struct Library *SysBase = fs->sysbase;
-	struct fbx_stat statbuf;
-	struct FbxEntry *e;
-	struct FbxNotifyNode *nn;
-	char *fullpath = fs->pathbuf[0];
-	LONG etype;
-	int error;
-
-	PDEBUGF("FbxAddNotify(%#p, %#p)\n", fs, notify);
-
-	CHECKVOLUME(DOSFALSE);
-
-	notify->nr_notifynode = (IPTR)NULL;
-	notify->nr_MsgCount = 0;
-
-	if (!FbxLockName2Path(fs, NULL, (char *)notify->nr_FullName, fullpath)) {
-		fs->r2 = ERROR_OBJECT_NOT_FOUND;
-		return DOSFALSE;
-	}
-
-	error = Fbx_getattr(fs, fullpath, &statbuf);
-	if (error) {
-		if (fs->r2 == -ENOENT) { // file did not exist
-			NDEBUGF("FbxAddNotify: file '%s' did not exist.\n", fullpath);
-
-			nn = AllocFbxNotifyNode();
-			if (nn == NULL) {
-				fs->r2 = ERROR_NO_FREE_STORE;
-				return DOSFALSE;
-			}
-
-			nn->nr = notify;
-			nn->entry = NULL;
-
-			notify->nr_notifynode = (IPTR)nn;
-			// lets put request on the unresolved list
-			AddTail((struct List *)&fs->currvol->unres_notifys, (struct Node *)&nn->chain);
-		} else {
-			NDEBUGF("FbxAddNotify: getattr() error %d.\n", error);
-			fs->r2 = FbxFuseErrno2Error(error);
-			return DOSFALSE;
-		}
-	} else { // file existed
-		NDEBUGF("FbxAddNotify: file '%s' existed.\n", fullpath);
-
-		if (S_ISREG(statbuf.st_mode)) {
-			etype = ETYPE_FILE;
-		} else {
-			etype = ETYPE_DIR;
-		}
-
-		e = FbxFindEntry(fs, fullpath);
-		if (e == NULL) {
-			e = FbxSetupEntry(fs, fullpath, etype, statbuf.st_ino);
-			if (e == NULL) return DOSFALSE;
-		}
-
-		nn = AllocFbxNotifyNode();
-		if (nn == NULL) {
-			fs->r2 = ERROR_NO_FREE_STORE;
-			return DOSFALSE;
-		}
-
-		nn->nr = notify;
-		nn->entry = e;
-
-		notify->nr_notifynode = (IPTR)nn;
-		AddTail((struct List *)&e->notifylist, (struct Node *)&nn->chain);
-
-		if (notify->nr_Flags & NRF_NOTIFY_INITIAL) {
-			FbxDoNotifyRequest(fs, notify);
-		}
-	}
-
-	notify->nr_Handler = fs->fsport;
-
-	AddTail((struct List *)&fs->currvol->notifylist, (struct Node *)&nn->volumechain);
-
-	fs->r2 = 0;
-	return DOSTRUE;
-}
-
 static int FbxRemoveNotify(struct FbxFS *fs, struct NotifyRequest *nr) {
 	struct Library *SysBase = fs->sysbase;
 	struct FbxNotifyNode *nn;
@@ -989,17 +906,6 @@ int FbxFlushAll(struct FbxFS *fs) {
 
 	fs->r2 = 0;
 	return DOSTRUE;
-}
-
-static BPTR FbxCurrentVolume(struct FbxFS *fs, struct FbxLock *lock) {
-	fs->r2 = fs->fssm ? fs->fssm->fssm_Unit : -1; // yeah..
-	if (lock != NULL) {
-		CHECKLOCK(lock, ZERO);
-		return lock->volumebptr;
-	} else {
-		CHECKVOLUME(ZERO);
-		return MKBADDR(fs->currvol);
-	}
 }
 
 SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {

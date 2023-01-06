@@ -523,6 +523,7 @@ void FbxAddEntry(struct FbxFS *fs, struct FbxEntry *e);
 BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf);
 BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, char *fullpathbuf);
 int FbxFuseErrno2Error(int error);
+void FbxDoNotifyRequest(struct FbxFS *fs, struct NotifyRequest *nr);
 void FbxDoNotifyEntry(struct FbxFS *fs, struct FbxEntry *entry);
 void FbxDoNotify(struct FbxFS *fs, const char *path);
 void FbxSetEntryPath(struct FbxFS *fs, struct FbxEntry *e, const char *p);
@@ -554,6 +555,9 @@ int FbxAsyncRemVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRemFreeVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRenameVolume(struct FbxFS *fs, struct FbxVolume *vol, const char *name);
 
+/* fsaddnotify.c */
+int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify);
+
 /* fschangemode.c */
 int FbxChangeMode(struct FbxFS *fs, struct FbxLock *lock, int mode);
 
@@ -570,6 +574,9 @@ int FbxMakeHardLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 /* fscreatesoftlink.c */
 int FbxMakeSoftLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	const char *softname);
+
+/* fscurrentvolume.c */
+BPTR FbxCurrentVolume(struct FbxFS *fs, struct FbxLock *lock);
 
 /* fsdelete.c */
 int FbxDeleteObject(struct FbxFS *fs, struct FbxLock *lock, const char *name);
