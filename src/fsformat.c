@@ -19,6 +19,9 @@ static int Fbx_format(struct FbxFS *fs, const char *volname, ULONG dostype)
 
 int FbxFormat(struct FbxFS *fs, const char *volname, ULONG dostype) {
 	int error;
+#ifdef ENABLE_CHARSET_CONVERSION
+	char fsvolname[FBX_MAX_NAME];
+#endif
 
 	PDEBUGF("FbxFormat(%#p, '%s', %#lx)\n", fs, volname, dostype);
 
@@ -27,7 +30,17 @@ int FbxFormat(struct FbxFS *fs, const char *volname, ULONG dostype) {
 		return DOSFALSE;
 	}
 
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		if (local_to_utf8(fsvolname, volname, FBX_MAX_NAME, fs->maptable) >= FBX_MAX_NAME) {
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return DOSFALSE;
+		}
+		volname = fsvolname;
+	}
+#else
 	CHECKSTRING(volname, DOSFALSE);
+#endif
 
 	error = Fbx_format(fs, volname, dostype);
 	if (error) {
