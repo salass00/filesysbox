@@ -16,6 +16,7 @@
 static void FbxStartTimer(struct FbxFS *fs);
 static void FbxStopTimer(struct FbxFS *fs);
 static void FbxHandlePackets(struct FbxFS *fs);
+static void FbxHandleNotifyReplies(struct FbxFS *fs);
 static void FbxHandleTimerEvent(struct FbxFS *fs);
 static void FbxHandleUserEvent(struct FbxFS *fs, ULONG signals);
 
@@ -163,6 +164,26 @@ static void FbxHandlePackets(struct FbxFS *fs) {
 		pkt = (struct DosPacket *)msg->mn_Node.ln_Name;
 		r1 = FbxDoPacket(fs, pkt);
 		FbxReturnPacket(fs, pkt, r1, fs->r2);
+	}
+}
+
+static void FbxHandleNotifyReplies(struct FbxFS *fs) {
+	struct Library *SysBase = fs->sysbase;
+	struct NotifyMessage *nm;
+	struct NotifyRequest *nr;
+
+	NDEBUGF("FbxHandleNotifyReplies(%#p)\n", fs);
+
+	while ((nm = (struct NotifyMessage *)GetMsg(fs->notifyreplyport)) != NULL) {
+		nr = nm->nm_NReq;
+		if (nr->nr_Flags & NRF_MAGIC) {
+			// reuse request and send it one more time
+			nr->nr_Flags &= ~NRF_MAGIC;
+			PutMsg(nr->nr_stuff.nr_Msg.nr_Port, (struct Message *)nm);
+		} else {
+			nr->nr_MsgCount--;
+			FreeNotifyMessage(nm);
+		}
 	}
 }
 

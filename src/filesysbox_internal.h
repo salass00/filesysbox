@@ -522,22 +522,16 @@ void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock);
 void FbxAddEntry(struct FbxFS *fs, struct FbxEntry *e);
 BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, char *fullpathbuf);
 int FbxFuseErrno2Error(int error);
-void FbxDoNotifyRequest(struct FbxFS *fs, struct NotifyRequest *nr);
-void FbxDoNotifyEntry(struct FbxFS *fs, struct FbxEntry *entry);
-void FbxDoNotify(struct FbxFS *fs, const char *path);
 void FbxSetEntryPath(struct FbxFS *fs, struct FbxEntry *e, const char *p);
 struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int type, QUAD id);
 void FbxCleanupEntry(struct FbxFS *fs, struct FbxEntry *e);
-void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e);
 BOOL FbxCheckLock(struct FbxFS *fs, struct FbxLock *lock);
 ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath);
 void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass);
 void FbxSetModifyState(struct FbxFS *fs, int state);
-void FbxUnResolveNotifys(struct FbxFS *fs, struct FbxEntry *e);
 BOOL FbxIsParent(struct FbxFS *fs, const char *parent, const char *child);
 void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStamp *ds);
 int FbxFlushAll(struct FbxFS *fs);
-void FbxHandleNotifyReplies(struct FbxFS *fs);
 
 /* timer.c */
 struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
@@ -545,6 +539,13 @@ void FbxCleanupTimerIO(struct FbxFS *fs);
 void FbxInitUpTime(struct FbxFS *fs);
 void FbxGetUpTime(struct FbxFS *fs, struct timeval *tv);
 QUAD FbxGetUpTimeMillis(struct FbxFS *fs);
+
+/* notify.c */
+void FbxDoNotifyRequest(struct FbxFS *fs, struct NotifyRequest *nr);
+void FbxDoNotifyEntry(struct FbxFS *fs, struct FbxEntry *entry);
+void FbxDoNotify(struct FbxFS *fs, const char *path);
+void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e);
+void FbxUnResolveNotifys(struct FbxFS *fs, struct FbxEntry *e);
 
 /* dopacket.c */
 SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt);
