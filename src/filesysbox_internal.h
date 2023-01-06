@@ -704,6 +704,10 @@ int utf8_stricmp(const char *s1, const char *s2);
 int utf8_strnicmp(const char *s1, const char *s2, size_t n);
 size_t utf8_strlcpy(char *dst, const char *src, size_t dst_size);
 size_t utf8_strlcat(char *dst, const char *src, size_t dst_size);
+#ifdef ENABLE_CHARSET_CONVERSION
+size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const ULONG *maptable);
+size_t local_to_utf8(char *dst, const char *src, size_t dst_size, const ULONG *maptable);
+#endif
 
 /* ucs4.c */
 ULONG ucs4_toupper(ULONG c);

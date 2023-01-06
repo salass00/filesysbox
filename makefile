@@ -10,6 +10,8 @@ INCLUDES = -I./include -I.
 DEFINES  = -DNODEBUG -D__NOLIBBASE__
 WARNINGS = -Werror -Wall -Wwrite-strings -Wno-attributes
 
+DEFINES += -DENABLE_CHARSET_CONVERSION
+
 CFLAGS  = -O2 -g -fomit-frame-pointer -fno-strict-aliasing \
           $(INCLUDES) $(DEFINES) $(WARNINGS)
 LDFLAGS = -nostartfiles
