@@ -251,15 +251,26 @@ size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const ULONG *m
 			}
 			else
 			{
-				int i, local;
-
-				local = '\0';
-				for (i = 0x80; i < 0x100; i++)
+				if (maptable == NULL)
 				{
-					if (maptable[i] == unicode)
-					{
+					/* Assume latin-1 */
+					if (unicode < 0x100)
 						local = i;
-						break;
+					else
+						local = '\0';
+				}
+				else
+				{
+					int i, local;
+
+					local = '\0';
+					for (i = 0x80; i < 0x100; i++)
+					{
+						if (maptable[i] == unicode)
+						{
+							local = i;
+							break;
+						}
 					}
 				}
 
@@ -301,15 +312,26 @@ size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const ULONG *m
 		}
 		else
 		{
-			int i, local;
-
-			local = '\0';
-			for (i = 0x80; i < 0x100; i++)
+			if (maptable == NULL)
 			{
-				if (maptable[i] == unicode)
-				{
+				/* Assume latin-1 */
+				if (unicode < 0x100)
 					local = i;
-					break;
+				else
+					local = '\0';
+			}
+			else
+			{
+				int i, local;
+
+				local = '\0';
+				for (i = 0x80; i < 0x100; i++)
+				{
+					if (maptable[i] == unicode)
+					{
+						local = i;
+						break;
+					}
 				}
 			}
 
@@ -487,7 +509,11 @@ size_t local_to_utf8(char *dst, const char *src, size_t dst_size, const ULONG *m
 			{
 				ULONG unicode;
 
-				unicode = maptable[local];
+				if (maptable == NULL)
+					unicode = local; /* Assume latin-1 */
+				else
+					unicode = maptable[local];
+
 				if (unicode < 0x80)
 				{
 					*dst++ = unicode;
@@ -554,7 +580,11 @@ size_t local_to_utf8(char *dst, const char *src, size_t dst_size, const ULONG *m
 		{
 			ULONG unicode;
 
-			unicode = maptable[local];
+			if (maptable == NULL)
+				unicode = local; /* Assume latin-1 */
+			else
+				unicode = maptable[local];
+
 			if (unicode < 0x80)
 			{
 				dst++;
