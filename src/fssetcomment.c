@@ -15,8 +15,12 @@
 int FbxSetComment(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	const char *comment)
 {
-	char fullpath[FBX_MAX_PATH];
 	int error;
+	char fullpath[FBX_MAX_PATH];
+#ifdef ENABLE_CHARSET_CONVERSION
+	char fsname[FBX_MAX_NAME];
+	char fscomment[FBX_MAX_COMMENT];
+#endif
 
 	PDEBUGF("FbxSetComment(%#p, %#p, '%s', '%s')\n", fs, lock, name, comment);
 
@@ -32,8 +36,23 @@ int FbxSetComment(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 		}
 	}
 
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		if (local_to_utf8(fsname, name, FBX_MAX_NAME, fs->maptable) >= FBX_MAX_NAME) {
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return DOSFALSE;
+		}
+		name = fsname;
+		if (local_to_utf8(fscomment, comment, FBX_MAX_COMMENT, fs->maptable) >= FBX_MAX_COMMENT) {
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return DOSFALSE;
+		}
+		comment = fscomment;
+	}
+#else
 	CHECKSTRING(name, DOSFALSE);
 	CHECKSTRING(comment, DOSFALSE);
+#endif
 
 	FbxLockName2Path(fs, lock, name, fullpath);
 
