@@ -24,7 +24,16 @@ static APTR Fbx_init(struct FbxFS *fs, struct fuse_conn_info *conn)
 	}
 	else
 	{
-		FbxStrlcpy(fs, conn->volume_name, BADDR(fs->devnode->dn_Name) + 1, CONN_VOLUME_NAME_BYTES);
+		const char *devname = (const char *)BADDR(fs->devnode->dn_Name) + 1;
+#ifdef ENABLE_CHARSET_CONVERSION
+		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES)
+			local_to_utf8(conn->volume_name, devname, CONN_VOLUME_NAME_BYTES, fs->maptable);
+		else
+			strlcpy(conn->volume_name, devname, CONN_VOLUME_NAME_BYTES);
+#else
+		/* FIXME: No UTF-8 validity check */
+		FbxStrlcpy(fs, conn->volume_name, devname, CONN_VOLUME_NAME_BYTES);
+#endif
 		return (APTR)TRUE;
 	}
 }
@@ -47,6 +56,10 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 	struct FbxVolume *vol;
 	struct statvfs st;
 	struct fbx_stat statbuf;
+#ifdef ENABLE_CHARSET_CONVERSION
+	char advolname[FBX_MAX_NAME];
+#endif
+	const char *volname;
 
 	DEBUGF("FbxSetupVolume(%#p)\n", fs);
 
@@ -74,6 +87,17 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 	}
 
 	DEBUGF("FbxSetupVolume: conn.volume_name '%s'\n", conn->volume_name);
+
+	volname = conn->volume_name;
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		if (utf8_to_local(advolname, volname, FBX_MAX_NAME, fs->maptable) >= FBX_MAX_NAME) {
+			Fbx_destroy(fs, fs->initret);
+			return NULL;
+		}
+		volname = advolname;
+	}
+#endif
 
 	// if statfs fails, abort.
 	error = Fbx_statfs(fs, "/", &st);
@@ -106,7 +130,11 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 #endif
 
 	FbxTimeSpec2DS(fs, &statbuf.st_ctim, &vol->dl.dl_VolumeDate);
-	FbxStrlcpy(fs, vol->volname, conn->volume_name, CONN_VOLUME_NAME_BYTES);
+#ifdef ENABLE_CHARSET_CONVERSION
+	strlcpy(vol->volname, volname, CONN_VOLUME_NAME_BYTES);
+#else
+	FbxStrlcpy(fs, vol->volname, volname, CONN_VOLUME_NAME_BYTES);
+#endif
 	vol->volnamelen = strlen(vol->volname);
 
 	vol->fs           = fs;
