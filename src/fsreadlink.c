@@ -19,14 +19,17 @@ static int Fbx_readlink(struct FbxFS *fs, const char *path, char *buf, size_t bu
 }
 
 int FbxReadLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
-	char *buffer, int len)
+	char *buffer, int size)
 {
+	struct fbx_stat statbuf;
+	int error, len;
 	char fullpath[FBX_MAX_PATH];
 	char softname[FBX_MAX_PATH];
-	struct fbx_stat statbuf;
-	int error;
+#ifdef ENABLE_CHARSET_CONVERSION
+	char fsname[FBX_MAX_NAME];
+#endif
 
-	PDEBUGF("FbxReadLink(%#p, %#p, '%s', %#p, %d)\n", fs, lock, name, buffer, len);
+	PDEBUGF("FbxReadLink(%#p, %#p, '%s', %#p, %d)\n", fs, lock, name, buffer, size);
 
 	CHECKVOLUME(-1);
 
@@ -39,7 +42,17 @@ int FbxReadLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 		}
 	}
 
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		if (local_to_utf8(fsname, name, FBX_MAX_NAME, fs->maptable) >= FBX_MAX_NAME) {
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return -1;
+		}
+		name = fsname;
+	}
+#else
 	CHECKSTRING(name, -1);
+#endif
 
 	if (!FbxLockName2Path(fs, lock, name, fullpath)) {
 		fs->r2 = ERROR_OBJECT_NOT_FOUND;
@@ -64,12 +77,20 @@ int FbxReadLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 		return -1;
 	}
 
-	if (FbxStrlcpy(fs, buffer, softname, len) >= len) {
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES)
+		len = utf8_to_local(buffer, softname, size, fs->maptable);
+	else
+		len = strlcpy(buffer, softname, size);
+#else
+	len = FbxStrlcpy(fs, buffer, softname, size);
+#endif
+	if (len >= size) {
 		fs->r2 = ERROR_LINE_TOO_LONG;
 		return -2;
 	}
 
 	fs->r2 = 0;
-	return strlen(softname);
+	return len;
 }
 
