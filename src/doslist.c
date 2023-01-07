@@ -78,7 +78,11 @@ static int FbxDosListProc(void) {
 					break;
 				case FBX_ASYNC_RENAME:
 					if (RemDosEntry(&vol->dol)) {
+#ifdef ENABLE_CHARSET_CONVERSION
+						strlcpy(vol->volname, async_msg->name, CONN_VOLUME_NAME_BYTES);
+#else
 						FbxStrlcpy(async_msg->fs, vol->volname, async_msg->name, CONN_VOLUME_NAME_BYTES);
+#endif
 						vol->volnamelen = strlen(vol->volname);
 						AddDosEntry(&vol->dol);
 					}
