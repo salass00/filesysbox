@@ -13,7 +13,7 @@
 
 #include "filesysbox_internal.h"
 
-static const UBYTE utf8_trailing_bytes[256] = {
+static const unsigned char utf8_trailing_bytes[256] = {
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -29,7 +29,7 @@ static const ULONG utf8_offsets[6] = {
 	0x03C82080UL, 0xFA082080UL, 0x82082080UL
 };
 
-static const UBYTE utf8_lb_masks[6] = {
+static const unsigned char utf8_lb_masks[6] = {
 	0x7F, 0x1F, 0x0F, 0x07, 0x03, 0x01
 };
 
@@ -39,8 +39,8 @@ static const ULONG utf8_first_codes[6] = {
 
 // slow, validating decode function
 LONG utf8_decode_slow(const char **strp) {
-	const UBYTE *str = (const UBYTE *)*strp;
-	UBYTE byte, ntb;
+	const unsigned char *str = (const unsigned char *)*strp;
+	unsigned char byte, ntb;
 	ULONG unicode;
 	if (((byte = *str++) & 0xC0) == 0x80) return -1;
 	ntb = utf8_trailing_bytes[byte];
@@ -78,8 +78,8 @@ LONG utf8_decode_slow(const char **strp) {
 
 // faster decode function which assumes valid UTF-8
 inline LONG utf8_decode_fast(const char **strp) {
-	const UBYTE *str = (const UBYTE *)*strp;
-	UBYTE ntb = utf8_trailing_bytes[*str];
+	const unsigned char *str = (const unsigned char *)*strp;
+	unsigned char ntb = utf8_trailing_bytes[*str];
 	ULONG unicode = 0;
 	switch (ntb) {
 	case 3: unicode += *str++; unicode <<= 6;
@@ -95,7 +95,7 @@ inline LONG utf8_decode_fast(const char **strp) {
 size_t utf8_strlen(const char *str) {
 	size_t len = 0;
 	int byte;
-	while ((byte = (UBYTE)*str) != '\0') {
+	while ((byte = (unsigned char)*str) != '\0') {
 		str += 1 + utf8_trailing_bytes[byte];
 		len++;
 	}
@@ -126,7 +126,7 @@ size_t utf8_strlcpy(char *dst, const char *src, size_t dst_size) {
 	char *dst_end = dst + dst_size;
 	int byte, utf8_size;
 	if (dst_end > dst) {
-		while ((byte = (UBYTE)*src) != '\0') {
+		while ((byte = (unsigned char)*src) != '\0') {
 			utf8_size = 1 + utf8_trailing_bytes[byte];
 			if ((dst + utf8_size) >= dst_end) break;
 			switch (utf8_size) {
@@ -138,7 +138,7 @@ size_t utf8_strlcpy(char *dst, const char *src, size_t dst_size) {
 		}
 		*dst = '\0';
 	}
-	while ((byte = (UBYTE)*src) != '\0') {
+	while ((byte = (unsigned char)*src) != '\0') {
 		utf8_size = 1 + utf8_trailing_bytes[byte];
 		src += utf8_size;
 		dst += utf8_size;
@@ -150,12 +150,12 @@ size_t utf8_strlcat(char *dst, const char *src, size_t dst_size) {
 	char *dst_start = dst;
 	char *dst_end = dst + dst_size;
 	int byte, utf8_size;
-	while ((byte = (UBYTE)*dst) != '\0') {
+	while ((byte = (unsigned char)*dst) != '\0') {
 		utf8_size = 1 + utf8_trailing_bytes[byte];
 		dst += utf8_size;
 	}
 	if (dst_end > dst) {
-		while ((byte = (UBYTE)*src) != '\0') {
+		while ((byte = (unsigned char)*src) != '\0') {
 			utf8_size = 1 + utf8_trailing_bytes[byte];
 			if ((dst + utf8_size) >= dst_end) break;
 			switch (utf8_size) {
@@ -167,7 +167,7 @@ size_t utf8_strlcat(char *dst, const char *src, size_t dst_size) {
 		}
 		*dst = '\0';
 	}
-	while ((byte = (UBYTE)*src) != '\0') {
+	while ((byte = (unsigned char)*src) != '\0') {
 		utf8_size = 1 + utf8_trailing_bytes[byte];
 		src += utf8_size;
 		dst += utf8_size;
@@ -251,19 +251,17 @@ size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const ULONG *m
 			}
 			else
 			{
+				int local = '\0';
+
 				if (maptable == NULL)
 				{
 					/* Assume latin-1 */
 					if (unicode < 0x100)
-						local = i;
-					else
-						local = '\0';
+						local = unicode;
 				}
 				else
 				{
-					int i, local;
-
-					local = '\0';
+					int i;
 					for (i = 0x80; i < 0x100; i++)
 					{
 						if (maptable[i] == unicode)
@@ -312,19 +310,17 @@ size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const ULONG *m
 		}
 		else
 		{
+			int local = '\0';
+
 			if (maptable == NULL)
 			{
 				/* Assume latin-1 */
 				if (unicode < 0x100)
-					local = i;
-				else
-					local = '\0';
+					local = unicode;
 			}
 			else
 			{
-				int i, local;
-
-				local = '\0';
+				int i;
 				for (i = 0x80; i < 0x100; i++)
 				{
 					if (maptable[i] == unicode)
@@ -356,7 +352,7 @@ static LONG unescape_unicode(const char **strp, const char *b32tab)
 	unsigned len;
 	ULONG unicode;
 
-	if (b32tab[c = *s++] == 0)
+	if (b32tab[c = (unsigned char)*s++] == 0)
 		return -1; /* Not valid base32 */
 	b = c - b32tab[c];
 	len = b >> 2;
@@ -366,7 +362,7 @@ static LONG unescape_unicode(const char **strp, const char *b32tab)
 		{
 			case 1:
 				unicode = (b&0x3)<<5;
-				if (b32tab[c = *s++] == 0)
+				if (b32tab[c = (unsigned char)*s++] == 0)
 					return -1; /* Not valid base32 */
 				b = c - b32tab[c];
 				unicode |= b;
@@ -374,11 +370,11 @@ static LONG unescape_unicode(const char **strp, const char *b32tab)
 
 			case 2:
 				unicode = (b&0x3)<<10;
-				if (b32tab[c = *s++] == 0)
+				if (b32tab[c = (unsigned char)*s++] == 0)
 					return -1; /* Not valid base32 */
 				b = c - b32tab[c];
 				unicode |= b<<5;
-				if (b32tab[c = *s++] == 0)
+				if (b32tab[c = (unsigned char)*s++] == 0)
 					return -1; /* Not valid base32 */
 				b = c - b32tab[c];
 				unicode |= b;
@@ -386,15 +382,15 @@ static LONG unescape_unicode(const char **strp, const char *b32tab)
 
 			case 3:
 				unicode = (b&0x3)<<14;
-				if (b32tab[c = *s++] == 0)
+				if (b32tab[c = (unsigned char)*s++] == 0)
 					return -1; /* Not valid base32 */
 				b = c - b32tab[c];
 				unicode |= b<<9;
-				if (b32tab[c = *s++] == 0)
+				if (b32tab[c = (unsigned char)*s++] == 0)
 					return -1; /* Not valid base32 */
 				b = c - b32tab[c];
 				unicode |= b<<4;
-				if (b32tab[c = *s++] == 0)
+				if (b32tab[c = (unsigned char)*s++] == 0)
 					return -1; /* Not valid base32 */
 				b = c - b32tab[c];
 				if (b&1)
@@ -404,19 +400,19 @@ static LONG unescape_unicode(const char **strp, const char *b32tab)
 
 			case 4:
 				unicode = (b&0x3)<<19;
-				if (b32tab[c = *s++] == 0)
+				if (b32tab[c = (unsigned char)*s++] == 0)
 					return -1; /* Not valid base32 */
 				b = c - b32tab[c];
 				unicode |= b<<14;
-				if (b32tab[c = *s++] == 0)
+				if (b32tab[c = (unsigned char)*s++] == 0)
 					return -1; /* Not valid base32 */
 				b = c - b32tab[c];
 				unicode |= b<<9;
-				if (b32tab[c = *s++] == 0)
+				if (b32tab[c = (unsigned char)*s++] == 0)
 					return -1; /* Not valid base32 */
 				b = c - b32tab[c];
 				unicode |= b<<4;
-				if (b32tab[c = *s++] == 0)
+				if (b32tab[c = (unsigned char)*s++] == 0)
 					return -1; /* Not valid base32 */
 				b = c - b32tab[c];
 				if (b&1)
@@ -503,7 +499,7 @@ size_t local_to_utf8(char *dst, const char *src, size_t dst_size, const ULONG *m
 	{
 		dst_end--;
 
-		while (dst < dst_end && (local = *src++) != '\0')
+		while (dst < dst_end && (local = (unsigned char)*src++) != '\0')
 		{
 			if (local != '%')
 			{
@@ -574,7 +570,7 @@ size_t local_to_utf8(char *dst, const char *src, size_t dst_size, const ULONG *m
 			return dst - dst_start;
 	}
 
-	while ((local = *src++) != '\0')
+	while ((local = (unsigned char)*src++) != '\0')
 	{
 		if (local != '%')
 		{
