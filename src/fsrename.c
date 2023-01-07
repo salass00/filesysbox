@@ -54,11 +54,15 @@ int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	struct FbxLock *lock2, const char *name2)
 {
 	struct Library *SysBase = fs->sysbase;
-	char fullpath[FBX_MAX_PATH];
-	char fullpath2[FBX_MAX_PATH];
 	struct FbxEntry *e, *e2;
 	struct fbx_stat statbuf;
 	int error;
+	char fullpath[FBX_MAX_PATH];
+	char fullpath2[FBX_MAX_PATH];
+#ifdef ENABLE_CHARSET_CONVERSION
+	char fsname[FBX_MAX_NAME];
+	char fsname2[FBX_MAX_NAME];
+#endif
 
 	CHECKVOLUME(DOSFALSE);
 	CHECKWRITABLE(DOSFALSE);
@@ -80,8 +84,23 @@ int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 		}
 	}
 
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		if (local_to_utf8(fsname, name, FBX_MAX_NAME, fs->maptable) >= FBX_MAX_NAME) {
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return DOSFALSE;
+		}
+		name = fsname;
+		if (local_to_utf8(fsname2, name2, FBX_MAX_NAME, fs->maptable) >= FBX_MAX_NAME) {
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return DOSFALSE;
+		}
+		name2 = fsname2;
+	}
+#else
 	CHECKSTRING(name, DOSFALSE);
 	CHECKSTRING(name2, DOSFALSE);
+#endif
 
 	if (!FbxLockName2Path(fs, lock, name, fullpath) ||
 		!FbxLockName2Path(fs, lock2, name2, fullpath2))
