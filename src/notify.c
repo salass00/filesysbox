@@ -73,7 +73,11 @@ void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e) {
 	struct FbxNotifyNode *nn;
 	struct MinNode *chain, *succ;
 	struct NotifyRequest *nr;
+	const char *fullname;
 	char fullpath[FBX_MAX_PATH];
+#ifdef ENABLE_CHARSET_CONVERSION
+	char fsfullname[FBX_MAX_PATH];
+#endif
 
 	NDEBUGF("FbxTryResolveNotify(%#p, %#p)\n", fs, e);
 
@@ -81,7 +85,19 @@ void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e) {
 	while ((succ = chain->mln_Succ) != NULL) {
 		nn = FSNOTIFYNODEFROMCHAIN(chain);
 		nr = nn->nr;
-		if (FbxLockName2Path(fs, NULL, (const char *)nr->nr_FullName, fullpath) &&
+
+		fullname = (const char *)nr->nr_FullName;
+#ifdef ENABLE_CHARSET_CONVERSION
+		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+			/* FIXME: Can the charset converted path be saved in FbxAddNotify
+			 * and then reused here?
+			 */
+			local_to_utf8(fsfullname, fullname, FBX_MAX_PATH, fs->maptable);
+			fullname = fsfullname;
+		}
+#endif
+
+		if (FbxLockName2Path(fs, NULL, fullname, fullpath) &&
 			FbxStrcmp(fs, fullpath, e->path) == 0)
 		{
 			Remove((struct Node *)chain);
