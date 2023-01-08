@@ -39,7 +39,11 @@ static void FbxFillInfoData(struct FbxFS *fs, struct InfoData *info) {
 		info->id_NumBlocks = st.f_blocks;
 		info->id_NumBlocksUsed = st.f_blocks - st.f_bfree;
 		info->id_BytesPerBlock = st.f_frsize;
+#ifdef __AROS__
 		info->id_DiskType = fs->dostype;
+#else
+		info->id_DiskType = ID_INTER_FFS_DISK;
+#endif
 		info->id_VolumeNode = MKBADDR(vol);
 
 		if (!IsMinListEmpty(&vol->locklist) ||
