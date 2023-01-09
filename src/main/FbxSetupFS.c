@@ -100,13 +100,11 @@
 static int dumopfunc(void) { return -ENOSYS; }
 static int dumopfunc2(void) { return 0; }
 
-static void FbxDiskChangeHandler(struct FbxFS *fs) {
-	struct Library *SysBase = fs->sysbase;
-	fs->dosetup = TRUE;
-	Signal(&fs->thisproc->pr_Task, 1UL << fs->diskchangesig);
-}
-
+static void FbxDiskChangeHandler(struct FbxFS *fs);
 void FbxReadDebugFlags(struct FbxFS *fs);
+#ifdef ENABLE_CHARSET_CONVERSION
+static void FbxGetCharsetMapTable(struct FbxFS *fs);
+#endif
 
 #ifdef __AROS__
 #define FbxReturnMountMsg(msg, r1, r2) \
@@ -190,6 +188,8 @@ struct FbxFS *FbxSetupFS(
 				fs->dostype = de->de_DosType;
 		}
 	}
+
+	FbxReadDebugFlags(fs);
 
 	if (LocaleBase != NULL) {
 		struct Locale *locale;
@@ -286,6 +286,12 @@ struct FbxFS *FbxSetupFS(
 		}
 	}
 
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		FbxGetCharsetMapTable(fs);
+	}
+#endif
+
 	if (fs->fsflags & FBXF_ENABLE_DISK_CHANGE_DETECTION) {
 		if (FbxAddDiskChangeHandler(fs, FbxDiskChangeHandler) == NULL) goto error;
 	}
@@ -299,8 +305,6 @@ struct FbxFS *FbxSetupFS(
 	}
 	ReleaseSemaphore(&libBase->dlproc_sem);
 	if (libBase->dlproc == NULL) goto error;
-
-	FbxReadDebugFlags(fs);
 
 	fs->fcntx.fuse = fs;
 	fs->fcntx.private_data = udata;
@@ -326,6 +330,12 @@ error:
 #ifdef __AROS__
 	AROS_LIBFUNC_EXIT
 #endif
+}
+
+static void FbxDiskChangeHandler(struct FbxFS *fs) {
+	struct Library *SysBase = fs->sysbase;
+	fs->dosetup = TRUE;
+	Signal(&fs->thisproc->pr_Task, 1UL << fs->diskchangesig);
 }
 
 static void HexToLong(CONST_STRPTR str, ULONG *res) {
@@ -356,4 +366,11 @@ void FbxReadDebugFlags(struct FbxFS *fs) {
 
 	fs->dbgflags = flags;
 }
+
+#ifdef ENABLE_CHARSET_CONVERSION
+static void FbxGetCharsetMapTable(struct FbxFS *fs) {
+	fs->maptable = NULL;
+	/* FIXME: Implement this function */
+}
+#endif
 
