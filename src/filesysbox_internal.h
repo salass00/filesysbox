@@ -514,8 +514,6 @@ void CopyStringCToBSTR(const char *cstr, BSTR bstr, size_t size);
 
 /* filesysbox.c */
 struct FileSysStartupMsg *FbxGetFSSM(struct Library *sysbase, struct DeviceNode *devnode);
-struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskChangeHandlerFunc func);
-void FbxRemDiskChangeHandler(struct FbxFS *fs);
 BOOL FbxCheckString(struct FbxFS *fs, const char *str);
 size_t FbxStrlen(struct FbxFS *fs, const char *str);
 int FbxStrcmp(struct FbxFS *fs, const char *s1, const char *s2);
@@ -540,6 +538,10 @@ void FbxSetModifyState(struct FbxFS *fs, int state);
 BOOL FbxIsParent(struct FbxFS *fs, const char *parent, const char *child);
 void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStamp *ds);
 int FbxFlushAll(struct FbxFS *fs);
+
+/* diskchange.c */
+struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskChangeHandlerFunc func);
+void FbxRemDiskChangeHandler(struct FbxFS *fs);
 
 /* timer.c */
 struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
