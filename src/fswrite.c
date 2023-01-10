@@ -43,14 +43,14 @@ int FbxWriteFile(struct FbxFS *fs, struct FbxLock *lock, CONST_APTR buffer, int 
 		fs->r2 = FbxFuseErrno2Error(res);
 		return -1;
 	}
-	if (res == bytes) {
+
+	if (res > 0) {
 		lock->filepos += bytes;
-		fs->r2 = 0;
+		lock->flags |= LOCKFLAG_MODIFIED; // for notification
+		FbxSetModifyState(fs, 1);
 	}
 
-	lock->flags |= LOCKFLAG_MODIFIED; // for notification
-	FbxSetModifyState(fs, 1);
-
+	fs->r2 = (res == bytes) ? 0 : -1;
 	return res;
 }
 

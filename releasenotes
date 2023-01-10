@@ -99,3 +99,6 @@ filesysbox.library 54.1 (d.m.2023)
   "rename tmp TMP") no longer fail with ERROR_OBJECT_EXISTS on case
   insensitive file system implementations.
 
+- Advance the file position in FSWrite() also if write() returns a lower
+  number of bytes written than was specified.
+
