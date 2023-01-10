@@ -11,6 +11,7 @@
 #include <libraries/filesysbox.h>
 #include "../filesysbox_vectors.h"
 #include "../filesysbox_internal.h"
+#include "codesets.h"
 
 #include <errno.h>
 #include <string.h>
@@ -369,8 +370,32 @@ void FbxReadDebugFlags(struct FbxFS *fs) {
 
 #ifdef ENABLE_CHARSET_CONVERSION
 static void FbxGetCharsetMapTable(struct FbxFS *fs) {
-	fs->maptable = NULL;
-	/* FIXME: Implement this function */
+	struct Library *LocaleBase = fs->localebase;
+	struct Locale *locale;
+
+	if (LocaleBase != NULL) {
+		locale = OpenLocale(NULL);
+		if (locale != NULL) {
+			struct Library *SysBase = fs->sysbase;
+			const struct FbxCodeSet *cs;
+
+			/* Search using country code */
+			cs = FbxFindCodeSetByCountry(fs, locale->loc_CountryCode);
+
+			if (cs == NULL) {
+				/* Search using language name */
+				cs = FbxFindCodeSetByLanguage(fs, locale->loc_LanguageName);
+			}
+
+			if (cs != NULL && cs->gen_maptab != NULL) {
+				fs->maptable = AllocMem(MEMF_ANY, 256*sizeof(ULONG));
+				if (fs->maptable != NULL)
+					cs->gen_maptab(fs->maptable);
+			}
+
+			CloseLocale(locale);
+		}
+	}
 }
 #endif
 
