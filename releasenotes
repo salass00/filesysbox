@@ -102,3 +102,11 @@ filesysbox.library 54.1 (d.m.2023)
 - Advance the file position in FSWrite() also if write() returns a lower
   number of bytes written than was specified.
 
+- Implemented the same charset conversion system that is used in the latest
+  AmigaOS 4 filesysbox versions. Internally filesysbox still uses UTF-8 for
+  all strings and conversion only happens when strings are passed to or from
+  the AmigaDOS API. In order for the conversion to be reversible any UTF-8
+  characters that do not have an equivalent in the local charset will be
+  converted into URL-style escape sequences where the character is specified
+  as a base32 encoded character sequence preceded by a percent symbol.
+
