@@ -39,45 +39,79 @@ static const struct FbxCodeSet codesets[FBX_CS_MAX] =
 	/* [FBX_CS_ISO_8859_3]     = { gen_iso_8859_3      }, */
 };
 
-struct locmap
+static const struct
 {
-	const char *language;
-	ULONG       carplatecode;
-	ULONG       iso3166code;
-	LONG        csi;
+	ULONG carplatecode;
+	ULONG iso3166code;
+	WORD  csi;
+}
+country2cs[] =
+{
+	{ MAKE_ID('B','A',0,0),   MAKE_ID('B','I','H',0), FBX_CS_ISO_8859_2     },
+	{ MAKE_ID('E',0,0,0),     MAKE_ID('E','S','P',0), FBX_CS_ISO_8859_1_EUR },
+	{ MAKE_ID('C','Z',0,0),   MAKE_ID('C','Z','E',0), FBX_CS_ISO_8859_2     },
+	{ MAKE_ID('D','K',0,0),   MAKE_ID('D','N','K',0), FBX_CS_ISO_8859_1_EUR },
+	{ MAKE_ID('D',0,0,0),     MAKE_ID('D','E','U',0), FBX_CS_ISO_8859_1_EUR },
+	{ MAKE_ID('G','B',0,0),   MAKE_ID('G','B','R',0), FBX_CS_ISO_8859_1_EUR },
+	{ MAKE_ID('E','E',0,0),   MAKE_ID('E','S','T',0), FBX_CS_ISO_8859_15    },
+	{ MAKE_ID('C','Z',0,0),   MAKE_ID('C','Z','E',0), FBX_CS_ISO_8859_2     },
+	{ MAKE_ID('E',0,0,0),     MAKE_ID('E','S','P',0), FBX_CS_ISO_8859_1_EUR },
+	{ MAKE_ID('F',0,0,0),     MAKE_ID('F','R','A',0), FBX_CS_ISO_8859_1_EUR },
+	{ MAKE_ID('E',0,0,0),     MAKE_ID('E','S','P',0), FBX_CS_ISO_8859_1_EUR },
+	{ MAKE_ID('G','R',0,0),   MAKE_ID('G','R','C',0), FBX_CS_ISO_8859_7     },
+	{ MAKE_ID('H','R',0,0),   MAKE_ID('H','R','V',0), FBX_CS_ISO_8859_2     },
+	{ MAKE_ID('I',0,0,0),     MAKE_ID('I','T','A',0), FBX_CS_ISO_8859_1_EUR },
+	{ MAKE_ID('L','T',0,0),   MAKE_ID('L','T','U',0), FBX_CS_ISO_8859_13    },
+	{ MAKE_ID('H','U',0,0),   MAKE_ID('H','U','N',0), FBX_CS_ISO_8859_2     },
+	{ MAKE_ID('N','L',0,0),   MAKE_ID('N','L','D',0), FBX_CS_ISO_8859_1_EUR },
+	{ MAKE_ID('N',0,0,0),     MAKE_ID('N','O','R',0), FBX_CS_ISO_8859_1_EUR },
+	{ MAKE_ID('P','L',0,0),   MAKE_ID('P','O','L',0), FBX_CS_ISO_8859_2     },
+	{ MAKE_ID('P','T',0,0),   MAKE_ID('P','R','T',0), FBX_CS_ISO_8859_1_EUR },
+	{ MAKE_ID('R','U',0,0),   MAKE_ID('R','U','S',0), FBX_CS_AMIGA_1251     },
+	{ MAKE_ID('S','K',0,0),   MAKE_ID('S','V','K',0), FBX_CS_ISO_8859_2     },
+	{ MAKE_ID('S','I',0,0),   MAKE_ID('S','V','N',0), FBX_CS_ISO_8859_2     },
+	{ MAKE_ID('R','S',0,0),   MAKE_ID('S','R','B',0), FBX_CS_ISO_8859_2     },
+	{ MAKE_ID('F','I','N',0), MAKE_ID('F','I','N',0), FBX_CS_ISO_8859_1_EUR },
+	{ MAKE_ID('S',0,0,0),     MAKE_ID('S','W','E',0), FBX_CS_ISO_8859_1_EUR },
+	{ MAKE_ID('T','R',0,0),   MAKE_ID('T','U','R',0), FBX_CS_ISO_8859_9     }
 };
 
-static const struct locmap loc2cs[] =
+static const struct
 {
-	{ "bosanski",          MAKE_ID('B','A',0,0),   MAKE_ID('B','I','H',0), FBX_CS_ISO_8859_2     },
-	{ "catal\xE0",         MAKE_ID('E',0,0,0),     MAKE_ID('E','S','P',0), FBX_CS_ISO_8859_1_EUR },
-	{ "czech",             MAKE_ID('C','Z',0,0),   MAKE_ID('C','Z','E',0), FBX_CS_ISO_8859_2     },
-	{ "dansk",             MAKE_ID('D','K',0,0),   MAKE_ID('D','N','K',0), FBX_CS_ISO_8859_1_EUR },
-	{ "deutch",            MAKE_ID('D',0,0,0),     MAKE_ID('D','E','U',0), FBX_CS_ISO_8859_1_EUR },
-	{ "english",           MAKE_ID('G','B',0,0),   MAKE_ID('G','B','R',0), FBX_CS_ISO_8859_1_EUR },
-	{ "esperanto",         MAKE_ID(0,0,0,0),       MAKE_ID(0,0,0,0),       FBX_CS_ISO_8859_3     },
-	{ "eesti",             MAKE_ID('E','E',0,0),   MAKE_ID('E','S','T',0), FBX_CS_ISO_8859_15    },
-	{ "\xE8""e\xB9""tina", MAKE_ID('C','Z',0,0),   MAKE_ID('C','Z','E',0), FBX_CS_ISO_8859_2     },
-	{ "espa\xF1""ol",      MAKE_ID('E',0,0,0),     MAKE_ID('E','S','P',0), FBX_CS_ISO_8859_1_EUR },
-	{ "fran\xE7""ais",     MAKE_ID('F',0,0,0),     MAKE_ID('F','R','A',0), FBX_CS_ISO_8859_1_EUR },
-	{ "gaeilge",           MAKE_ID(0,0,0,0),       MAKE_ID(0,0,0,0),       FBX_CS_ISO_8859_15    },
-	{ "galego",            MAKE_ID('E',0,0,0),     MAKE_ID('E','S','P',0), FBX_CS_ISO_8859_1_EUR },
-	{ "greek",             MAKE_ID('G','R',0,0),   MAKE_ID('G','R','C',0), FBX_CS_ISO_8859_7     },
-	{ "hrvatski",          MAKE_ID('H','R',0,0),   MAKE_ID('H','R','V',0), FBX_CS_ISO_8859_2     },
-	{ "italiano",          MAKE_ID('I',0,0,0),     MAKE_ID('I','T','A',0), FBX_CS_ISO_8859_1_EUR },
-	{ "lietuvi",           MAKE_ID('L','T',0,0),   MAKE_ID('L','T','U',0), FBX_CS_ISO_8859_13    },
-	{ "magyar",            MAKE_ID('H','U',0,0),   MAKE_ID('H','U','N',0), FBX_CS_ISO_8859_2     },
-	{ "nederlands",        MAKE_ID('N','L',0,0),   MAKE_ID('N','L','D',0), FBX_CS_ISO_8859_1_EUR },
-	{ "norsk",             MAKE_ID('N',0,0,0),     MAKE_ID('N','O','R',0), FBX_CS_ISO_8859_1_EUR },
-	{ "polski",            MAKE_ID('P','L',0,0),   MAKE_ID('P','O','L',0), FBX_CS_ISO_8859_2     },
-	{ "portugu\xEA""s",    MAKE_ID('P','T',0,0),   MAKE_ID('P','R','T',0), FBX_CS_ISO_8859_1_EUR },
-	{ "russian",           MAKE_ID('R','U',0,0),   MAKE_ID('R','U','S',0), FBX_CS_AMIGA_1251     },
-	{ "slovak",            MAKE_ID('S','K',0,0),   MAKE_ID('S','V','K',0), FBX_CS_ISO_8859_2     },
-	{ "slovensko",         MAKE_ID('S','I',0,0),   MAKE_ID('S','V','N',0), FBX_CS_ISO_8859_2     },
-	{ "srpski",            MAKE_ID('R','S',0,0),   MAKE_ID('S','R','B',0), FBX_CS_ISO_8859_2     },
-	{ "suomi",             MAKE_ID('F','I','N',0), MAKE_ID('F','I','N',0), FBX_CS_ISO_8859_1_EUR },
-	{ "svenska",           MAKE_ID('S',0,0,0),     MAKE_ID('S','W','E',0), FBX_CS_ISO_8859_1_EUR },
-	{ "t\xFC""rk\xE7""e",  MAKE_ID('T','R',0,0),   MAKE_ID('T','U','R',0), FBX_CS_ISO_8859_9     }
+	const char *language;
+	WORD        csi;
+}
+language2cs[] =
+{
+	{ "bosanski",          FBX_CS_ISO_8859_2     },
+	{ "catal\xE0",         FBX_CS_ISO_8859_1_EUR },
+	{ "czech",             FBX_CS_ISO_8859_2     },
+	{ "dansk",             FBX_CS_ISO_8859_1_EUR },
+	{ "deutch",            FBX_CS_ISO_8859_1_EUR },
+	{ "english",           FBX_CS_ISO_8859_1_EUR },
+	{ "esperanto",         FBX_CS_ISO_8859_3     },
+	{ "eesti",             FBX_CS_ISO_8859_15    },
+	{ "\xE8""e\xB9""tina", FBX_CS_ISO_8859_2     },
+	{ "espa\xF1""ol",      FBX_CS_ISO_8859_1_EUR },
+	{ "fran\xE7""ais",     FBX_CS_ISO_8859_1_EUR },
+	{ "gaeilge",           FBX_CS_ISO_8859_15    },
+	{ "galego",            FBX_CS_ISO_8859_1_EUR },
+	{ "greek",             FBX_CS_ISO_8859_7     },
+	{ "hrvatski",          FBX_CS_ISO_8859_2     },
+	{ "italiano",          FBX_CS_ISO_8859_1_EUR },
+	{ "lietuvi",           FBX_CS_ISO_8859_13    },
+	{ "magyar",            FBX_CS_ISO_8859_2     },
+	{ "nederlands",        FBX_CS_ISO_8859_1_EUR },
+	{ "norsk",             FBX_CS_ISO_8859_1_EUR },
+	{ "polski",            FBX_CS_ISO_8859_2     },
+	{ "portugu\xEA""s",    FBX_CS_ISO_8859_1_EUR },
+	{ "russian",           FBX_CS_AMIGA_1251     },
+	{ "slovak",            FBX_CS_ISO_8859_2     },
+	{ "slovensko",         FBX_CS_ISO_8859_2     },
+	{ "srpski",            FBX_CS_ISO_8859_2     },
+	{ "suomi",             FBX_CS_ISO_8859_1_EUR },
+	{ "svenska",           FBX_CS_ISO_8859_1_EUR },
+	{ "t\xFC""rk\xE7""e",  FBX_CS_ISO_8859_9     }
 };
 
 const struct FbxCodeSet *FbxFindCodeSetByCountry(struct FbxFS *fs, ULONG country)
@@ -87,12 +121,12 @@ const struct FbxCodeSet *FbxFindCodeSetByCountry(struct FbxFS *fs, ULONG country
 	if (country == 0)
 		return NULL;
 
-	for (i = 0; i < (sizeof(loc2cs) / sizeof(loc2cs[0])); i++)
+	for (i = 0; i < (sizeof(country2cs) / sizeof(country2cs[0])); i++)
 	{
-		if (country == loc2cs[i].carplatecode ||
-			country == loc2cs[i].iso3166code)
+		if (country == country2cs[i].carplatecode ||
+			country == country2cs[i].iso3166code)
 		{
-			return &codesets[loc2cs[i].csi];
+			return &codesets[country2cs[i].csi];
 		}
 	}
 
@@ -106,9 +140,9 @@ const struct FbxCodeSet *FbxFindCodeSetByLanguage(struct FbxFS *fs, CONST_STRPTR
 	if (language == NULL || language[0] == '\0')
 		return NULL;
 
-	for (i = 0; i < (sizeof(loc2cs) / sizeof(loc2cs[0])); i++) {
-		if (Stricmp(language, (CONST_STRPTR)loc2cs[i].language) == 0) {
-			return &codesets[loc2cs[i].csi];
+	for (i = 0; i < (sizeof(language2cs) / sizeof(language2cs[0])); i++) {
+		if (Stricmp(language, (CONST_STRPTR)language2cs[i].language) == 0) {
+			return &codesets[language2cs[i].csi];
 		}
 	}
 
