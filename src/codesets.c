@@ -180,6 +180,18 @@ static void gen_iso_8859_1_euro(ULONG *maptab)
 	}
 }
 
+static void gen_maptab_generic(ULONG *maptab, const UWORD *difftab, int start, int stop)
+{
+	int i;
+	for (i = 0; i < 0x100; i++)
+	{
+		if (i < start || i >= stop)
+			maptab[i] = i;
+		else
+			maptab[i] = difftab[i - start];
+	}
+}
+
 static const UWORD iso_8859_2_to_ucs4[0x100 - 0xA0] =
 {
 	0x00A0,0x0104,0x02D8,0x0141,0x00A4,0x013D,0x015A,0x00A7,
@@ -198,14 +210,7 @@ static const UWORD iso_8859_2_to_ucs4[0x100 - 0xA0] =
 
 static void gen_iso_8859_2(ULONG *maptab)
 {
-	int i;
-	for (i = 0; i < 0x100; i++)
-	{
-		if (i < 0xA0)
-			maptab[i] = i;
-		else
-			maptab[i] = iso_8859_2_to_ucs4[i - 0xA0];
-	}
+	gen_maptab_generic(maptab, iso_8859_2_to_ucs4, 0xA0, 0x100);
 }
 
 static const UWORD iso_8859_3_to_ucs4[0x100 - 0xA0] =
@@ -226,14 +231,7 @@ static const UWORD iso_8859_3_to_ucs4[0x100 - 0xA0] =
 
 static void gen_iso_8859_3(ULONG *maptab)
 {
-	int i;
-	for (i = 0; i < 0x100; i++)
-	{
-		if (i < 0xA0)
-			maptab[i] = i;
-		else
-			maptab[i] = iso_8859_3_to_ucs4[i - 0xA0];
-	}
+	gen_maptab_generic(maptab, iso_8859_3_to_ucs4, 0xA0, 0x100);
 }
 
 static const UWORD iso_8859_7_to_ucs4[0x100 - 0xA0] =
@@ -254,14 +252,7 @@ static const UWORD iso_8859_7_to_ucs4[0x100 - 0xA0] =
 
 static void gen_iso_8859_7(ULONG *maptab)
 {
-	int i;
-	for (i = 0; i < 0x100; i++)
-	{
-		if (i < 0xA0)
-			maptab[i] = i;
-		else
-			maptab[i] = iso_8859_7_to_ucs4[i - 0xA0];
-	}
+	gen_maptab_generic(maptab, iso_8859_7_to_ucs4, 0xA0, 0x100);
 }
 
 static const UWORD iso_8859_9_to_ucs4[0x100 - 0xD0] =
@@ -276,14 +267,7 @@ static const UWORD iso_8859_9_to_ucs4[0x100 - 0xD0] =
 
 static void gen_iso_8859_9(ULONG *maptab)
 {
-	int i;
-	for (i = 0; i < 0x100; i++)
-	{
-		if (i < 0xD0)
-			maptab[i] = i;
-		else
-			maptab[i] = iso_8859_9_to_ucs4[i - 0xD0];
-	}
+	gen_maptab_generic(maptab, iso_8859_9_to_ucs4, 0xD0, 0x100);
 }
 
 static const UWORD iso_8859_13_to_ucs4[0x100 - 0xA0] =
@@ -304,14 +288,7 @@ static const UWORD iso_8859_13_to_ucs4[0x100 - 0xA0] =
 
 static void gen_iso_8859_13(ULONG *maptab)
 {
-	int i;
-	for (i = 0; i < 0x100; i++)
-	{
-		if (i < 0xA0)
-			maptab[i] = i;
-		else
-			maptab[i] = iso_8859_13_to_ucs4[i - 0xA0];
-	}
+	gen_maptab_generic(maptab, iso_8859_13_to_ucs4, 0xA0, 0x100);
 }
 
 static const UWORD iso_8859_15_to_ucs4[0xC0 - 0xA0] =
@@ -324,14 +301,7 @@ static const UWORD iso_8859_15_to_ucs4[0xC0 - 0xA0] =
 
 static void gen_iso_8859_15(ULONG *maptab)
 {
-	int i;
-	for (i = 0; i < 0x100; i++)
-	{
-		if (i < 0xA0 || i >= 0xC0)
-			maptab[i] = i;
-		else
-			maptab[i] = iso_8859_15_to_ucs4[i - 0xA0];
-	}
+	gen_maptab_generic(maptab, iso_8859_15_to_ucs4, 0xA0, 0xC0);
 }
 
 static const UWORD amiga_1251_to_ucs4[0x100 - 0xA0] =
@@ -352,13 +322,6 @@ static const UWORD amiga_1251_to_ucs4[0x100 - 0xA0] =
 
 static void gen_amiga_1251(ULONG *maptab)
 {
-	int i;
-	for (i = 0; i < 0x100; i++)
-	{
-		if (i < 0xA0)
-			maptab[i] = i;
-		else
-			maptab[i] = amiga_1251_to_ucs4[i - 0xA0];
-	}
+	gen_maptab_generic(maptab, amiga_1251_to_ucs4, 0xA0, 0x100);
 }
 
