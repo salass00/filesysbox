@@ -31,6 +31,7 @@ static void gen_iso_8859_1_euro(ULONG *maptab);
 static void gen_iso_8859_2(ULONG *maptab);
 static void gen_iso_8859_3(ULONG *maptab);
 static void gen_iso_8859_7(ULONG *maptab);
+static void gen_iso_8859_9(ULONG *maptab);
 
 static const struct FbxCodeSet codesets[FBX_CS_MAX] =
 {
@@ -39,6 +40,7 @@ static const struct FbxCodeSet codesets[FBX_CS_MAX] =
 	[FBX_CS_ISO_8859_2]     = { gen_iso_8859_2      },
 	[FBX_CS_ISO_8859_3]     = { gen_iso_8859_3      },
 	[FBX_CS_ISO_8859_7]     = { gen_iso_8859_7      },
+	[FBX_CS_ISO_8859_9]     = { gen_iso_8859_9      },
 };
 
 static const struct
@@ -253,6 +255,28 @@ static void gen_iso_8859_7(ULONG *maptab)
 			maptab[i] = i;
 		else
 			maptab[i] = iso_8859_7_to_ucs4[i - 0xA0];
+	}
+}
+
+static const UWORD iso_8859_9_to_ucs4[0x100 - 0xD0] =
+{
+	0x011E,0x00D1,0x00D2,0x00D3,0x00D4,0x00D5,0x00D6,0x00D7,
+	0x00D8,0x00D9,0x00DA,0x00DB,0x00DC,0x0130,0x015E,0x00DF,
+	0x00E0,0x00E1,0x00E2,0x00E3,0x00E4,0x00E5,0x00E6,0x00E7,
+	0x00E8,0x00E9,0x00EA,0x00EB,0x00EC,0x00ED,0x00EE,0x00EF,
+	0x011F,0x00F1,0x00F2,0x00F3,0x00F4,0x00F5,0x00F6,0x00F7,
+	0x00F8,0x00F9,0x00FA,0x00FB,0x00FC,0x0131,0x015F,0x00FF,
+};
+
+static void gen_iso_8859_9(ULONG *maptab)
+{
+	int i;
+	for (i = 0; i < 256; i++)
+	{
+		if (i < 0xD0)
+			maptab[i] = i;
+		else
+			maptab[i] = iso_8859_9_to_ucs4[i - 0xD0];
 	}
 }
 
