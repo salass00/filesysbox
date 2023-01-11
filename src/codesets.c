@@ -162,7 +162,7 @@ const struct FbxCodeSet *FbxFindCodeSetByLanguage(struct FbxFS *fs, CONST_STRPTR
 /* static void gen_iso_8859_1(ULONG *maptab)
 {
 	int i;
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < 0x100; i++)
 	{
 		maptab[i] = i;
 	}
@@ -171,9 +171,9 @@ const struct FbxCodeSet *FbxFindCodeSetByLanguage(struct FbxFS *fs, CONST_STRPTR
 static void gen_iso_8859_1_euro(ULONG *maptab)
 {
 	int i;
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < 0x100; i++)
 	{
-		if (i == 164)
+		if (i == 0xA4)
 			maptab[i] = 0x20AC; /* Euro sign */
 		else
 			maptab[i] = i;
@@ -199,7 +199,7 @@ static const UWORD iso_8859_2_to_ucs4[0x100 - 0xA0] =
 static void gen_iso_8859_2(ULONG *maptab)
 {
 	int i;
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < 0x100; i++)
 	{
 		if (i < 0xA0)
 			maptab[i] = i;
@@ -227,7 +227,7 @@ static const UWORD iso_8859_3_to_ucs4[0x100 - 0xA0] =
 static void gen_iso_8859_3(ULONG *maptab)
 {
 	int i;
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < 0x100; i++)
 	{
 		if (i < 0xA0)
 			maptab[i] = i;
@@ -255,7 +255,7 @@ static const UWORD iso_8859_7_to_ucs4[0x100 - 0xA0] =
 static void gen_iso_8859_7(ULONG *maptab)
 {
 	int i;
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < 0x100; i++)
 	{
 		if (i < 0xA0)
 			maptab[i] = i;
@@ -277,7 +277,7 @@ static const UWORD iso_8859_9_to_ucs4[0x100 - 0xD0] =
 static void gen_iso_8859_9(ULONG *maptab)
 {
 	int i;
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < 0x100; i++)
 	{
 		if (i < 0xD0)
 			maptab[i] = i;
@@ -305,7 +305,7 @@ static const UWORD iso_8859_13_to_ucs4[0x100 - 0xA0] =
 static void gen_iso_8859_13(ULONG *maptab)
 {
 	int i;
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < 0x100; i++)
 	{
 		if (i < 0xA0)
 			maptab[i] = i;
@@ -325,7 +325,7 @@ static const UWORD iso_8859_15_to_ucs4[0xC0 - 0xA0] =
 static void gen_iso_8859_15(ULONG *maptab)
 {
 	int i;
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < 0x100; i++)
 	{
 		if (i < 0xA0 || i >= 0xC0)
 			maptab[i] = i;
@@ -353,7 +353,7 @@ static const UWORD amiga_1251_to_ucs4[0x100 - 0xA0] =
 static void gen_amiga_1251(ULONG *maptab)
 {
 	int i;
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < 0x100; i++)
 	{
 		if (i < 0xA0)
 			maptab[i] = i;
