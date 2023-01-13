@@ -6,13 +6,14 @@ STRIP = $(HOST)-strip
 TARGET  = filesysbox.library
 VERSION = 54
 
+DEBUG    = -g
 INCLUDES = -I./include -I. -I./src
 DEFINES  = -DNODEBUG -D__NOLIBBASE__
 WARNINGS = -Werror -Wall -Wwrite-strings -Wno-attributes
 
 DEFINES += -DENABLE_CHARSET_CONVERSION
 
-CFLAGS  = -O2 -g -fomit-frame-pointer -fno-strict-aliasing \
+CFLAGS  = -O2 -fomit-frame-pointer -fno-strict-aliasing $(DEBUG) \
           $(INCLUDES) $(DEFINES) $(WARNINGS)
 LDFLAGS = -nostartfiles
 LIBS    = -ldebug
@@ -64,9 +65,17 @@ obj/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+ifneq (,$(findstring -aros,$(HOST)))
+$(TARGET).debug: $(OBJS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+$(TARGET): $(OBJS)
+	$(CC) -s $(LDFLAGS) -o $@ $^ $(LIBS)
+else
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) -o $@.debug $^ $(LIBS)
 	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
+endif
 
 init.o: $(TARGET)_rev.h src/filesysbox_vectors.c src/filesysbox_vectors.h
 
