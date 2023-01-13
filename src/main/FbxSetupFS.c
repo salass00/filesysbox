@@ -377,10 +377,19 @@ static void FbxGetCharsetMapTable(struct FbxFS *fs) {
 		locale = OpenLocale(NULL);
 		if (locale != NULL) {
 			struct Library *SysBase = fs->sysbase;
-			const struct FbxCodeSet *cs;
+			struct Library *DOSBase = fs->dosbase;
+			const struct FbxCodeSet *cs = NULL;
+			TEXT charset[32];
 
-			/* Search using country code */
-			cs = FbxFindCodeSetByCountry(fs, locale->loc_CountryCode);
+			if (GetVar((CONST_STRPTR)"CHARSET", charset, sizeof(charset), 0) > 0) {
+				/* Search using charset name */
+				cs = FbxFindCodeSetByName(fs, charset);
+			}
+
+			if (cs == NULL) {
+				/* Search using country code */
+				cs = FbxFindCodeSetByCountry(fs, locale->loc_CountryCode);
+			}
 
 			if (cs == NULL) {
 				/* Search using language name */

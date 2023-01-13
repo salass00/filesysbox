@@ -18,8 +18,9 @@ struct FbxCodeSet
 	void (*gen_maptab)(ULONG *maptab);
 };
 
-struct FbxFS;
+struct FbxFS; /* Forward declaration */
 
+const struct FbxCodeSet *FbxFindCodeSetByName(struct FbxFS *fs, CONST_STRPTR name);
 const struct FbxCodeSet *FbxFindCodeSetByCountry(struct FbxFS *fs, ULONG country);
 const struct FbxCodeSet *FbxFindCodeSetByLanguage(struct FbxFS *fs, CONST_STRPTR language);
 

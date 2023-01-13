@@ -52,9 +52,27 @@ static const struct FbxCodeSet codesets[FBX_CS_MAX] =
 
 static const struct
 {
+	CONST_STRPTR name;
+	WORD csi;
+}
+name2cs[] =
+{
+	{ (CONST_STRPTR)"iso-8859-1",        FBX_CS_ISO_8859_1     },
+	{ (CONST_STRPTR)"iso-8859-1 + euro", FBX_CS_ISO_8859_1_EUR },
+	{ (CONST_STRPTR)"iso-8859-2",        FBX_CS_ISO_8859_2     },
+	{ (CONST_STRPTR)"iso-8859-3",        FBX_CS_ISO_8859_3     },
+	{ (CONST_STRPTR)"iso-8859-7",        FBX_CS_ISO_8859_7     },
+	{ (CONST_STRPTR)"iso-8859-9",        FBX_CS_ISO_8859_9     },
+	{ (CONST_STRPTR)"iso-8859-13",       FBX_CS_ISO_8859_13    },
+	{ (CONST_STRPTR)"iso-8859-15",       FBX_CS_ISO_8859_15    },
+	{ (CONST_STRPTR)"amiga-1251",        FBX_CS_AMIGA_1251     },
+};
+
+static const struct
+{
 	ULONG carplatecode;
 	ULONG iso3166code;
-	WORD  csi;
+	WORD csi;
 }
 country2cs[] =
 {
@@ -89,41 +107,59 @@ country2cs[] =
 
 static const struct
 {
-	const char *language;
-	WORD        csi;
+	CONST_STRPTR language;
+	WORD csi;
 }
 language2cs[] =
 {
-	{ "bosanski",          FBX_CS_ISO_8859_2     },
-	{ "catal\xE0",         FBX_CS_ISO_8859_1_EUR },
-	{ "czech",             FBX_CS_ISO_8859_2     },
-	{ "dansk",             FBX_CS_ISO_8859_1_EUR },
-	{ "deutch",            FBX_CS_ISO_8859_1_EUR },
-	{ "english",           FBX_CS_ISO_8859_1_EUR },
-	{ "esperanto",         FBX_CS_ISO_8859_3     },
-	{ "eesti",             FBX_CS_ISO_8859_15    },
-	{ "\xE8""e\xB9""tina", FBX_CS_ISO_8859_2     },
-	{ "espa\xF1""ol",      FBX_CS_ISO_8859_1_EUR },
-	{ "fran\xE7""ais",     FBX_CS_ISO_8859_1_EUR },
-	{ "gaeilge",           FBX_CS_ISO_8859_15    },
-	{ "galego",            FBX_CS_ISO_8859_1_EUR },
-	{ "greek",             FBX_CS_ISO_8859_7     },
-	{ "hrvatski",          FBX_CS_ISO_8859_2     },
-	{ "italiano",          FBX_CS_ISO_8859_1_EUR },
-	{ "lietuvi",           FBX_CS_ISO_8859_13    },
-	{ "magyar",            FBX_CS_ISO_8859_2     },
-	{ "nederlands",        FBX_CS_ISO_8859_1_EUR },
-	{ "norsk",             FBX_CS_ISO_8859_1_EUR },
-	{ "polski",            FBX_CS_ISO_8859_2     },
-	{ "portugu\xEA""s",    FBX_CS_ISO_8859_1_EUR },
-	{ "russian",           FBX_CS_AMIGA_1251     },
-	{ "slovak",            FBX_CS_ISO_8859_2     },
-	{ "slovensko",         FBX_CS_ISO_8859_2     },
-	{ "srpski",            FBX_CS_ISO_8859_2     },
-	{ "suomi",             FBX_CS_ISO_8859_1_EUR },
-	{ "svenska",           FBX_CS_ISO_8859_1_EUR },
-	{ "t\xFC""rk\xE7""e",  FBX_CS_ISO_8859_9     }
+	{ (CONST_STRPTR)"bosanski",          FBX_CS_ISO_8859_2     },
+	{ (CONST_STRPTR)"catal\xE0",         FBX_CS_ISO_8859_1_EUR },
+	{ (CONST_STRPTR)"czech",             FBX_CS_ISO_8859_2     },
+	{ (CONST_STRPTR)"dansk",             FBX_CS_ISO_8859_1_EUR },
+	{ (CONST_STRPTR)"deutch",            FBX_CS_ISO_8859_1_EUR },
+	{ (CONST_STRPTR)"english",           FBX_CS_ISO_8859_1_EUR },
+	{ (CONST_STRPTR)"esperanto",         FBX_CS_ISO_8859_3     },
+	{ (CONST_STRPTR)"eesti",             FBX_CS_ISO_8859_15    },
+	{ (CONST_STRPTR)"\xE8""e\xB9""tina", FBX_CS_ISO_8859_2     },
+	{ (CONST_STRPTR)"espa\xF1""ol",      FBX_CS_ISO_8859_1_EUR },
+	{ (CONST_STRPTR)"fran\xE7""ais",     FBX_CS_ISO_8859_1_EUR },
+	{ (CONST_STRPTR)"gaeilge",           FBX_CS_ISO_8859_15    },
+	{ (CONST_STRPTR)"galego",            FBX_CS_ISO_8859_1_EUR },
+	{ (CONST_STRPTR)"greek",             FBX_CS_ISO_8859_7     },
+	{ (CONST_STRPTR)"hrvatski",          FBX_CS_ISO_8859_2     },
+	{ (CONST_STRPTR)"italiano",          FBX_CS_ISO_8859_1_EUR },
+	{ (CONST_STRPTR)"lietuvi",           FBX_CS_ISO_8859_13    },
+	{ (CONST_STRPTR)"magyar",            FBX_CS_ISO_8859_2     },
+	{ (CONST_STRPTR)"nederlands",        FBX_CS_ISO_8859_1_EUR },
+	{ (CONST_STRPTR)"norsk",             FBX_CS_ISO_8859_1_EUR },
+	{ (CONST_STRPTR)"polski",            FBX_CS_ISO_8859_2     },
+	{ (CONST_STRPTR)"portugu\xEA""s",    FBX_CS_ISO_8859_1_EUR },
+	{ (CONST_STRPTR)"russian",           FBX_CS_AMIGA_1251     },
+	{ (CONST_STRPTR)"slovak",            FBX_CS_ISO_8859_2     },
+	{ (CONST_STRPTR)"slovensko",         FBX_CS_ISO_8859_2     },
+	{ (CONST_STRPTR)"srpski",            FBX_CS_ISO_8859_2     },
+	{ (CONST_STRPTR)"suomi",             FBX_CS_ISO_8859_1_EUR },
+	{ (CONST_STRPTR)"svenska",           FBX_CS_ISO_8859_1_EUR },
+	{ (CONST_STRPTR)"t\xFC""rk\xE7""e",  FBX_CS_ISO_8859_9     }
 };
+
+const struct FbxCodeSet *FbxFindCodeSetByName(struct FbxFS *fs, CONST_STRPTR name) {
+	struct Library *UtilityBase = fs->utilitybase;
+	int i;
+
+	if (name == NULL || name[0] == '\0')
+		return NULL;
+
+	for (i = 0; i < (sizeof(name2cs) / sizeof(name2cs[0])); i++)
+	{
+		if (Stricmp(name, name2cs[i].name) == 0)
+		{
+			return &codesets[name2cs[i].csi];
+		}
+	}
+
+	return NULL;
+}
 
 const struct FbxCodeSet *FbxFindCodeSetByCountry(struct FbxFS *fs, ULONG country)
 {
@@ -144,15 +180,18 @@ const struct FbxCodeSet *FbxFindCodeSetByCountry(struct FbxFS *fs, ULONG country
 	return NULL;
 }
 
-const struct FbxCodeSet *FbxFindCodeSetByLanguage(struct FbxFS *fs, CONST_STRPTR language) {
+const struct FbxCodeSet *FbxFindCodeSetByLanguage(struct FbxFS *fs, CONST_STRPTR language)
+{
 	struct Library *UtilityBase = fs->utilitybase;
 	int i;
 
 	if (language == NULL || language[0] == '\0')
 		return NULL;
 
-	for (i = 0; i < (sizeof(language2cs) / sizeof(language2cs[0])); i++) {
-		if (Stricmp(language, (CONST_STRPTR)language2cs[i].language) == 0) {
+	for (i = 0; i < (sizeof(language2cs) / sizeof(language2cs[0])); i++)
+	{
+		if (Stricmp(language, language2cs[i].language) == 0)
+		{
 			return &codesets[language2cs[i].csi];
 		}
 	}
