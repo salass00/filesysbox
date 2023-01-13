@@ -12,6 +12,7 @@
  */
 
 #include "filesysbox_internal.h"
+#include <stdint.h> /* For UINT16_MAX */
 
 static const unsigned char utf8_trailing_bytes[256] = {
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -228,7 +229,7 @@ static int escape_unicode(char *seq, ULONG unicode, const char *b32tab)
 	}
 }
 
-size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const ULONG *maptable)
+size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const FbxUCS *maptable)
 {
 	static const char b32tab[32] =
 	{
@@ -259,15 +260,20 @@ size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const ULONG *m
 					if (unicode < 0x100)
 						local = unicode;
 				}
-				else
+				else if (sizeof(FbxUCS) == 4 || unicode <= UINT16_MAX)
 				{
-					int i;
-					for (i = 0x80; i < 0x100; i++)
+					if (unicode < 0xA0)
+						local = unicode;
+					else
 					{
-						if (maptable[i] == unicode)
+						int i;
+						for (i = 0xA0; i < 0x100; i++)
 						{
-							local = i;
-							break;
+							if (maptable[i] == unicode)
+							{
+								local = i;
+								break;
+							}
 						}
 					}
 				}
@@ -318,15 +324,20 @@ size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const ULONG *m
 				if (unicode < 0x100)
 					local = unicode;
 			}
-			else
+			else if (sizeof(FbxUCS) == 4 || unicode <= UINT16_MAX)
 			{
-				int i;
-				for (i = 0x80; i < 0x100; i++)
+				if (unicode < 0xA0)
+					local = unicode;
+				else
 				{
-					if (maptable[i] == unicode)
+					int i;
+					for (i = 0xA0; i < 0x100; i++)
 					{
-						local = i;
-						break;
+						if (maptable[i] == unicode)
+						{
+							local = i;
+							break;
+						}
 					}
 				}
 			}
@@ -478,7 +489,7 @@ static int encode_unicode(char *seq, ULONG unicode)
 	}
 }
 
-size_t local_to_utf8(char *dst, const char *src, size_t dst_size, const ULONG *maptable)
+size_t local_to_utf8(char *dst, const char *src, size_t dst_size, const FbxUCS *maptable)
 {
 	static const char b32tab[256] =
 	{

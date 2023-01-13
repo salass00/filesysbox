@@ -397,7 +397,7 @@ static void FbxGetCharsetMapTable(struct FbxFS *fs) {
 			}
 
 			if (cs != NULL && cs->gen_maptab != NULL) {
-				fs->maptable = AllocMem(MEMF_ANY, 256*sizeof(ULONG));
+				fs->maptable = (FbxUCS *)AllocMem(MEMF_ANY, 256*sizeof(FbxUCS));
 				if (fs->maptable != NULL)
 					cs->gen_maptab(fs->maptable);
 			}

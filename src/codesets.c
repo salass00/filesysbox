@@ -27,15 +27,15 @@ enum
 	FBX_CS_MAX
 };
 
-/* static void gen_iso_8859_1(ULONG *maptab); */
-static void gen_iso_8859_1_euro(ULONG *maptab);
-static void gen_iso_8859_2(ULONG *maptab);
-static void gen_iso_8859_3(ULONG *maptab);
-static void gen_iso_8859_7(ULONG *maptab);
-static void gen_iso_8859_9(ULONG *maptab);
-static void gen_iso_8859_13(ULONG *maptab);
-static void gen_iso_8859_15(ULONG *maptab);
-static void gen_amiga_1251(ULONG *maptab);
+/* static void gen_iso_8859_1(FbxUCS *maptab); */
+static void gen_iso_8859_1_euro(FbxUCS *maptab);
+static void gen_iso_8859_2(FbxUCS *maptab);
+static void gen_iso_8859_3(FbxUCS *maptab);
+static void gen_iso_8859_7(FbxUCS *maptab);
+static void gen_iso_8859_9(FbxUCS *maptab);
+static void gen_iso_8859_13(FbxUCS *maptab);
+static void gen_iso_8859_15(FbxUCS *maptab);
+static void gen_amiga_1251(FbxUCS *maptab);
 
 static const struct FbxCodeSet codesets[FBX_CS_MAX] =
 {
@@ -199,7 +199,7 @@ const struct FbxCodeSet *FbxFindCodeSetByLanguage(struct FbxFS *fs, CONST_STRPTR
 	return NULL;
 }
 
-/* static void gen_iso_8859_1(ULONG *maptab)
+/* static void gen_iso_8859_1(FbxUCS *maptab)
 {
 	int i;
 	for (i = 0; i < 0x100; i++)
@@ -208,7 +208,7 @@ const struct FbxCodeSet *FbxFindCodeSetByLanguage(struct FbxFS *fs, CONST_STRPTR
 	}
 } */
 
-static void gen_iso_8859_1_euro(ULONG *maptab)
+static void gen_iso_8859_1_euro(FbxUCS *maptab)
 {
 	int i;
 	for (i = 0; i < 0x100; i++)
@@ -220,7 +220,7 @@ static void gen_iso_8859_1_euro(ULONG *maptab)
 	}
 }
 
-static void gen_maptab_generic(ULONG *maptab, const UWORD *difftab, int start, int stop)
+static void gen_maptab_generic(FbxUCS *maptab, const UWORD *difftab, int start, int stop)
 {
 	int i;
 	for (i = 0; i < 0x100; i++)
@@ -248,7 +248,7 @@ static const UWORD iso_8859_2_to_ucs4[0x100 - 0xA0] =
 	0x0159,0x016F,0x00FA,0x0171,0x00FC,0x00FD,0x0163,0x02D9
 };
 
-static void gen_iso_8859_2(ULONG *maptab)
+static void gen_iso_8859_2(FbxUCS *maptab)
 {
 	gen_maptab_generic(maptab, iso_8859_2_to_ucs4, 0xA0, 0x100);
 }
@@ -269,7 +269,7 @@ static const UWORD iso_8859_3_to_ucs4[0x100 - 0xA0] =
 	0x011D,0x00F9,0x00FA,0x00FB,0x00FC,0x016D,0x015D,0x02D9
 };
 
-static void gen_iso_8859_3(ULONG *maptab)
+static void gen_iso_8859_3(FbxUCS *maptab)
 {
 	gen_maptab_generic(maptab, iso_8859_3_to_ucs4, 0xA0, 0x100);
 }
@@ -290,7 +290,7 @@ static const UWORD iso_8859_7_to_ucs4[0x100 - 0xA0] =
 	0x03C8,0x03C9,0x03CA,0x03CB,0x03CC,0x03CD,0x03CE,0x0000
 };
 
-static void gen_iso_8859_7(ULONG *maptab)
+static void gen_iso_8859_7(FbxUCS *maptab)
 {
 	gen_maptab_generic(maptab, iso_8859_7_to_ucs4, 0xA0, 0x100);
 }
@@ -305,7 +305,7 @@ static const UWORD iso_8859_9_to_ucs4[0x100 - 0xD0] =
 	0x00F8,0x00F9,0x00FA,0x00FB,0x00FC,0x0131,0x015F,0x00FF,
 };
 
-static void gen_iso_8859_9(ULONG *maptab)
+static void gen_iso_8859_9(FbxUCS *maptab)
 {
 	gen_maptab_generic(maptab, iso_8859_9_to_ucs4, 0xD0, 0x100);
 }
@@ -326,7 +326,7 @@ static const UWORD iso_8859_13_to_ucs4[0x100 - 0xA0] =
 	0x0173,0x0142,0x015B,0x016B,0x00FC,0x017C,0x017E,0x2019,
 };
 
-static void gen_iso_8859_13(ULONG *maptab)
+static void gen_iso_8859_13(FbxUCS *maptab)
 {
 	gen_maptab_generic(maptab, iso_8859_13_to_ucs4, 0xA0, 0x100);
 }
@@ -339,7 +339,7 @@ static const UWORD iso_8859_15_to_ucs4[0xC0 - 0xA0] =
 	0x017E,0x00B9,0x00BA,0x00BB,0x0152,0x0153,0x0178,0x00BF,
 };
 
-static void gen_iso_8859_15(ULONG *maptab)
+static void gen_iso_8859_15(FbxUCS *maptab)
 {
 	gen_maptab_generic(maptab, iso_8859_15_to_ucs4, 0xA0, 0xC0);
 }
@@ -360,7 +360,7 @@ static const UWORD amiga_1251_to_ucs4[0x100 - 0xA0] =
 	0x0448,0x0449,0x044A,0x044B,0x044C,0x044D,0x044E,0x044F,
 };
 
-static void gen_amiga_1251(ULONG *maptab)
+static void gen_amiga_1251(FbxUCS *maptab)
 {
 	gen_maptab_generic(maptab, amiga_1251_to_ucs4, 0xA0, 0x100);
 }

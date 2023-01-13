@@ -15,7 +15,7 @@
 
 struct FbxCodeSet
 {
-	void (*gen_maptab)(ULONG *maptab);
+	void (*gen_maptab)(FbxUCS *maptab);
 };
 
 struct FbxFS; /* Forward declaration */
