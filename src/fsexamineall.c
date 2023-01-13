@@ -10,6 +10,7 @@
 
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
+#include <string.h>
 
 int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,
 	int type, struct ExAllControl *ctrl)

@@ -11,6 +11,7 @@
 #include <libraries/filesysbox.h>
 #include "../filesysbox_vectors.h"
 #include "../filesysbox_internal.h"
+#include <string.h>
 
 void CopyStringBSTRToC(BSTR bstr, char *cstr, size_t size) {
 #if defined(__AROS__) && defined(AROS_FAST_BSTR)

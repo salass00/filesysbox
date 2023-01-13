@@ -11,6 +11,7 @@
 #include "filesysbox_internal.h"
 #include <devices/trackdisk.h>
 #include <SDI/SDI_interrupt.h>
+#include <string.h>
 
 #ifdef __AROS__
 AROS_UFH5(int, FbxDiskChangeInterrupt,

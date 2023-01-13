@@ -11,6 +11,7 @@
 #include <libraries/filesysbox.h>
 #include "../filesysbox_vectors.h"
 #include "../filesysbox_internal.h"
+#include <string.h>
 
 #ifndef __AROS__
 static size_t strnlen(const char *str, size_t maxlen)

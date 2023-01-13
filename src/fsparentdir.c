@@ -9,6 +9,7 @@
  */
 
 #include "filesysbox_internal.h"
+#include <string.h>
 
 BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf) {
 	if (strcmp(pathbuf, "/") == 0) {

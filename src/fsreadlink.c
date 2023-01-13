@@ -10,6 +10,7 @@
 
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
+#include <string.h>
 
 static int Fbx_readlink(struct FbxFS *fs, const char *path, char *buf, size_t buflen)
 {

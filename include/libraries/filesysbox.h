@@ -33,6 +33,12 @@ typedef signed long long   QUAD;
 
 typedef QUAD fbx_off_t;
 
+#ifdef __AROS__
+#undef st_atime
+#undef st_mtime
+#undef st_ctime
+#endif
+
 struct fbx_stat {
 	mode_t          st_mode;
 	UQUAD           st_ino;

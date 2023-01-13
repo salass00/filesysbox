@@ -10,7 +10,12 @@
 
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
+#include <string.h>
 #include <errno.h>
+
+#ifndef ENODATA
+#define ENODATA ENOENT
+#endif
 
 int FbxSetComment(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	const char *comment)

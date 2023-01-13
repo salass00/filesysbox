@@ -10,6 +10,7 @@
 
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
+#include <string.h>
 
 static int Fbx_opendir(struct FbxFS *fs, const char *path, struct fuse_file_info *fi)
 {

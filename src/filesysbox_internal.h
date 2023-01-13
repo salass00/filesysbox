@@ -31,7 +31,11 @@
 #define DOS_OWNER_ROOT 65535
 #define DOS_OWNER_NONE 0
 
+#if defined(__AROS__) && defined(AROS_FAST_BPTR)
+#define IS_VALID_BPTR(bptr) ((IPTR)(bptr) >= 4096)
+#else
 #define IS_VALID_BPTR(bptr) (((bptr) & 0xC0000000) == 0 && (bptr) >= 1024)
+#endif
 
 #ifndef NEWLIST
 #define NEWLIST(list) \
@@ -55,10 +59,6 @@
 #endif
 #ifndef FIBF_HOLD
 #define FIBF_HOLD (1<<FIBB_HOLD)
-#endif
-
-#ifndef ENODATA
-#define ENODATA ENOENT
 #endif
 
 struct FileSysBoxBase {

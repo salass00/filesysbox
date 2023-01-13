@@ -61,5 +61,8 @@ void FbxGetSysTime(
 #endif
 	struct Device *TimerBase = fs->timerbase;
 	GetSysTime(tv);
+#ifdef __AROS__
+	AROS_LIBFUNC_EXIT
+#endif
 }
 

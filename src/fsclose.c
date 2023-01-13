@@ -10,6 +10,7 @@
 
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
+#include <string.h>
 
 static void FbxClearArchiveFlags(struct FbxFS *fs, const char *fullpath) {
 	char pathbuf[FBX_MAX_PATH];

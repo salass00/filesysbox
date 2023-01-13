@@ -10,6 +10,7 @@
 
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
+#include <string.h>
 
 #ifdef __AROS__
 #define ID_BUSY_DISK AROS_MAKE_ID('B','U','S','Y')

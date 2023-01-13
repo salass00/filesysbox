@@ -10,6 +10,7 @@
 
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
+#include <string.h>
 #include <errno.h>
 
 static int Fbx_rename(struct FbxFS *fs, const char *path, const char *path2)

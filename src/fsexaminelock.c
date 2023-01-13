@@ -10,6 +10,7 @@
 
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
+#include <string.h>
 
 LONG FbxMode2EntryType(const mode_t mode) {
 	if (S_ISDIR(mode)) {

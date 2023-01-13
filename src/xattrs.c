@@ -12,6 +12,10 @@
 #include "fuse_stubs.h"
 #include <errno.h>
 
+#ifndef ENODATA
+#define ENODATA ENOENT
+#endif
+
 ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath) {
 	char buffer[4];
 	int res, i;
