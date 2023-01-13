@@ -454,8 +454,12 @@ struct FbxNotifyNode {
 
 struct FbxDirData {
 	struct MinNode  node;
+	char           *fsname;
+
+	/* Only used by ExAll() */
 	char           *name;
 	char           *comment;
+
 	struct fbx_stat stat;
 };
 

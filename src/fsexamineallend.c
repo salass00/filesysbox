@@ -18,6 +18,9 @@ void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd) {
 	DEBUGF("FreeFbxDirData(%#p, %#p)\n", fs, dd);
 
 	if (dd != NULL) {
+		if (dd->name != NULL)
+			FreeVecPooled(fs->mempool, dd->name);
+
 		if (dd->comment != NULL)
 			FreeVecPooled(fs->mempool, dd->comment);
 

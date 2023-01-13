@@ -25,7 +25,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 	struct DateStamp ds;
 	struct fbx_stat statbuf;
 	char fullpath[FBX_MAX_PATH];
-	char comment[FBX_MAX_COMMENT];
+	const char *pname, *pcomment;
 
 	CHECKVOLUME(DOSFALSE);
 
@@ -103,19 +103,44 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 		ed = (struct FbxDirData *)RemHead((struct List *)&lock->dirdatalist);
 		if (ed == NULL) break;
 
+		pname = ed->name;
+		pcomment = NULL;
+
+#ifdef ENABLE_CHARSET_CONVERSION
+		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+			char adname[FBX_MAX_NAME];
+			size_t namelen;
+			if ((namelen = utf8_to_local(adname, ed->fsname, FBX_MAX_NAME, fs->maptable))
+				>= FBX_MAX_NAME)
+			{
+				FreeFbxDirData(fs, ed);
+				fs->r2 = ERROR_LINE_TOO_LONG;
+				return DOSFALSE;
+			}
+			ed->name = AllocVecPooled(fs->mempool, namelen + 1);
+			if (ed->name == NULL) {
+				FreeFbxDirData(fs, ed);
+				fs->r2 = ERROR_NO_FREE_STORE;
+				return DOSFALSE;
+			}
+			strlcpy(ed->name, adname, namelen + 1);
+			pname = ed->name;
+		}
+#endif
+
 		start = lptr;
 		*lptr = (IPTR)NULL; // clear next pointer
 
 		if (ctrl->eac_MatchString != NULL &&
 			ctrl->eac_MatchFunc == NULL &&
-			!MatchPatternNoCase(ctrl->eac_MatchString, (STRPTR)ed->name))
+			!MatchPatternNoCase(ctrl->eac_MatchString, (STRPTR)pname))
 		{
 			FreeFbxDirData(fs, ed);
 			continue;
 		}
 
 		if (type >= ED_TYPE) {
-			if (!FbxLockName2Path(fs, lock, ed->name, fullpath)) {
+			if (!FbxLockName2Path(fs, lock, ed->fsname, fullpath)) {
 				FreeFbxDirData(fs, ed);
 				fs->r2 = ERROR_INVALID_COMPONENT_NAME;
 				return DOSFALSE;
@@ -134,25 +159,56 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 		}
 
 		if (type >= ED_COMMENT) {
+			char comment[FBX_MAX_COMMENT];
+
 			FbxGetComment(fs, fullpath, comment, FBX_MAX_COMMENT);
-
 			if (comment[0] != '\0') {
-				size_t len = strlen(comment) + 1;
+#ifdef ENABLE_CHARSET_CONVERSION
+				const char *src;
+				size_t srclen;
+				char adcomment[FBX_MAX_COMMENT];
 
-				ed->comment = AllocVecPooled(fs->mempool, len);
+				if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+
+					if ((srclen = utf8_to_local(adcomment, comment, FBX_MAX_COMMENT,
+						fs->maptable)) >= FBX_MAX_COMMENT)
+					{
+						FreeFbxDirData(fs, ed);
+						fs->r2 = ERROR_LINE_TOO_LONG;
+						return DOSFALSE;
+					}
+					src = adcomment;
+				} else {
+					src = comment;
+					srclen = strlen(comment);
+				}
+				ed->comment = AllocVecPooled(fs->mempool, srclen + 1);
 				if (ed->comment == NULL) {
 					FreeFbxDirData(fs, ed);
 					fs->r2 = ERROR_NO_FREE_STORE;
 					return DOSFALSE;
 				}
+				strlcpy(ed->comment, src, srclen + 1);
+				pcomment = ed->comment;
+#else
+				size_t commentlen;
 
-				FbxStrlcpy(fs, ed->comment, comment, len);
+				commentlen = strlen(comment);
+				ed->comment = AllocVecPooled(fs->mempool, commentlen + 1);
+				if (ed->comment == NULL) {
+					FreeFbxDirData(fs, ed);
+					fs->r2 = ERROR_NO_FREE_STORE;
+					return DOSFALSE;
+				}
+				FbxStrlcpy(fs, ed->comment, comment, commentlen + 1);
+				pcomment = ed->comment;
+#endif
 			}
 		}
 
 		lptr++; // skip next pointer
 
-		if (type >= ED_NAME) *lptr++ = (IPTR)ed->name;
+		if (type >= ED_NAME) *lptr++ = (IPTR)pname;
 		if (type >= ED_TYPE) *lptr++ = FbxMode2EntryType(statbuf.st_mode);
 		if (type >= ED_SIZE) *lptr++ = (statbuf.st_size > 0xffffffff) ? 0 : statbuf.st_size;
 		if (type >= ED_PROTECTION) {
@@ -165,7 +221,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 			*lptr++ = ds.ds_Minute;
 			*lptr++ = ds.ds_Tick;
 		}
-		if (type >= ED_COMMENT) *lptr++ = (ed->comment != NULL) ? (IPTR)ed->comment : (IPTR)"";
+		if (type >= ED_COMMENT) *lptr++ = (pcomment != NULL) ? (IPTR)pcomment : (IPTR)"";
 		if (type >= ED_OWNER) {
 			ULONG uid = FbxUnix2AmigaOwner(statbuf.st_uid);
 			ULONG gid = FbxUnix2AmigaOwner(statbuf.st_gid);

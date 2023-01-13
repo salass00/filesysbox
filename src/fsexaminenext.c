@@ -49,9 +49,13 @@ static int dir_fill_func(void *udata, const char *name, const struct fbx_stat *s
 			ed = AllocFbxDirData(fs, len);
 			if (ed == NULL) return 1;
 
-			ed->name = (char *)(ed + 1);
+			ed->fsname = (char *)(ed + 1);
+
+			/* Only used by ExAll() */
+			ed->name    = NULL;
 			ed->comment = NULL;
-			FbxStrlcpy(fs, ed->name, name, len);
+
+			FbxStrlcpy(fs, ed->fsname, name, len);
 			if (stat != NULL)
 			{
 				ed->stat = *stat;
@@ -141,7 +145,7 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 		return DOSFALSE;
 	}
 
-	if (!FbxLockName2Path(fs, lock, ed->name, fullpath)) {
+	if (!FbxLockName2Path(fs, lock, ed->fsname, fullpath)) {
 		fs->r2 = ERROR_OBJECT_NOT_FOUND;
 		return DOSFALSE;
 	}
