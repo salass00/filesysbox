@@ -163,9 +163,9 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 
 			FbxGetComment(fs, fullpath, comment, FBX_MAX_COMMENT);
 			if (comment[0] != '\0') {
-#ifdef ENABLE_CHARSET_CONVERSION
 				const char *src;
 				size_t srclen;
+#ifdef ENABLE_CHARSET_CONVERSION
 				char adcomment[FBX_MAX_COMMENT];
 
 				if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
@@ -182,27 +182,22 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 					src = comment;
 					srclen = strlen(comment);
 				}
+#else
+				src = comment;
+				srclen = strlen(comment);
+#endif
 				ed->comment = AllocVecPooled(fs->mempool, srclen + 1);
 				if (ed->comment == NULL) {
 					FreeFbxDirData(fs, ed);
 					fs->r2 = ERROR_NO_FREE_STORE;
 					return DOSFALSE;
 				}
+#ifdef ENABLE_CHARSET_CONVERSION
 				strlcpy(ed->comment, src, srclen + 1);
-				pcomment = ed->comment;
 #else
-				size_t commentlen;
-
-				commentlen = strlen(comment);
-				ed->comment = AllocVecPooled(fs->mempool, commentlen + 1);
-				if (ed->comment == NULL) {
-					FreeFbxDirData(fs, ed);
-					fs->r2 = ERROR_NO_FREE_STORE;
-					return DOSFALSE;
-				}
-				FbxStrlcpy(fs, ed->comment, comment, commentlen + 1);
-				pcomment = ed->comment;
+				FbxStrlcpy(fs, ed->comment, src, srclen + 1);
 #endif
+				pcomment = ed->comment;
 			}
 		}
 
