@@ -8,6 +8,9 @@
  * See the file LICENSE.APL
  */
 
+#ifndef FILESYSBOX_INTERNAL_H
+#define FILESYSBOX_INTERNAL_H 1
+
 // Internal structures constants and macros.
 
 // All structures are PRIVATE to Filesysbox framework. 
@@ -727,4 +730,6 @@ void FreeVecPooled(APTR mempool, APTR ptr);
 size_t strlcpy(char *dst, const char *src, size_t size);
 size_t strlcat(char *dst, const char *src, size_t size);
 #endif
+
+#endif /* FILESYSBOX_INTERNAL_H */
 
