@@ -156,7 +156,7 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 		}
 	}
 
-	FbxPathStat2FIB(fs, ed->name, &statbuf, fib);
+	FbxPathStat2FIB(fs, fullpath, &statbuf, fib);
 
 	fs->r2 = 0;
 	return DOSTRUE;
