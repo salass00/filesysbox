@@ -5,10 +5,9 @@
  * See the file LICENSE.APL
  */
 
+#ifndef NODEBUG
 #include "filesysbox_internal.h"
 #include <clib/debug_protos.h>
-
-#ifndef NODEBUG
 
 int vdebugf(const char *fmt, va_list args) {
 	char buffer[256];
@@ -26,6 +25,5 @@ int debugf(const char *fmt, ...) {
 	va_end(ap);
 	return retval;
 }
-#endif
-
+#endif /* !NODEBUG */
 

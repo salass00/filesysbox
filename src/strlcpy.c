@@ -25,10 +25,10 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef __AROS__
 #include "filesysbox_internal.h"
 #include <string.h>
 
-#ifndef __AROS__
 size_t strlcpy(char *dst, const char *src, size_t siz) {
 	register char *d = dst;
 	register const char *s = src;
@@ -78,5 +78,5 @@ size_t strlcat(char *dst, const char *src, size_t siz) {
 
 	return dlen + (s - src); /* count does not include NUL */
 }
-#endif
+#endif /* !__AROS__ */
 

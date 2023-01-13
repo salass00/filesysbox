@@ -8,6 +8,7 @@
  * See the file LICENSE.APL
  */
 
+#ifdef ENABLE_CHARSET_CONVERSION
 #include "filesysbox_internal.h"
 #include "codesets.h"
 #include <libraries/iffparse.h> /* For MAKE_ID() */
@@ -324,4 +325,5 @@ static void gen_amiga_1251(ULONG *maptab)
 {
 	gen_maptab_generic(maptab, amiga_1251_to_ucs4, 0xA0, 0x100);
 }
+#endif /* ENABLE_CHARSET_CONVERSION */
 
