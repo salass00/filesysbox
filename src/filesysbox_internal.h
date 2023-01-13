@@ -526,8 +526,6 @@ size_t FbxStrlcat(struct FbxFS *fs, char *dst, const char *src, size_t dst_size)
 unsigned int FbxHashPath(struct FbxFS *fs, const char *str);
 struct FbxEntry *FbxFindEntry(struct FbxFS *fs, const char *path);
 struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mode);
-void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd);
-void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list);
 void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock);
 void FbxAddEntry(struct FbxFS *fs, struct FbxEntry *e);
 BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, char *fullpathbuf);
@@ -604,6 +602,8 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 	int type, struct ExAllControl *ctrl);
 
 /* fsexamineallend.c */
+void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd);
+void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list);
 int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,
 	int type, struct ExAllControl *ctrl);
 

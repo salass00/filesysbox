@@ -259,35 +259,6 @@ struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mode) {
 	return lock;
 }
 
-void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd) {
-#ifdef __AROS__
-	struct Library *SysBase = fs->sysbase;
-#endif
-
-	DEBUGF("FreeFbxDirData(%#p, %#p)\n", fs, dd);
-
-	if (dd != NULL) {
-		if (dd->comment != NULL)
-			FreeVecPooled(fs->mempool, dd->comment);
-
-		FreeVecPooled(fs->mempool, dd);
-	}
-}
-
-void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list) {
-	struct MinNode *chain, *succ;
-
-	DEBUGF("FreeFbxDirDataList(%#p, %#p)\n", fs, list);
-
-	chain = list->mlh_Head;
-	while ((succ = chain->mln_Succ) != NULL) {
-		FreeFbxDirData(fs, FSDIRDATAFROMNODE(chain));
-		chain = succ;
-	}
-
-	NEWLIST(list);
-}
-
 void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock) {
 	struct Library *SysBase = fs->sysbase;
 
