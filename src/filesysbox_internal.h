@@ -31,6 +31,10 @@
 #include <stddef.h>
 #include <SDI/SDI_compiler.h>
 
+#if defined(__AROS__) && defined(__DOS64)
+#error "FIXME: Implement DOS64 support"
+#endif
+
 #define DOS_OWNER_ROOT 65535
 #define DOS_OWNER_NONE 0
 
