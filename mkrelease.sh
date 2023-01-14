@@ -8,6 +8,13 @@ HOST="${1:-i386-aros}"
 #make HOST=$HOST clean
 make HOST=$HOST all autodoc
 
+if [ "$HOST" = "m68k-amigaos" ]; then
+  chmod 775 filesysbox.library.000
+  chmod 775 filesysbox.library.020
+else
+  chmod 775 filesysbox.library
+fi;
+
 DESTDIR='tmp'
 #FULLVERS=`version filesysbox.library`
 #NUMVERS=`echo "${FULLVERS}" | cut -d' ' -f2`
