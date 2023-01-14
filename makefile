@@ -1,4 +1,5 @@
-HOST ?= i386-aros
+HOST  ?= i386-aros
+DEBUG ?= 0
 
 CC    = $(HOST)-gcc
 STRIP = $(HOST)-strip
@@ -6,14 +7,17 @@ STRIP = $(HOST)-strip
 TARGET  = filesysbox.library
 VERSION = 54
 
-DEBUG    = -g
 INCLUDES = -I./include -I. -I./src
-DEFINES  = -DNODEBUG -D__NOLIBBASE__
+DEFINES  = -D__NOLIBBASE__
 WARNINGS = -Werror -Wall -Wwrite-strings -Wno-attributes
+
+ifneq (1,$(DEBUG))
+	DEFINES += -DNODEBUG
+endif
 
 DEFINES += -DENABLE_CHARSET_CONVERSION
 
-CFLAGS  = -O2 -fomit-frame-pointer -fno-strict-aliasing $(DEBUG) \
+CFLAGS  = -O2 -g -fomit-frame-pointer -fno-strict-aliasing \
           $(INCLUDES) $(DEFINES) $(WARNINGS)
 LDFLAGS = -nostartfiles
 LIBS    = -ldebug
