@@ -184,6 +184,9 @@ SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
 		r1 = FbxSetOwnerInfo(fs, (struct FbxLock *)BADDR(pkt->dp_Arg2), BTOC(pkt->dp_Arg3),
 			pkt->dp_Arg4 >> 16, pkt->dp_Arg4 & 0xffff);
 		break;
+	case ACTION_DIE:
+		r1 = FbxDie(fs);
+		break;
 	case ACTION_IS_FILESYSTEM:
 		r1 = DOSTRUE;
 		fs->r2 = 0;

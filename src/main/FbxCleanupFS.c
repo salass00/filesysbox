@@ -61,6 +61,8 @@ void FbxCleanupFS(
 
 	if (fs != NULL) {
 		struct Library *SysBase = fs->sysbase;
+		struct Library *DOSBase = fs->dosbase;
+		struct DosPacket *deathpacket = fs->deathpacket;
 		struct MinNode *chain;
 
 		// clear msgport in device node.
@@ -105,6 +107,10 @@ void FbxCleanupFS(
 		bzero(fs, sizeof(*fs));
 
 		FreeFbxFS(fs);
+
+		if (deathpacket != NULL) {
+			ReplyPkt(deathpacket, DOSTRUE, 0);
+		}
 	}
 
 	ADEBUGF("FbxCleanupFS: DONE\n");

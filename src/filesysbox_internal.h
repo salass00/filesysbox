@@ -386,6 +386,7 @@ struct FbxFS {
 	const char                  *xattr_amiga_protection;
 	LONG                         gmtoffset;
 	FbxUCS                      *maptable;
+	struct DosPacket            *deathpacket; // ACTION_DIE packet
 };
 
 #define FBX_TIMER_MICROS 100000
@@ -603,6 +604,9 @@ BPTR FbxCurrentVolume(struct FbxFS *fs, struct FbxLock *lock);
 
 /* fsdelete.c */
 int FbxDeleteObject(struct FbxFS *fs, struct FbxLock *lock, const char *name);
+
+/* fsdie.c */
+int FbxDie(struct FbxFS *fs);
 
 /* fsduplock.c */
 struct FbxLock *FbxDupLock(struct FbxFS *fs, struct FbxLock *lock);

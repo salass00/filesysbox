@@ -163,7 +163,10 @@ static void FbxHandlePackets(struct FbxFS *fs) {
 	while ((msg = GetMsg(fs->fsport)) != NULL) {
 		pkt = (struct DosPacket *)msg->mn_Node.ln_Name;
 		r1 = FbxDoPacket(fs, pkt);
-		FbxReturnPacket(fs, pkt, r1, fs->r2);
+		if (r1 == DOSTRUE && pkt->dp_Type == ACTION_DIE)
+			fs->deathpacket = pkt;
+		else
+			FbxReturnPacket(fs, pkt, r1, fs->r2);
 	}
 }
 
