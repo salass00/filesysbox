@@ -51,10 +51,15 @@ cp -p include/libraries/filesysbox.h ${DESTDIR}/filesysbox/Developer/include/inc
 cp -p include/proto/filesysbox.h ${DESTDIR}/filesysbox/Developer/include/include_h/proto
 cp -p include/sys/statvfs.h ${DESTDIR}/filesysbox/Developer/include/include_h/sys
 
-rm -f filesysbox.${HOST}.7z
-7za u filesysbox.${HOST}.7z ./${DESTDIR}/*
+#rm -f filesysbox.${HOST}.7z
+#7za u filesysbox.${HOST}.7z ./${DESTDIR}/*
+rm -rf filesysbox.${HOST}.lha
+PREVDIR=`pwd`
+cd ${DESTDIR} && lha ao5 ../filesysbox.${HOST}.lha *
+cd ${PREVDIR}
 
 rm -rf ${DESTDIR}
 
-echo "filesysbox.${HOST}.7z created"
+#echo "filesysbox.${HOST}.7z created"
+echo "filesysbox.${HOST}.lha created"
 
