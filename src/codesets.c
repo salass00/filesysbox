@@ -92,7 +92,7 @@ country2cs[] =
 	{ MAKE_ID('H','R',0,0),   MAKE_ID('H','R','V',0), FBX_CS_ISO_8859_2     },
 	{ MAKE_ID('I',0,0,0),     MAKE_ID('I','T','A',0), FBX_CS_ISO_8859_1_EUR },
 	{ MAKE_ID('L','T',0,0),   MAKE_ID('L','T','U',0), FBX_CS_ISO_8859_13    },
-	{ MAKE_ID('H','U',0,0),   MAKE_ID('H','U','N',0), FBX_CS_ISO_8859_2     },
+	{ MAKE_ID('H',0,0,0),     MAKE_ID('H','U','N',0), FBX_CS_ISO_8859_2     },
 	{ MAKE_ID('N','L',0,0),   MAKE_ID('N','L','D',0), FBX_CS_ISO_8859_1_EUR },
 	{ MAKE_ID('N',0,0,0),     MAKE_ID('N','O','R',0), FBX_CS_ISO_8859_1_EUR },
 	{ MAKE_ID('P','L',0,0),   MAKE_ID('P','O','L',0), FBX_CS_ISO_8859_2     },
