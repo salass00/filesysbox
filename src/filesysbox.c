@@ -504,7 +504,7 @@ void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass) {
 	struct InputEvent ie;
 	struct timeval tv;
 
-	DEBUGF("FbxNotifyDiskChange(%#p, %#x)\n", fs, class);
+	DEBUGF("FbxNotifyDiskChange(%#p, %#x)\n", fs, ieclass);
 
 	inputmp = CreateMsgPort();
 	inputio = CreateIORequest(inputmp, sizeof(struct IOStdReq));
