@@ -110,3 +110,13 @@ filesysbox.library 54.1 (14.1.2023)
   converted into URL-style escape sequences where the character is specified
   as a base32 encoded character sequence preceded by a percent symbol.
 
+
+filesysbox.library 54.2 (d.m.2023)
+
+- Fixed support for codesets other than ISO-8859-1/latin-1 (was not working
+  before due to size and attributes parameters being switched around in the
+  AllocMem() call).
+
+- Now ignores the ".language" extension when looking for a codeset based on
+  loc_LanguageName.
+
