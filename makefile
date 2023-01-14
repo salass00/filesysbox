@@ -115,7 +115,9 @@ endif
 
 .PHONY: clean
 clean:
-	rm -rf $(TARGET) $(TARGET).debug obj obj-000 obj-020
+	rm -rf $(TARGET) $(TARGET).debug obj
+	rm -rf $(TARGET).000 $(TARGET).000.debug obj-000
+	rm -rf $(TARGET).020 $(TARGET).020.debug obj-020
 
 .PHONY: revision
 revision:
