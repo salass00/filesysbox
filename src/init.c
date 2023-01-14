@@ -61,7 +61,7 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 		goto error;
 	}
 
-	libBase->localebase = OpenLibrary((CONST_STRPTR)"locale.library", 39);
+	libBase->localebase = OpenLibrary((CONST_STRPTR)"locale.library", 38);
 
 #ifdef __AROS__
 	libBase->aroscbase = OpenLibrary((CONST_STRPTR)"arosc.library", 41);
