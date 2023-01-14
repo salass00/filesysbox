@@ -9,3 +9,4 @@ filesysbox.library.020
 filesysbox.doc
 # Ignore release archives
 *.7z
+*.lha
