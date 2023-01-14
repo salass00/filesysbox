@@ -1,0 +1,10 @@
+(welcome)
+(set @default-dest "LIBS:")
+(copylib
+  (prompt "Copying filesysbox.library")
+  (help @copylib-help)
+  (source "Libs/filesysbox.library")
+  (dest @default-dest)
+)
+(exit)
+

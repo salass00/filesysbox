@@ -37,6 +37,8 @@ if [ "$HOST" = "m68k-amigaos" ]; then
   cp -p filesysbox.library.000 ${DESTDIR}/filesysbox/Libs
   cp -p filesysbox.library.020 ${DESTDIR}/filesysbox/Libs
 else
+  cp -p Install-AROS ${DESTDIR}/filesysbox/Install
+  cp -p icons/def_install.info ${DESTDIR}/filesysbox/Install.info
   cp -p filesysbox.library ${DESTDIR}/filesysbox/Libs
 fi;
 cp -p filesysbox.doc ${DESTDIR}/filesysbox/Developer/AutoDocs
