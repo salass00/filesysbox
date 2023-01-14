@@ -88,7 +88,7 @@ void FbxCleanupFS(
 #ifdef ENABLE_CHARSET_CONVERSION
 		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
 			if (fs->maptable != NULL)
-				FreeMem(fs->maptable, 256*sizeof(ULONG));
+				FreeMem(fs->maptable, 256*sizeof(FbxUCS));
 		}
 #endif
 
