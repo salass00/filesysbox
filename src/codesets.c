@@ -12,6 +12,7 @@
 #include "filesysbox_internal.h"
 #include "codesets.h"
 #include <libraries/iffparse.h> /* For MAKE_ID() */
+#include <string.h>
 
 enum
 {
@@ -183,14 +184,20 @@ const struct FbxCodeSet *FbxFindCodeSetByCountry(struct FbxFS *fs, ULONG country
 const struct FbxCodeSet *FbxFindCodeSetByLanguage(struct FbxFS *fs, CONST_STRPTR language)
 {
 	struct Library *UtilityBase = fs->utilitybase;
-	int i;
+	int i, len;
 
 	if (language == NULL || language[0] == '\0')
 		return NULL;
 
+	/* Ignore .language extension */
+	len = strlen((const char *)language);
+	if (len > 9 && Stricmp(&language[len - 9], (CONST_STRPTR)".language"))
+		len -= 9;
+
 	for (i = 0; i < (sizeof(language2cs) / sizeof(language2cs[0])); i++)
 	{
-		if (Stricmp(language, language2cs[i].language) == 0)
+		if (len == strlen((const char *)language2cs[i].language) &&
+			Strnicmp(language, language2cs[i].language, len) == 0)
 		{
 			return &codesets[language2cs[i].csi];
 		}
