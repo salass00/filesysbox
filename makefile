@@ -65,16 +65,15 @@ obj/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-ifneq (,$(findstring -aros,$(HOST)))
 $(TARGET).debug: $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
 
+ifneq (,$(findstring -aros,$(HOST)))
 $(TARGET): $(OBJS)
 	$(CC) -s $(LDFLAGS) -o $@ $^ $(LIBS)
 else
-$(TARGET): $(OBJS)
-	$(CC) $(LDFLAGS) -o $@.debug $^ $(LIBS)
-	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
+$(TARGET): $(TARGET).debug
+	$(STRIP) $(STRIPFLAGS) -o $@ $<
 endif
 
 init.o: $(TARGET)_rev.h src/filesysbox_vectors.c src/filesysbox_vectors.h
