@@ -99,7 +99,9 @@ void FbxCleanupFS(
 		DeleteMsgPort(fs->notifyreplyport);
 
 		FreeSignal(fs->diskchangesig);
+#ifndef NODEBUG
 		FreeSignal(fs->dbgflagssig);
+#endif
 
 		DeletePool(fs->mempool);
 

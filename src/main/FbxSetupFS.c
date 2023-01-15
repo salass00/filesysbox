@@ -158,7 +158,9 @@ struct FbxFS *FbxSetupFS(
 
 	fs->libbase = libBase;
 
+#ifndef NODEBUG
 	fs->dbgflagssig = -1;
+#endif
 	fs->diskchangesig = -1;
 
 	fs->sysbase     = SysBase;
@@ -190,7 +192,9 @@ struct FbxFS *FbxSetupFS(
 		}
 	}
 
+#ifndef NODEBUG
 	FbxReadDebugFlags(fs);
+#endif
 
 	if (LocaleBase != NULL) {
 		struct Locale *locale;
@@ -209,8 +213,10 @@ struct FbxFS *FbxSetupFS(
 	fs->mempool = CreatePool(MEMF_PUBLIC, 4096, 1024);
 	if (fs->mempool == NULL) goto error;
 
+#ifndef NODEBUG
 	fs->dbgflagssig = AllocSignal(-1);
 	if (fs->dbgflagssig == -1) goto error;
+#endif
 
 	fs->diskchangesig = AllocSignal(-1);
 	if (fs->diskchangesig == -1) goto error;
@@ -339,6 +345,7 @@ static void FbxDiskChangeHandler(struct FbxFS *fs) {
 	Signal(&fs->thisproc->pr_Task, 1UL << fs->diskchangesig);
 }
 
+#ifndef NODEBUG
 static void HexToLong(CONST_STRPTR str, ULONG *res) {
 	TEXT c;
 	ULONG v = 0;
@@ -367,6 +374,7 @@ void FbxReadDebugFlags(struct FbxFS *fs) {
 
 	fs->dbgflags = flags;
 }
+#endif
 
 #ifdef ENABLE_CHARSET_CONVERSION
 static void FbxGetCharsetMapTable(struct FbxFS *fs) {

@@ -66,8 +66,10 @@ LONG FbxEventLoop(
 {
 #endif
 	struct Library *SysBase = fs->sysbase;
+#ifndef NODEBUG
 	struct Library *DOSBase = fs->dosbase;
 	struct NotifyRequest nr;
+#endif
 	LONG run = TRUE;
 
 	ADEBUGF("FbxEventLoop(%#p)\n", fs);
@@ -77,12 +79,17 @@ LONG FbxEventLoop(
 	const ULONG packsig       = 1UL << fs->fsport->mp_SigBit;
 	const ULONG notrepsig     = 1UL << fs->notifyreplyport->mp_SigBit;
 	const ULONG timesig       = 1UL << fs->timerio->tr_node.io_Message.mn_ReplyPort->mp_SigBit;
+#ifndef NODEBUG
 	const ULONG dbgflagssig   = 1UL << fs->dbgflagssig;
+#else
+	const ULONG dbgflagssig   = 0;
+#endif
 	const ULONG diskchangesig = 1UL << fs->diskchangesig;
 	const ULONG wsigs         = packsig | notrepsig | timesig | dbgflagssig | diskchangesig;
 
 	FbxStartTimer(fs);
 
+#ifndef NODEBUG
 	bzero(&nr, sizeof(nr));
 	nr.nr_Name = (STRPTR)"ENV:FBX_DBGFLAGS";
 	nr.nr_Flags = NRF_SEND_SIGNAL;
@@ -90,6 +97,7 @@ LONG FbxEventLoop(
 	nr.nr_stuff.nr_Signal.nr_SignalNum = fs->dbgflagssig;
 
 	StartNotify(&nr);
+#endif
 
 	while (run) {
 		if (fs->dosetup) {
@@ -103,7 +111,9 @@ LONG FbxEventLoop(
 		const ULONG usigs = fs->signalcallbacksignals;
 		const ULONG rsigs = Wait(wsigs | usigs);
 
+#ifndef NODEBUG
 		if (rsigs & dbgflagssig) FbxReadDebugFlags(fs);
+#endif
 		if (rsigs & packsig) FbxHandlePackets(fs);
 		if (rsigs & notrepsig) FbxHandleNotifyReplies(fs);
 		if (rsigs & timesig) FbxHandleTimerEvent(fs);
@@ -111,7 +121,9 @@ LONG FbxEventLoop(
 		if (fs->shutdown) run = FALSE;
 	}
 
+#ifndef NODEBUG
 	EndNotify(&nr);
+#endif
 
 	FbxStopTimer(fs);
 

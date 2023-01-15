@@ -374,7 +374,10 @@ struct FbxFS {
 	SIPTR                        r2;
 	ULONG                        fsflags; // set in SetupFS
 	ULONG                        dostype; // set in SetupFS
+#ifndef NODEBUG
 	ULONG                        dbgflags; // set in SetupFS
+	LONG                         dbgflagssig;
+#endif
 	APTR                         initret;
 	LONG                         shutdown; // read by FbxEventLoop()
 	LONG                         dosetup; // read by FbxEventLoop()
@@ -384,7 +387,6 @@ struct FbxFS {
 	QUAD                         firstmodify;
 	QUAD                         lastmodify;
 	LONG                         timerbusy;
-	LONG                         dbgflagssig;
 	LONG                         diskchangesig;
 	struct FbxDiskChangeHandler *diskchangehandler;
 	struct fuse_conn_info        conn;
@@ -533,7 +535,9 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 #define FbxLocalToUTF8(fs, dst, src, dst_size) local_to_utf8(dst, src, dst_size, (fs)->maptable)
 
 /* main/FbxSetupFS.c */
+#ifndef NODEBUG
 void FbxReadDebugFlags(struct FbxFS *fs);
+#endif
 
 /* main/FbxCopyStringBSTRToC.c */
 void CopyStringBSTRToC(BSTR bstr, char *cstr, size_t size);
