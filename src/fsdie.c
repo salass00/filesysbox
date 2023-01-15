@@ -19,7 +19,7 @@ int FbxDie(struct FbxFS *fs) {
 		return DOSFALSE;
 	}
 
-	if (!isMinListEmpty(&fs->volumelist) ||
+	if (!IsMinListEmpty(&fs->volumelist) ||
 		!IsMinListEmpty(&vol->locklist) ||
 		!IsMinListEmpty(&vol->notifylist) ||
 		!IsMinListEmpty(&vol->unres_notifys))
