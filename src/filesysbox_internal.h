@@ -618,6 +618,9 @@ BPTR FbxCurrentVolume(struct FbxFS *fs, struct FbxLock *lock);
 /* fsdelete.c */
 int FbxDeleteObject(struct FbxFS *fs, struct FbxLock *lock, const char *name);
 
+/* fsdie.c */
+int FbxDie(struct FbxFS *fs);
+
 /* fsduplock.c */
 struct FbxLock *FbxDupLock(struct FbxFS *fs, struct FbxLock *lock);
 
