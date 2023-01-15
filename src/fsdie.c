@@ -19,10 +19,18 @@ int FbxDie(struct FbxFS *fs) {
 		return DOSFALSE;
 	}
 
-	if (!IsMinListEmpty(&fs->volumelist) ||
-		!IsMinListEmpty(&vol->locklist) ||
-		!IsMinListEmpty(&vol->notifylist) ||
-		!IsMinListEmpty(&vol->unres_notifys))
+	if (OKVOLUME(vol))
+	{
+		if (!IsMinListEmpty(&vol->locklist) ||
+			!IsMinListEmpty(&vol->notifylist) ||
+			!IsMinListEmpty(&vol->unres_notifys))
+		{
+			fs->r2 = ERROR_OBJECT_IN_USE;
+			return DOSFALSE;
+		}
+	}
+
+	if (!IsMinListEmpty(&fs->volumelist))
 	{
 		fs->r2 = ERROR_OBJECT_IN_USE;
 		return DOSFALSE;
