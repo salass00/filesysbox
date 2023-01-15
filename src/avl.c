@@ -12,7 +12,7 @@
 #include "filesysbox_internal.h"
 
 /* 
- * AVL implementation based on information at:
+ * AVL implementation based on information from:
  * https://en.wikipedia.org/wiki/AVL_tree
  */
 

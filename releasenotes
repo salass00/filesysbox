@@ -120,3 +120,8 @@ filesysbox.library 54.2 (d.m.2023)
 - Now ignores the ".language" extension when looking for a codeset based on
   loc_LanguageName.
 
+- UTF-8 to local charset conversion now uses an AVL tree instead of iterating
+  over the maptable array to find a match.
+
+- Experimental ACTION_DIE packet support.
+
