@@ -352,7 +352,7 @@ struct FbxAVL {
 struct FbxFS {
 	struct FileSysBoxBase       *libbase;
 	struct MsgPort              *dlproc_port;
-	struct MsgPort              *lhproc_port;
+//	struct MsgPort              *lhproc_port;
 	struct Library              *sysbase;
 	struct Library              *dosbase;
 	struct Library              *utilitybase;
