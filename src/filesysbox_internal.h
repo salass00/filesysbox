@@ -516,6 +516,9 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 
 #define OneInMinList(list) ((list)->mlh_Head == (list)->mlh_TailPred)
 
+#define FbxLocalToUTF8(fs, dst, src, dst_size) local_to_utf8(dst, src, dst_size, (fs)->maptable)
+#define FbxUTF8ToLocal(fs, dst, src, dst_size) utf8_to_local(dst, src, dst_size, (fs)->maptable)
+
 /* main/FbxSetupFS.c */
 void FbxReadDebugFlags(struct FbxFS *fs);
 

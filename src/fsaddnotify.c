@@ -35,7 +35,7 @@ int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify) {
 	fullname = (const char *)notify->nr_FullName;
 #ifdef ENABLE_CHARSET_CONVERSION
 	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		if (local_to_utf8(fsfullname, fullname, FBX_MAX_PATH, fs->maptable) >= FBX_MAX_PATH) {
+		if (FbxLocalToUTF8(fs, fsfullname, fullname, FBX_MAX_PATH) >= FBX_MAX_PATH) {
 			fs->r2 = ERROR_LINE_TOO_LONG;
 			return DOSFALSE;
 		}

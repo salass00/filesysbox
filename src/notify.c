@@ -92,7 +92,7 @@ void FbxTryResolveNotify(struct FbxFS *fs, struct FbxEntry *e) {
 			/* FIXME: Can the charset converted path be saved in FbxAddNotify
 			 * and then reused here?
 			 */
-			local_to_utf8(fsfullname, fullname, FBX_MAX_PATH, fs->maptable);
+			FbxLocalToUTF8(fs, fsfullname, fullname, FBX_MAX_PATH);
 			fullname = fsfullname;
 		}
 #endif

@@ -27,7 +27,7 @@ static APTR Fbx_init(struct FbxFS *fs, struct fuse_conn_info *conn)
 		const char *devname = (const char *)BADDR(fs->devnode->dn_Name) + 1;
 #ifdef ENABLE_CHARSET_CONVERSION
 		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES)
-			local_to_utf8(conn->volume_name, devname, CONN_VOLUME_NAME_BYTES, fs->maptable);
+			FbxLocalToUTF8(fs, conn->volume_name, devname, CONN_VOLUME_NAME_BYTES);
 		else
 			strlcpy(conn->volume_name, devname, CONN_VOLUME_NAME_BYTES);
 #else
@@ -91,7 +91,7 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 	volname = conn->volume_name;
 #ifdef ENABLE_CHARSET_CONVERSION
 	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		if (utf8_to_local(advolname, volname, FBX_MAX_NAME, fs->maptable) >= FBX_MAX_NAME) {
+		if (FbxUTF8ToLocal(fs, advolname, volname, FBX_MAX_NAME) >= FBX_MAX_NAME) {
 			Fbx_destroy(fs, fs->initret);
 			return NULL;
 		}

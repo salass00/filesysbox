@@ -110,7 +110,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
 			char adname[FBX_MAX_NAME];
 			size_t namelen;
-			if ((namelen = utf8_to_local(adname, ed->fsname, FBX_MAX_NAME, fs->maptable))
+			if ((namelen = FbxUTF8ToLocal(fs, adname, ed->fsname, FBX_MAX_NAME))
 				>= FBX_MAX_NAME)
 			{
 				FreeFbxDirData(fs, ed);
@@ -170,8 +170,8 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 
 				if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
 
-					if ((srclen = utf8_to_local(adcomment, comment, FBX_MAX_COMMENT,
-						fs->maptable)) >= FBX_MAX_COMMENT)
+					if ((srclen = FbxUTF8ToLocal(fs, adcomment, comment, FBX_MAX_COMMENT))
+						>= FBX_MAX_COMMENT)
 					{
 						FreeFbxDirData(fs, ed);
 						fs->r2 = ERROR_LINE_TOO_LONG;

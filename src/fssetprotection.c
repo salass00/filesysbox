@@ -58,7 +58,7 @@ int FbxSetProtection(struct FbxFS *fs, struct FbxLock *lock, const char *name, U
 
 #ifdef ENABLE_CHARSET_CONVERSION
 	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		if (local_to_utf8(fsname, name, FBX_MAX_NAME, fs->maptable) >= FBX_MAX_NAME) {
+		if (FbxLocalToUTF8(fs, fsname, name, FBX_MAX_NAME) >= FBX_MAX_NAME) {
 			fs->r2 = ERROR_LINE_TOO_LONG;
 			return DOSFALSE;
 		}

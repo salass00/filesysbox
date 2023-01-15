@@ -70,7 +70,7 @@ void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *st
 		type = FbxMode2EntryType(stat->st_mode);
 #ifdef ENABLE_CHARSET_CONVERSION
 		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-			utf8_to_local(adname, name, FBX_MAX_NAME, fs->maptable);
+			FbxUTF8ToLocal(fs, adname, name, FBX_MAX_NAME);
 			name = adname;
 		}
 #endif
@@ -89,7 +89,7 @@ void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *st
 	FbxGetComment(fs, fullpath, comment, FBX_MAX_COMMENT);
 #ifdef ENABLE_CHARSET_CONVERSION
 	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		utf8_to_local(adcomment, comment, FBX_MAX_COMMENT, fs->maptable);
+		FbxUTF8ToLocal(fs, adcomment, comment, FBX_MAX_COMMENT);
 		pcomment = adcomment;
 	}
 #endif
