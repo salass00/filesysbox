@@ -340,6 +340,15 @@ struct FbxDiskChangeHandler {
 
 typedef UWORD FbxUCS;
 
+struct FbxAVL {
+	struct FbxAVL *left; /* nodes for lower unicodes */
+	struct FbxAVL *right; /* nodes for higher unicodes */
+	struct FbxAVL *parent;
+	FbxUCS         unicode;
+	UBYTE          local;
+	BYTE           balance; /* > 0 right heavy, < 0 left heavy */
+};
+
 struct FbxFS {
 	struct FileSysBoxBase       *libbase;
 	struct MsgPort              *dlproc_port;
@@ -386,6 +395,8 @@ struct FbxFS {
 	const char                  *xattr_amiga_protection;
 	LONG                         gmtoffset;
 	FbxUCS                      *maptable;
+	struct FbxAVL               *maptree;
+	struct FbxAVL               *avlbuf;
 };
 
 #define FBX_TIMER_MICROS 100000
@@ -516,8 +527,8 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 
 #define OneInMinList(list) ((list)->mlh_Head == (list)->mlh_TailPred)
 
+#define FbxUTF8ToLocal(fs, dst, src, dst_size) utf8_to_local(dst, src, dst_size, (fs)->maptree)
 #define FbxLocalToUTF8(fs, dst, src, dst_size) local_to_utf8(dst, src, dst_size, (fs)->maptable)
-#define FbxUTF8ToLocal(fs, dst, src, dst_size) utf8_to_local(dst, src, dst_size, (fs)->maptable)
 
 /* main/FbxSetupFS.c */
 void FbxReadDebugFlags(struct FbxFS *fs);
@@ -725,7 +736,7 @@ int utf8_strnicmp(const char *s1, const char *s2, size_t n);
 size_t utf8_strlcpy(char *dst, const char *src, size_t dst_size);
 size_t utf8_strlcat(char *dst, const char *src, size_t dst_size);
 #ifdef ENABLE_CHARSET_CONVERSION
-size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const FbxUCS *maptable);
+size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const struct FbxAVL *maptree);
 size_t local_to_utf8(char *dst, const char *src, size_t dst_size, const FbxUCS *maptable);
 #endif
 
@@ -742,6 +753,11 @@ void FreeVecPooled(APTR mempool, APTR ptr);
 #ifndef __AROS__
 size_t strlcpy(char *dst, const char *src, size_t size);
 size_t strlcat(char *dst, const char *src, size_t size);
+#endif
+
+/* avl.c */
+#ifdef ENABLE_CHARSET_CONVERSION
+void FbxSetupAVL(struct FbxFS *fs);
 #endif
 
 #endif /* FILESYSBOX_INTERNAL_H */

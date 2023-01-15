@@ -229,7 +229,7 @@ static int escape_unicode(char *seq, ULONG unicode, const char *b32tab)
 	}
 }
 
-size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const FbxUCS *maptable)
+size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const struct FbxAVL *maptree)
 {
 	static const char b32tab[32] =
 	{
@@ -254,7 +254,7 @@ size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const FbxUCS *
 			{
 				int local = '\0';
 
-				if (maptable == NULL)
+				if (maptree == NULL)
 				{
 					/* Assume latin-1 */
 					if (unicode < 0x100)
@@ -262,19 +262,19 @@ size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const FbxUCS *
 				}
 				else if (sizeof(FbxUCS) == 4 || unicode <= UINT16_MAX)
 				{
-					if (unicode < 0xA0)
-						local = unicode;
-					else
+					const struct FbxAVL *n = maptree;
+					while (n != NULL)
 					{
-						int i;
-						for (i = 0xA0; i < 0x100; i++)
+						if (unicode == n->unicode)
 						{
-							if (maptable[i] == unicode)
-							{
-								local = i;
-								break;
-							}
+							local = n->local;
+							break;
 						}
+
+						if (unicode < n->unicode)
+							n = n->left;
+						else
+							n = n->right;
 					}
 				}
 
@@ -318,7 +318,7 @@ size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const FbxUCS *
 		{
 			int local = '\0';
 
-			if (maptable == NULL)
+			if (maptree == NULL)
 			{
 				/* Assume latin-1 */
 				if (unicode < 0x100)
@@ -326,19 +326,19 @@ size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const FbxUCS *
 			}
 			else if (sizeof(FbxUCS) == 4 || unicode <= UINT16_MAX)
 			{
-				if (unicode < 0xA0)
-					local = unicode;
-				else
+				const struct FbxAVL *n = maptree;
+				while (n != NULL)
 				{
-					int i;
-					for (i = 0xA0; i < 0x100; i++)
+					if (unicode == n->unicode)
 					{
-						if (maptable[i] == unicode)
-						{
-							local = i;
-							break;
-						}
+						local = n->local;
+						break;
 					}
+
+					if (unicode < n->unicode)
+						n = n->left;
+					else
+						n = n->right;
 				}
 			}
 

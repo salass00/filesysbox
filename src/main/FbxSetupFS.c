@@ -398,8 +398,18 @@ static void FbxGetCharsetMapTable(struct FbxFS *fs) {
 
 			if (cs != NULL && cs->gen_maptab != NULL) {
 				fs->maptable = (FbxUCS *)AllocMem(256*sizeof(FbxUCS), MEMF_ANY);
-				if (fs->maptable != NULL)
+				if (fs->maptable != NULL) {
 					cs->gen_maptab(fs->maptable);
+
+					/* Generate AVL tree for faster unicode to local mapping */
+					fs->avlbuf = (struct FbxAVL *)AllocMem(128*sizeof(struct FbxAVL), MEMF_ANY);
+					if (fs->avlbuf != NULL)
+						FbxSetupAVL(fs);
+					else {
+						FreeMem(fs->maptable, 256*sizeof(FbxUCS));
+						fs->maptable = NULL;
+					}
+				}
 			}
 
 			CloseLocale(locale);
