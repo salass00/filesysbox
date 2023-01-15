@@ -20,7 +20,7 @@ void KPutStr(CONST_STRPTR str) {
 		"bne.s 1b"
 		:
 		: "a" (str)
-		: "d0", "a6"
+		: "d0", "a6", "cc"
 	);
 }
 #endif

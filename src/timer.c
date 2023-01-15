@@ -72,11 +72,13 @@ void FbxGetUpTime(struct FbxFS *fs, struct timeval *tv) {
 	__asm__("divul %4,%0:%1"
 		: "=d" (remainder), "=d" (seconds)
 		: "0" ((ULONG)(eclock_elapsed >> 32)), "1" ((ULONG)eclock_elapsed), "d" (freq)
+		: "cc"
 	);
 	__asm__("mulul #1000000,%1:%0\n"
 		"\tdivul %3,%1:%0"
 		: "=&d" (micros), "=&d" (dummy)
 		: "0" (remainder), "d" (freq)
+		: "cc"
 	);
 #else
 	seconds = eclock_elapsed / freq;
