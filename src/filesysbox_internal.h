@@ -386,7 +386,6 @@ struct FbxFS {
 	const char                  *xattr_amiga_protection;
 	LONG                         gmtoffset;
 	FbxUCS                      *maptable;
-	struct DosPacket            *deathpacket; // ACTION_DIE packet
 };
 
 #define FBX_TIMER_MICROS 100000

@@ -27,6 +27,11 @@ int FbxDie(struct FbxFS *fs) {
 		return DOSFALSE;
 	}
 
+	if (fs->devnode != NULL) {
+		fs->devnode->dn_Task = NULL;
+		fs->devnode = NULL;
+	}
+
 	FbxCleanupVolume(fs);
 
 	fs->shutdown = TRUE;
