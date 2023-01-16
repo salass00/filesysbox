@@ -488,7 +488,7 @@ struct FbxDirData {
 
 struct FbxExAllState { // exallctrl->lastkey points to this
 	struct MinList freelist; // FbxDirData's to free from previous invocation of exall
-	LONG           iptrs; // cached value
+	LONG           eadsize; // cached value
 };
 
 #define AllocStructure(name) (struct name *)AllocMem(sizeof(struct name), MEMF_PUBLIC|MEMF_CLEAR)

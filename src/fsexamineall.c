@@ -12,16 +12,18 @@
 #include "fuse_stubs.h"
 #include <string.h>
 
-int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,
+#define offset_after(type,member) (offsetof(type, member) + sizeof(((type *)0)->member))
+
+int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR bufsize,
 	int type, struct ExAllControl *ctrl)
 {
 	struct Library *SysBase     = fs->sysbase;
 	struct Library *DOSBase     = fs->dosbase;
 	struct Library *UtilityBase = fs->utilitybase;
 	struct FbxDirData *ed = NULL;
-	int error, iptrs;
 	struct FbxExAllState *exallstate;
-	IPTR *lptr, *start, *prev;
+	int error, eadsize;
+	struct ExAllData *prevead, *curread;
 	struct DateStamp ds;
 	struct fbx_stat statbuf;
 	char fullpath[FBX_MAX_PATH];
@@ -57,25 +59,25 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 
 		switch (type) {
 		case ED_NAME:
-			iptrs = 2;
+			eadsize = offset_after(struct ExAllData, ed_Name);
 			break;
 		case ED_TYPE:
-			iptrs = 3;
+			eadsize = offset_after(struct ExAllData, ed_Type);
 			break;
 		case ED_SIZE:
-			iptrs = 4;
+			eadsize = offset_after(struct ExAllData, ed_Size);
 			break;
 		case ED_PROTECTION:
-			iptrs = 5;
+			eadsize = offset_after(struct ExAllData, ed_Prot);
 			break;
 		case ED_DATE:
-			iptrs = 8;
+			eadsize = offset_after(struct ExAllData, ed_Ticks);
 			break;
 		case ED_COMMENT:
-			iptrs = 9;
+			eadsize = offset_after(struct ExAllData, ed_Comment);
 			break;
 		case ED_OWNER:
-			iptrs = 10;
+			eadsize = offset_after(struct ExAllData, ed_OwnerGID);
 			break;
 		default:
 			FreeFbxDirDataList(fs, &lock->dirdatalist);
@@ -84,7 +86,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 			return DOSFALSE;
 		}
 
-		exallstate->iptrs = iptrs;
+		exallstate->eadsize = eadsize;
 		ctrl->eac_LastKey = (IPTR)exallstate;
 	} else if (ctrl->eac_LastKey == (IPTR)-1) {
 		fs->r2 = ERROR_NO_MORE_ENTRIES;
@@ -95,11 +97,11 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 		FreeFbxDirDataList(fs, &exallstate->freelist);
 	}
 
-	lptr = buffer;
-	start = prev = NULL;
-	*lptr = 0; // clear next pointer
-	iptrs = exallstate->iptrs;
-	while ((char *)&lptr[iptrs] <= ((char *)buffer + len)) {
+	curread = (struct ExAllData *)buffer;
+	prevead = NULL;
+	curread->ed_Next = NULL;
+	eadsize = exallstate->eadsize;
+	while (((IPTR)curread + eadsize) <= ((IPTR)buffer + bufsize)) {
 		ed = (struct FbxDirData *)RemHead((struct List *)&lock->dirdatalist);
 		if (ed == NULL) break;
 
@@ -128,8 +130,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 		}
 #endif
 
-		start = lptr;
-		*lptr = (IPTR)NULL; // clear next pointer
+		curread->ed_Next = NULL;
 
 		if (ctrl->eac_MatchString != NULL &&
 			ctrl->eac_MatchFunc == NULL &&
@@ -201,33 +202,31 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 			}
 		}
 
-		lptr++; // skip next pointer
-
-		if (type >= ED_NAME) *lptr++ = (IPTR)pname;
-		if (type >= ED_TYPE) *lptr++ = FbxMode2EntryType(statbuf.st_mode);
-		if (type >= ED_SIZE) *lptr++ = (statbuf.st_size > 0xffffffff) ? 0 : statbuf.st_size;
+		if (type >= ED_NAME) curread->ed_Name = (STRPTR)pname;
+		if (type >= ED_TYPE) curread->ed_Type = FbxMode2EntryType(statbuf.st_mode);
+		if (type >= ED_SIZE) curread->ed_Size = (statbuf.st_size > 0xffffffff) ? 0 : statbuf.st_size;
 		if (type >= ED_PROTECTION) {
-			*lptr = FbxMode2Protection(statbuf.st_mode);
-			*lptr++ |= FbxGetAmigaProtectionFlags(fs, fullpath);
+			curread->ed_Prot  = FbxMode2Protection(statbuf.st_mode);
+			curread->ed_Prot |= FbxGetAmigaProtectionFlags(fs, fullpath);
 		}
 		if (type >= ED_DATE) {
 			FbxTimeSpec2DS(fs, &statbuf.st_mtim, &ds);
-			*lptr++ = ds.ds_Days;
-			*lptr++ = ds.ds_Minute;
-			*lptr++ = ds.ds_Tick;
+			curread->ed_Days  = ds.ds_Days;
+			curread->ed_Mins  = ds.ds_Minute;
+			curread->ed_Ticks = ds.ds_Tick;
 		}
-		if (type >= ED_COMMENT) *lptr++ = (pcomment != NULL) ? (IPTR)pcomment : (IPTR)"";
+		if (type >= ED_COMMENT) {
+			curread->ed_Comment = (STRPTR)((pcomment != NULL) ? pcomment : "");
+		}
 		if (type >= ED_OWNER) {
-			ULONG uid = FbxUnix2AmigaOwner(statbuf.st_uid);
-			ULONG gid = FbxUnix2AmigaOwner(statbuf.st_gid);
-			*lptr++ = (uid << 16)|gid;
+			curread->ed_OwnerUID = FbxUnix2AmigaOwner(statbuf.st_uid);
+			curread->ed_OwnerGID = FbxUnix2AmigaOwner(statbuf.st_gid);
 		}
 
 		if (ctrl->eac_MatchFunc != NULL &&
-			!CallHookPkt(ctrl->eac_MatchFunc, &type, start))
+			!CallHookPkt(ctrl->eac_MatchFunc, &type, curread))
 		{
 			FreeFbxDirData(fs, ed);
-			lptr = start;
 			continue;
 		}
 
@@ -235,8 +234,9 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 
 		ctrl->eac_Entries++;
 
-		if (prev != NULL) *prev = (IPTR)start; // link us in
-		prev = start;
+		if (prevead != NULL) prevead->ed_Next = curread; // link us in
+		prevead = curread;
+		curread = (struct ExAllData *)((IPTR)curread + eadsize); // advance to next ead
 	}
 
 	if (IsMinListEmpty(&lock->dirdatalist)) {
