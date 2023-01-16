@@ -122,7 +122,7 @@ clean:
 
 .PHONY: revision
 revision:
-	bumprev $(VERSION) $(TARGET)
+	bumprev -e si $(VERSION) $(TARGET)
 
 .PHONY: autodoc
 autodoc:
