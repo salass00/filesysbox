@@ -111,7 +111,7 @@ filesysbox.library 54.1 (14.1.2023)
   as a base32 encoded character sequence preceded by a percent symbol.
 
 
-filesysbox.library 54.2 (d.m.2023)
+filesysbox.library 54.2 (16.2.2023)
 
 - Fixed support for codesets other than ISO-8859-1/latin-1 (was not working
   before due to size and attributes parameters being switched around in the
@@ -123,5 +123,5 @@ filesysbox.library 54.2 (d.m.2023)
 - UTF-8 to local charset conversion now uses an AVL tree instead of iterating
   over the maptable array to find a match.
 
-- Experimental ACTION_DIE packet support.
+- Added experimental ACTION_DIE packet support.
 
