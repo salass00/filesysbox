@@ -10,6 +10,7 @@
 
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
+#include <string.h>
 #include <errno.h>
 
 static int Fbx_create(struct FbxFS *fs, const char *path, mode_t mode, struct fuse_file_info *fi)
@@ -61,6 +62,7 @@ static int FbxCreateOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct Fbx
 		fs->r2 = ERROR_NO_FREE_STORE;
 		return DOSFALSE;
 	}
+	bzero(lock->info, sizeof(*lock->info));
 
 	if (fs->currvol->vflags & FBXVF_READ_ONLY)
 		lock->info->flags = O_RDONLY;

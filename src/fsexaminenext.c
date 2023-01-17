@@ -84,6 +84,7 @@ int FbxReadDir(struct FbxFS *fs, struct FbxLock *lock) {
 			fs->r2 = ERROR_NO_FREE_STORE;
 			return DOSFALSE;
 		}
+		bzero(lock->info, sizeof(*lock->info));
 
 		error = Fbx_opendir(fs, lock->entry->path, fi);
 		if (error) {

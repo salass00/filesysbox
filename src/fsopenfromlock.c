@@ -9,6 +9,7 @@
  */
 
 #include "filesysbox_internal.h"
+#include <string.h>
 
 static int Fbx_open(struct FbxFS *fs, const char *path, struct fuse_file_info *fi)
 {
@@ -47,6 +48,7 @@ int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock) {
 		fs->r2 = ERROR_NO_FREE_STORE;
 		return DOSFALSE;
 	}
+	bzero(lock->info, sizeof(*lock->info));
 
 	if (fs->currvol->vflags & FBXVF_READ_ONLY)
 		lock->info->flags = O_RDONLY;

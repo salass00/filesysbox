@@ -125,3 +125,12 @@ filesysbox.library 54.2 (16.2.2023)
 
 - Added experimental ACTION_DIE packet support.
 
+
+filesysbox.library 54.3 (d.m.2023)
+
+- AllocFuseFileInfo() did not clear the allocated fuse_file_info structure
+  which resulted in randomly occurring bugs like otherwise legal ACTION_SEEK
+  packets failing with ERROR_ACTION_NOT_KNOWN if the nonseekable flag happened
+  to be set. This has now been fixed by explicitly clearing the memory before
+  it is used.
+
