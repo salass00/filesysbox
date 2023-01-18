@@ -227,8 +227,8 @@ static void FbxHandleTimerEvent(struct FbxFS *fs) {
 			chain = fs->timercallbacklist.mlh_Head;
 			while ((succ = chain->mln_Succ) != NULL) {
 				struct FbxTimerCallbackData *cb = FSTIMERCALLBACKDATAFROMFSCHAIN(chain);
-				QUAD currtime = FbxGetUpTimeMillis(fs);
-				QUAD x = currtime - cb->lastcall;
+				ULONG currtime = FbxGetUpTimeMillis(fs);
+				LONG x = (LONG)(currtime - cb->lastcall);
 				if (cb->period != 0 && x > cb->period) {
 					cb->lastcall = currtime;
 					cb->func();
@@ -243,9 +243,9 @@ static void FbxHandleTimerEvent(struct FbxFS *fs) {
 			ObtainSemaphore(&fs->fssema);
 
 			if (OKVOLUME(fs->currvol) && fs->firstmodify) {
-				QUAD currtime = FbxGetUpTimeMillis(fs);
-				QUAD x = currtime - fs->firstmodify;
-				QUAD y = currtime - fs->lastmodify;
+				ULONG currtime = FbxGetUpTimeMillis(fs);
+				LONG x = (LONG)(currtime - fs->firstmodify);
+				LONG y = (LONG)(currtime - fs->lastmodify);
 				if (fs->aut != 0 && x > fs->aut) {
 					FbxFlushAll(fs);
 				} else if (fs->iaut != 0 && y > fs->iaut) {

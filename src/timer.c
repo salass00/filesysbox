@@ -89,10 +89,10 @@ void FbxGetUpTime(struct FbxFS *fs, struct timeval *tv) {
 	tv->tv_micro = micros;
 }
 
-QUAD FbxGetUpTimeMillis(struct FbxFS *fs) {
+ULONG FbxGetUpTimeMillis(struct FbxFS *fs) {
 	struct timeval tv;
 
 	FbxGetUpTime(fs, &tv);
-	return (UQUAD)tv.tv_secs * 1000 + tv.tv_micro / 1000;
+	return (ULONG)tv.tv_secs * 1000UL + (ULONG)tv.tv_micro / 1000UL;
 }
 

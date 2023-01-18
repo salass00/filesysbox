@@ -443,6 +443,7 @@ BOOL FbxCheckLock(struct FbxFS *fs, struct FbxLock *lock) {
 void FbxSetModifyState(struct FbxFS *fs, int state) {
 	if (state) {
 		fs->lastmodify = FbxGetUpTimeMillis(fs);
+		if (fs->lastmodify == 0) fs->lastmodify++; /* Don't set to zero */
 		if (fs->firstmodify == 0)
 			fs->firstmodify = fs->lastmodify;
 	} else {

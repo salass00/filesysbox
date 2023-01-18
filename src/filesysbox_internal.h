@@ -270,7 +270,7 @@ struct FbxVolume {
 
 struct FbxTimerCallbackData {
 	struct MinNode       fschain;
-	QUAD                 lastcall;
+	ULONG                lastcall;
 	ULONG                period;
 	FbxTimerCallbackFunc func;
 };
@@ -384,8 +384,8 @@ struct FbxFS {
 	LONG                         inhibit;
 	ULONG                        aut; // active auto update timeout
 	ULONG                        iaut; // inactive auto update timeout
-	QUAD                         firstmodify;
-	QUAD                         lastmodify;
+	ULONG                        firstmodify;
+	ULONG                        lastmodify;
 	LONG                         timerbusy;
 	LONG                         diskchangesig;
 	struct FbxDiskChangeHandler *diskchangehandler;
@@ -579,7 +579,7 @@ struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
 void FbxCleanupTimerIO(struct FbxFS *fs);
 void FbxInitUpTime(struct FbxFS *fs);
 void FbxGetUpTime(struct FbxFS *fs, struct timeval *tv);
-QUAD FbxGetUpTimeMillis(struct FbxFS *fs);
+ULONG FbxGetUpTimeMillis(struct FbxFS *fs);
 
 /* notify.c */
 void FbxDoNotifyRequest(struct FbxFS *fs, struct NotifyRequest *nr);

@@ -134,3 +134,6 @@ filesysbox.library 54.3 (d.m.2023)
   to be set. This has now been fixed by explicitly clearing the memory before
   it is used.
 
+- Changed to use ULONGs for the uptime timestamps used in FbxEventLoop() to
+  save some CPU cycles.
+
