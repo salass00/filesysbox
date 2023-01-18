@@ -137,3 +137,6 @@ filesysbox.library 54.3 (d.m.2023)
 - Changed to use ULONGs for the uptime timestamps used in FbxEventLoop() to
   save some CPU cycles.
 
+- Rewrote the FbxExamineAll() function to not make assumptions about the sizes
+  of the various ExAllData fields.
+
