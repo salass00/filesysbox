@@ -11,6 +11,7 @@
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
 #include <string.h>
+#include <stdint.h>
 
 LONG FbxMode2EntryType(const mode_t mode) {
 	if (S_ISDIR(mode)) {
@@ -101,7 +102,13 @@ void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *st
 #endif
 	fib->fib_Comment[0] = strlen((char *)fib->fib_Comment + 1);
 
-	fib->fib_Size = stat->st_size;
+	if (stat->st_size < 0)
+		fib->fib_Size = 0;
+	else if (sizeof(fib->fib_Size) == 4 && stat->st_size >= INT32_MAX)
+		fib->fib_Size = INT32_MAX-1;
+	else
+		fib->fib_Size = stat->st_size;
+
 	fib->fib_Protection = FbxMode2Protection(stat->st_mode);
 	fib->fib_Protection |= FbxGetAmigaProtectionFlags(fs, fullpath);
 	fib->fib_NumBlocks = stat->st_blocks;

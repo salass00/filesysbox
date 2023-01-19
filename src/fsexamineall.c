@@ -11,6 +11,7 @@
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
 #include <string.h>
+#include <stdint.h>
 
 #define offset_after(type,member) (offsetof(type, member) + sizeof(((type *)0)->member))
 
@@ -204,7 +205,14 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 
 		if (type >= ED_NAME) curread->ed_Name = (STRPTR)pname;
 		if (type >= ED_TYPE) curread->ed_Type = FbxMode2EntryType(statbuf.st_mode);
-		if (type >= ED_SIZE) curread->ed_Size = statbuf.st_size;
+		if (type >= ED_SIZE) {
+			if (statbuf.st_size < 0)
+				curread->ed_Size = 0;
+			else if (sizeof(curread->ed_Size) == 4 && statbuf.st_size >= INT32_MAX)
+				curread->ed_Size = INT32_MAX-1;
+			else
+				curread->ed_Size = statbuf.st_size;
+		}
 		if (type >= ED_PROTECTION) {
 			curread->ed_Prot  = FbxMode2Protection(statbuf.st_mode);
 			curread->ed_Prot |= FbxGetAmigaProtectionFlags(fs, fullpath);

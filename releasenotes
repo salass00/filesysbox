@@ -140,3 +140,9 @@ filesysbox.library 54.3 (18.1.2023)
 - Rewrote the FbxExamineAll() function to not make assumptions about the sizes
   of the various ExAllData fields.
 
+
+filesysbox.library 54.4 (d.m.2023)
+
+- When setting fib_Size/ed_Size clamp file size to (INT32_MAX-1) if the field
+  is 32-bit (LONG/ULONG).
+
