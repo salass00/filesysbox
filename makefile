@@ -35,7 +35,6 @@ ifeq ($(HOST),m68k-amigaos)
 endif
 
 main_SRCS = $(wildcard src/main/*.c)
-main_OBJS = $(subst src/,obj/,$(main_SRCS:.c=.o))
 
 SRCS = $(addprefix src/, \
        init.c filesysbox.c diskchange.c timer.c notify.c doslist.c \
@@ -50,24 +49,28 @@ SRCS = $(addprefix src/, \
        strlcpy.c debugf.c kputstr.c snprintf.c allocvecpooled.c codesets.c \
        avl.c)
 
-OBJS = $(main_OBJS) $(subst src/,obj/,$(SRCS:.c=.o))
+OBJS = $(subst src/,obj/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+DEPS = $(OBJS:.o=.d)
 
 ifeq ($(HOST),m68k-amigaos)
-	main_OBJS_000 = $(subst obj/,obj-000/,$(main_OBJS))
-	main_OBJS_020 = $(subst obj/,obj-020/,$(main_OBJS))
 	OBJS_000 = $(subst obj/,obj-000/,$(OBJS))
 	OBJS_020 = $(subst obj/,obj-020/,$(OBJS))
+	DEPS_000 = $(OBJS_000:.o=.d)
+	DEPS_020 = $(OBJS_020:.o=.d)
 endif
 
 .PHONY: all
 ifeq ($(HOST),m68k-amigaos)
 all: $(TARGET).000 $(TARGET).020
 else
-all: $(TARGET)
+all: $(TARGET) $(TARGET).debug
 endif
+
+-include $(DEPS)
 
 obj/%.o: src/%.c
 	@mkdir -p $(dir $@)
+	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(CFLAGS) $<
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(TARGET).debug: $(OBJS)
@@ -81,19 +84,18 @@ $(TARGET): $(TARGET).debug
 	$(STRIP) $(STRIPFLAGS) -o $@ $<
 endif
 
-init.o: $(TARGET)_rev.h src/filesysbox_vectors.c src/filesysbox_vectors.h
-
-$(main_OBJS): src/filesysbox_vectors.h
-
-$(OBJS): src/filesysbox_internal.h
-
 ifeq ($(HOST),m68k-amigaos)
+-include $(DEPS_000)
+-include $(DEPS_020)
+
 obj-000/%.o: src/%.c
 	@mkdir -p $(dir $@)
+	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(ARCH_000) $(CFLAGS) $<
 	$(CC) $(ARCH_000) $(CFLAGS) -c -o $@ $<
 
 obj-020/%.o: src/%.c
 	@mkdir -p $(dir $@)
+	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(ARCH_020) $(CFLAGS) $<
 	$(CC) $(ARCH_020) $(CFLAGS) -c -o $@ $<
 
 $(TARGET).000: $(OBJS_000)
@@ -103,15 +105,6 @@ $(TARGET).000: $(OBJS_000)
 $(TARGET).020: $(OBJS_020)
 	$(CC) $(ARCH_020) $(LDFLAGS) -o $@.debug $^ $(LIBS)
 	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
-
-obj-000/init.o: $(TARGET)_rev.h src/filesysbox_vectors.c src/filesysbox_vectors.h
-obj-020/init.o: $(TARGET)_rev.h src/filesysbox_vectors.c src/filesysbox_vectors.h
-
-$(main_OBJS_000): src/filesysbox_vectors.h
-$(main_OBJS_020): src/filesysbox_vectors.h
-
-$(OBJS_000): src/filesysbox_internal.h
-$(OBJS_020): src/filesysbox_internal.h
 endif
 
 .PHONY: clean

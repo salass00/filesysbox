@@ -9,8 +9,8 @@
  */
 
 #include <libraries/filesysbox.h>
-#include "../filesysbox_vectors.h"
-#include "../filesysbox_internal.h"
+#include "filesysbox_vectors.h"
+#include "filesysbox_internal.h"
 
 #include <stdarg.h>
 

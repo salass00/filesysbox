@@ -1,5 +1,5 @@
-# Ignore object and archive files
-*.[oa]
+# Ignore object, dependency and archive files
+*.[oda]
 # Ignore generated exe file
 filesysbox.library
 filesysbox.library.000
