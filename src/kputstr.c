@@ -8,7 +8,7 @@
 #include <clib/debug_protos.h>
 
 #if !defined(__AROS__) && !defined(NODEBUG)
-void KPutStr(CONST_STRPTR str) {
+__stdargs void KPutStr(CONST_STRPTR str) {
 	__asm__ __volatile__
 	(
 		"move.l 4.w,a6\n\t"
