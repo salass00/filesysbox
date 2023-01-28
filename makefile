@@ -30,7 +30,7 @@ endif
 ifeq ($(HOST),m68k-amigaos)
 	ARCH_000 = -m68000
 	ARCH_020 = -m68020
-	CFLAGS  := -noixemul -fno-common $(CFLAGS)
+	CFLAGS  := -noixemul -fno-common -mregparm $(CFLAGS)
 	LDFLAGS := -noixemul $(LDFLAGS)
 endif
 

@@ -34,7 +34,7 @@ static int Fbx_readdir(struct FbxFS *fs, const char *path, APTR udata, fuse_fill
 	return FSOP readdir(path, udata, func, offset, fi, &fs->fcntx);
 }
 
-static int dir_fill_func(void *udata, const char *name, const struct fbx_stat *stat, fbx_off_t offset) {
+static STDARGS int dir_fill_func(void *udata, const char *name, const struct fbx_stat *stat, fbx_off_t offset) {
 	struct FbxLock *lock = udata;
 	struct FbxFS *fs = lock->fs;
 	struct Library *SysBase = fs->sysbase;

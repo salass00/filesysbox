@@ -23,6 +23,14 @@
 extern "C" {
 #endif
 
+#ifndef STDARGS
+#ifdef __GNUC__
+#define STDARGS __stdargs
+#else
+#define STDARGS
+#endif
+#endif /* !STDARGS */
+
 #if !defined(__AROS__) && !defined(AROS_TYPES_DEFINED)
 #define AROS_TYPES_DEFINED
 typedef ULONG              IPTR;
@@ -138,7 +146,7 @@ struct fuse_file_info {
 /* tags for FbxQueryFS() */
 #define FBXT_GMT_OFFSET              (TAG_USER + 101) /* equivalent to TZA_UTCOffset */
 
-typedef int (*fuse_fill_dir_t) (void *udata, const char *fsname, const struct fbx_stat *stbuf, fbx_off_t off);
+typedef STDARGS int (*fuse_fill_dir_t) (void *udata, const char *fsname, const struct fbx_stat *stbuf, fbx_off_t off);
 
 typedef void *fuse_dirfil_t;
 
@@ -166,49 +174,49 @@ struct fuse_context {
 struct fuse_operations {
 	unsigned int flag_nullpath_ok : 1;
 	unsigned int flag_reserved : 31;
-	int (*getattr) (const char *, struct fbx_stat *);
-	int (*readlink) (const char *, char *, size_t);
-	int (*mknod) (const char *, mode_t, dev_t);
-	int (*mkdir) (const char *, mode_t);
-	int (*unlink) (const char *);
-	int (*rmdir) (const char *);
-	int (*symlink) (const char *, const char *);
-	int (*rename) (const char *, const char *);
-	int (*link) (const char *, const char *);
-	int (*chmod) (const char *, mode_t);
-	int (*chown) (const char *, uid_t, gid_t);
-	int (*truncate) (const char *, fbx_off_t);
-	int (*utime) (const char *, struct utimbuf *);
-	int (*open) (const char *, struct fuse_file_info *);
-	int (*read) (const char *, char *, size_t, fbx_off_t, struct fuse_file_info *);
-	int (*write) (const char *, const char *, size_t, fbx_off_t, struct fuse_file_info *);
-	int (*statfs) (const char *, struct statvfs *);
-	int (*flush) (const char *, struct fuse_file_info *);
-	int (*release) (const char *, struct fuse_file_info *);
-	int (*fsync) (const char *, int, struct fuse_file_info *);
-	int (*setxattr) (const char *, const char *, const char *, size_t, int);
-	int (*getxattr) (const char *, const char *, char *, size_t);
-	int (*listxattr) (const char *, char *, size_t);
-	int (*removexattr) (const char *, const char *);
-	int (*opendir) (const char *, struct fuse_file_info *);
-	int (*readdir) (const char *, void *, fuse_fill_dir_t, fbx_off_t, struct fuse_file_info *);
-	int (*releasedir) (const char *, struct fuse_file_info *);
-	int (*fsyncdir) (const char *, int, struct fuse_file_info *);
-	void *(*init) (struct fuse_conn_info *conn);
-	void (*destroy) (void *);
-	int (*access) (const char *, int);
-	int (*create) (const char *, mode_t, struct fuse_file_info *);
-	int (*ftruncate) (const char *, fbx_off_t, struct fuse_file_info *);
-	int (*fgetattr) (const char *, struct fbx_stat *, struct fuse_file_info *);
-	int (*lock) (const char *, struct fuse_file_info *, int cmd, struct flock *);
-	int (*utimens) (const char *, const struct timespec tv[2]);
-	int (*bmap) (const char *, size_t blocksize, UQUAD *idx);
-	int (*format) (const char *, ULONG);
-	int (*relabel) (const char *);
+	STDARGS int (*getattr) (const char *, struct fbx_stat *);
+	STDARGS int (*readlink) (const char *, char *, size_t);
+	STDARGS int (*mknod) (const char *, mode_t, dev_t);
+	STDARGS int (*mkdir) (const char *, mode_t);
+	STDARGS int (*unlink) (const char *);
+	STDARGS int (*rmdir) (const char *);
+	STDARGS int (*symlink) (const char *, const char *);
+	STDARGS int (*rename) (const char *, const char *);
+	STDARGS int (*link) (const char *, const char *);
+	STDARGS int (*chmod) (const char *, mode_t);
+	STDARGS int (*chown) (const char *, uid_t, gid_t);
+	STDARGS int (*truncate) (const char *, fbx_off_t);
+	STDARGS int (*utime) (const char *, struct utimbuf *);
+	STDARGS int (*open) (const char *, struct fuse_file_info *);
+	STDARGS int (*read) (const char *, char *, size_t, fbx_off_t, struct fuse_file_info *);
+	STDARGS int (*write) (const char *, const char *, size_t, fbx_off_t, struct fuse_file_info *);
+	STDARGS int (*statfs) (const char *, struct statvfs *);
+	STDARGS int (*flush) (const char *, struct fuse_file_info *);
+	STDARGS int (*release) (const char *, struct fuse_file_info *);
+	STDARGS int (*fsync) (const char *, int, struct fuse_file_info *);
+	STDARGS int (*setxattr) (const char *, const char *, const char *, size_t, int);
+	STDARGS int (*getxattr) (const char *, const char *, char *, size_t);
+	STDARGS int (*listxattr) (const char *, char *, size_t);
+	STDARGS int (*removexattr) (const char *, const char *);
+	STDARGS int (*opendir) (const char *, struct fuse_file_info *);
+	STDARGS int (*readdir) (const char *, void *, fuse_fill_dir_t, fbx_off_t, struct fuse_file_info *);
+	STDARGS int (*releasedir) (const char *, struct fuse_file_info *);
+	STDARGS int (*fsyncdir) (const char *, int, struct fuse_file_info *);
+	STDARGS void *(*init) (struct fuse_conn_info *conn);
+	STDARGS void (*destroy) (void *);
+	STDARGS int (*access) (const char *, int);
+	STDARGS int (*create) (const char *, mode_t, struct fuse_file_info *);
+	STDARGS int (*ftruncate) (const char *, fbx_off_t, struct fuse_file_info *);
+	STDARGS int (*fgetattr) (const char *, struct fbx_stat *, struct fuse_file_info *);
+	STDARGS int (*lock) (const char *, struct fuse_file_info *, int cmd, struct flock *);
+	STDARGS int (*utimens) (const char *, const struct timespec tv[2]);
+	STDARGS int (*bmap) (const char *, size_t blocksize, UQUAD *idx);
+	STDARGS int (*format) (const char *, ULONG);
+	STDARGS int (*relabel) (const char *);
 };
 
-typedef void (*FbxSignalCallbackFunc)(ULONG matching_signals);
-typedef void (*FbxTimerCallbackFunc)(void);
+typedef STDARGS void (*FbxSignalCallbackFunc)(ULONG matching_signals);
+typedef STDARGS void (*FbxTimerCallbackFunc)(void);
 
 struct FbxTimerCallbackData;
 
