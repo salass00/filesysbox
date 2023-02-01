@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 #ifndef STDARGS
-#ifdef __GNUC__
+#if !defined(__AROS__) && defined(__GNUC__)
 #define STDARGS __stdargs
 #else
 #define STDARGS
