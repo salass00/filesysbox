@@ -28,8 +28,8 @@ ifneq (,$(findstring -aros,$(HOST)))
 endif
 
 ifeq ($(HOST),m68k-amigaos)
-	ARCH_000 = -m68000
-	ARCH_020 = -m68020
+	ARCH_000 = -mcpu=68000 -mtune=68000
+	ARCH_020 = -mcpu=68020 -mtune=68020-60
 	CFLAGS  := -noixemul -fno-common -mregparm $(CFLAGS)
 	LDFLAGS := -noixemul $(LDFLAGS)
 endif
