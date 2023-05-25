@@ -39,7 +39,7 @@ void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list) {
 		chain = succ;
 	}
 
-	NEWLIST(list);
+	NEWMINLIST(list);
 }
 
 int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,

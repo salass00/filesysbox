@@ -249,7 +249,7 @@ struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mode) {
 	lock->filepos    = 0;
 	lock->flags      = 0;
 
-	NEWLIST(&lock->dirdatalist);
+	NEWMINLIST(&lock->dirdatalist);
 
 	AddTail((struct List *)&e->locklist, (struct Node *)&lock->entrychain);
 	AddTail((struct List *)&lock->fsvol->locklist, (struct Node *)&lock->volumechain);
@@ -400,8 +400,8 @@ struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int type, QUA
 	}
 
 	FbxSetEntryPath(fs, e, path);
-	NEWLIST(&e->locklist);
-	NEWLIST(&e->notifylist);
+	NEWMINLIST(&e->locklist);
+	NEWMINLIST(&e->notifylist);
 	e->xlock = FALSE;
 	e->type = type;
 

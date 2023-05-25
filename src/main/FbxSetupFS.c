@@ -175,8 +175,8 @@ struct FbxFS *FbxSetupFS(
 	fs->aut = ACTIVE_UPDATE_TIMEOUT_MILLIS;
 	fs->iaut = INACTIVE_UPDATE_TIMEOUT_MILLIS;
 
-	NEWLIST(&fs->volumelist);
-	NEWLIST(&fs->timercallbacklist);
+	NEWMINLIST(&fs->volumelist);
+	NEWMINLIST(&fs->timercallbacklist);
 
 	if (msg != NULL) {
 		struct DosPacket *pkt = (struct DosPacket *)msg->mn_Node.ln_Name;

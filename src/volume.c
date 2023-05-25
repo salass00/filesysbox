@@ -141,11 +141,11 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 	vol->writeprotect = FALSE;
 	vol->vflags       = 0;
 
-	NEWLIST(&vol->unres_notifys);
-	NEWLIST(&vol->locklist);
-	NEWLIST(&vol->notifylist);
+	NEWMINLIST(&vol->unres_notifys);
+	NEWMINLIST(&vol->locklist);
+	NEWMINLIST(&vol->notifylist);
 	for (i = 0; i < ENTRYHASHSIZE; i++) {
-		NEWLIST(&vol->entrytab[i]);
+		NEWMINLIST(&vol->entrytab[i]);
 	}
 
 	if (st.f_flag & ST_CASE_SENSITIVE) {

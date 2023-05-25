@@ -49,7 +49,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 		}
 
 		FreeFbxDirDataList(fs, &lock->dirdatalist);
-		NEWLIST(&exallstate->freelist);
+		NEWMINLIST(&exallstate->freelist);
 
 		// read in entries
 		if (!FbxReadDir(fs, lock)) {

@@ -47,15 +47,29 @@
 #ifndef NEWLIST
 #define NEWLIST(list) \
 	do { \
-		((struct List *)(list))->lh_Head = (struct Node *)&((struct List *)(list))->lh_Tail; \
-		((struct List *)(list))->lh_Tail = NULL; \
-		((struct List *)(list))->lh_TailPred = (struct Node *)&((struct List *)(list))->lh_Head; \
+		(list)->lh_Head = (struct Node *)&(list)->lh_Tail; \
+		(list)->lh_Tail = NULL; \
+		(list)->lh_TailPred = (struct Node *)&(list)->lh_Head; \
+	} while (0)
+#endif
+#ifndef NEWMINLIST
+#define NEWMINLIST(list) \
+	do { \
+		(list)->mlh_Head = (struct MinNode *)&(list)->mlh_Tail; \
+		(list)->mlh_Tail = NULL; \
+		(list)->mlh_TailPred = (struct MinNode *)&(list)->mlh_Head; \
 	} while (0)
 #endif
 
-#ifndef IsMinListEmpty
-#define IsMinListEmpty(list) IsListEmpty((struct List *)list)
+#ifndef IsListEmpty
+#define IsListEmpty(list) ((list)->lh_TailPred == (struct Node *)(list))
 #endif
+#ifndef IsMinListEmpty
+#define IsMinListEmpty(list) ((list)->mlh_TailPred == (struct MinNode *)(list))
+#endif
+
+#define OneInList(list) ((list)->lh_Head == (list)->lh_TailPred)
+#define OneInMinList(list) ((list)->mlh_Head == (list)->mlh_TailPred)
 
 #ifndef ZERO
 #define ZERO MKBADDR(NULL)
@@ -528,8 +542,6 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 #define FreeFbxTimerCallbackData(fs,cb) FreeStructurePooled(fs, cb, FbxTimerCallbackData)
 
 #define UNIXTIMEOFFSET 252460800
-
-#define OneInMinList(list) ((list)->mlh_Head == (list)->mlh_TailPred)
 
 #define FbxUTF8ToLocal(fs, dst, src, dst_size) utf8_to_local(dst, src, dst_size, (fs)->maptree)
 #define FbxLocalToUTF8(fs, dst, src, dst_size) local_to_utf8(dst, src, dst_size, (fs)->maptable)
