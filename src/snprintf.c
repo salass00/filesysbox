@@ -311,6 +311,9 @@ int fbx_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg) {
 		}
 	}
 
+	/* Make sure that output is NUL terminated */
+	putchproc('\0', &putchdata);
+
 	return putchdata.count;
 }
 
