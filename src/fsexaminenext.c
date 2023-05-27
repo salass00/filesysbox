@@ -153,7 +153,9 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 
 	if (fs->fsflags & FBXF_USE_FILL_DIR_STAT) {
 		statbuf = ed->stat;
+		FreeFbxDirData(fs, ed);
 	} else {
+		FreeFbxDirData(fs, ed);
 		error = Fbx_getattr(fs, fullpath, &statbuf);
 		if (error) {
 			fs->r2 = FbxFuseErrno2Error(error);

@@ -146,3 +146,7 @@ filesysbox.library 54.4 (d.m.2023)
 - When setting fib_Size/ed_Size clamp file size to (INT32_MAX-1) if the field
   is 32-bit (LONG/ULONG).
 
+- Fixed a memory leak in the ExNext directory scanning implementation (nodes
+  are removed from the dirdatalist but not freed) that was already there in
+  the 0.730 version of the library.
+
