@@ -509,11 +509,11 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 #define AllocStructureNoClear(name) (struct name *)AllocMem(sizeof(struct name), MEMF_PUBLIC)
 #define FreeStructure(ptr,name) FreeMem((ptr), sizeof(struct name))
 
-#define AllocStructurePooled(fs,name) (struct name *)AllocPooled((fs)->mempool, sizeof(struct name))
-#define FreeStructurePooled(fs,ptr,name) FreePooled((fs)->mempool, (ptr), sizeof(struct name))
+#define AllocStructurePooled(pool,name) (struct name *)AllocPooled((pool), sizeof(struct name))
+#define FreeStructurePooled(pool,ptr,name) FreePooled((pool), (ptr), sizeof(struct name))
 
-#define AllocFbxEntry(fs) AllocStructurePooled(fs, FbxEntry)
-#define FreeFbxEntry(fs, e) FreeStructurePooled(fs, e, FbxEntry)
+#define AllocFbxEntry(fs) AllocStructurePooled((fs)->mempool, FbxEntry)
+#define FreeFbxEntry(fs, e) FreeStructurePooled((fs)->mempool, e, FbxEntry)
 
 #define AllocFbxLock() AllocStructureNoClear(FbxLock)
 #define FreeFbxLock(lock) FreeStructure(lock, FbxLock)
@@ -530,16 +530,16 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 #define AllocFbxVolume() AllocStructure(FbxVolume)
 #define FreeFbxVolume(vol) FreeStructure(vol, FbxVolume)
 
-#define AllocFbxExAllState(fs) AllocStructurePooled(fs, FbxExAllState)
-#define FreeFbxExAllState(fs,eas) FreeStructurePooled(fs, eas, FbxExAllState)
+#define AllocFbxExAllState(fs) AllocStructurePooled((fs)->mempool, FbxExAllState)
+#define FreeFbxExAllState(fs,eas) FreeStructurePooled((fs)->mempool, eas, FbxExAllState)
 
 #define AllocFbxDirData(fs,pool,len) (struct FbxDirData *)AllocVecPooled((pool), sizeof(struct FbxDirData) + (len))
 
-#define AllocFuseFileInfo(fs) AllocStructurePooled(fs, fuse_file_info)
-#define FreeFuseFileInfo(fs,ffi) FreeStructurePooled(fs, ffi, fuse_file_info)
+#define AllocFuseFileInfo(fs) AllocStructurePooled((fs)->mempool, fuse_file_info)
+#define FreeFuseFileInfo(fs,ffi) FreeStructurePooled((fs)->mempool, ffi, fuse_file_info)
 
-#define AllocFbxTimerCallbackData(fs) AllocStructurePooled(fs, FbxTimerCallbackData)
-#define FreeFbxTimerCallbackData(fs,cb) FreeStructurePooled(fs, cb, FbxTimerCallbackData)
+#define AllocFbxTimerCallbackData(fs) AllocStructurePooled((fs)->mempool, FbxTimerCallbackData)
+#define FreeFbxTimerCallbackData(fs,cb) FreeStructurePooled((fs)->mempool, cb, FbxTimerCallbackData)
 
 #define UNIXTIMEOFFSET 252460800
 
