@@ -46,7 +46,7 @@ static STDARGS int dir_fill_func(void *udata, const char *name, const struct fbx
 	if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0) {
 		if (FbxCheckString(fs, name)) {
 			len = strlen(name) + 1;
-			ed = AllocFbxDirData(fs, len);
+			ed = AllocFbxDirData(fs, fs->mempool, len);
 			if (ed == NULL) return 1;
 
 			ed->fsname = (char *)(ed + 1);
@@ -134,7 +134,7 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 
 	if (!lock->dirscan) {
 		if (!FbxReadDir(fs, lock)) {
-			FreeFbxDirDataList(fs, &lock->dirdatalist);
+			FreeFbxDirDataList(fs, fs->mempool, &lock->dirdatalist);
 			return DOSFALSE;
 		}
 		lock->dirscan = TRUE;
@@ -153,9 +153,9 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 
 	if (fs->fsflags & FBXF_USE_FILL_DIR_STAT) {
 		statbuf = ed->stat;
-		FreeFbxDirData(fs, ed);
+		FreeFbxDirData(fs, fs->mempool, ed);
 	} else {
-		FreeFbxDirData(fs, ed);
+		FreeFbxDirData(fs, fs->mempool, ed);
 		error = Fbx_getattr(fs, fullpath, &statbuf);
 		if (error) {
 			fs->r2 = FbxFuseErrno2Error(error);

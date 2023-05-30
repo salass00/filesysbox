@@ -10,7 +10,7 @@
 
 #include "filesysbox_internal.h"
 
-void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd) {
+void FreeFbxDirData(struct FbxFS *fs, APTR pool, struct FbxDirData *dd) {
 #ifdef __AROS__
 	struct Library *SysBase = fs->sysbase;
 #endif
@@ -19,23 +19,23 @@ void FreeFbxDirData(struct FbxFS *fs, struct FbxDirData *dd) {
 
 	if (dd != NULL) {
 		if (dd->name != NULL)
-			FreeVecPooled(fs->mempool, dd->name);
+			FreeVecPooled(pool, dd->name);
 
 		if (dd->comment != NULL)
-			FreeVecPooled(fs->mempool, dd->comment);
+			FreeVecPooled(pool, dd->comment);
 
-		FreeVecPooled(fs->mempool, dd);
+		FreeVecPooled(pool, dd);
 	}
 }
 
-void FreeFbxDirDataList(struct FbxFS *fs, struct MinList *list) {
+void FreeFbxDirDataList(struct FbxFS *fs, APTR pool, struct MinList *list) {
 	struct MinNode *chain, *succ;
 
 	DEBUGF("FreeFbxDirDataList(%#p, %#p)\n", fs, list);
 
 	chain = list->mlh_Head;
 	while ((succ = chain->mln_Succ) != NULL) {
-		FreeFbxDirData(fs, FSDIRDATAFROMNODE(chain));
+		FreeFbxDirData(fs, pool, FSDIRDATAFROMNODE(chain));
 		chain = succ;
 	}
 
@@ -54,14 +54,14 @@ int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR 
 		exallstate = (struct FbxExAllState *)ctrl->eac_LastKey;
 		if (exallstate) {
 			if (exallstate != (APTR)-1) {
-				FreeFbxDirDataList(fs, &exallstate->freelist);
+				FreeFbxDirDataList(fs, fs->mempool, &exallstate->freelist);
 				FreeFbxExAllState(fs, exallstate);
 			}
 			ctrl->eac_LastKey = (IPTR)NULL;
 		}
 	}
 
-	if (lock != NULL) FreeFbxDirDataList(fs, &lock->dirdatalist);
+	if (lock != NULL) FreeFbxDirDataList(fs, fs->mempool, &lock->dirdatalist);
 
 	fs->r2 = 0;
 	return DOSTRUE;
