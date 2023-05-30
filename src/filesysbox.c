@@ -225,7 +225,7 @@ struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mode) {
 		return NULL;
 	}
 
-	lock = AllocFbxLock(fs);
+	lock = AllocFbxLock();
 	if (lock == NULL) {
 		fs->r2 = ERROR_NO_FREE_STORE;
 		return NULL;
@@ -279,7 +279,7 @@ void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock) {
 		FreeFbxVolume(lock->fsvol);
 	}
 
-	FreeFbxLock(fs, lock);
+	FreeFbxLock(lock);
 }
 
 void FbxAddEntry(struct FbxFS *fs, struct FbxEntry *e) {

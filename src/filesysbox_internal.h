@@ -515,8 +515,8 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 #define AllocFbxEntry(fs) AllocStructurePooled(fs, FbxEntry)
 #define FreeFbxEntry(fs, e) FreeStructurePooled(fs, e, FbxEntry)
 
-#define AllocFbxLock(fs) AllocStructurePooled(fs, FbxLock)
-#define FreeFbxLock(fs, lock) FreeStructurePooled(fs, lock, FbxLock)
+#define AllocFbxLock() AllocStructureNoClear(FbxLock)
+#define FreeFbxLock(lock) FreeStructure(lock, FbxLock)
 
 #define AllocFbxNotifyNode() AllocStructure(FbxNotifyNode)
 #define FreeFbxNotifyNode(nn) FreeStructure(nn, FbxNotifyNode)
