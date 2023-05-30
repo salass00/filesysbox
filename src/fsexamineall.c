@@ -42,19 +42,28 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 	ctrl->eac_Entries = 0;
 
 	if (ctrl->eac_LastKey == (IPTR)NULL) {
-		exallstate = AllocFbxExAllState(fs);
+		exallstate = AllocFbxExAllState(lock);
 		if (exallstate == NULL) {
 			fs->r2 = ERROR_NO_FREE_STORE;
 			return DOSFALSE;
 		}
 
-		FreeFbxDirDataList(fs->mempool, &lock->dirdatalist);
+		FreeFbxDirDataList(lock->mempool, &lock->dirdatalist);
 		NEWMINLIST(&exallstate->freelist);
+
+		if (lock->mempool == NULL) {
+			lock->mempool = CreatePool(MEMF_PUBLIC, 4096, 1024);
+			if (lock->mempool == NULL) {
+				FreeFbxExAllState(lock, exallstate);
+				fs->r2 = ERROR_NO_FREE_STORE;
+				return DOSFALSE;
+			}
+		}
 
 		// read in entries
 		if (!FbxReadDir(fs, lock)) {
-			FreeFbxDirDataList(fs->mempool, &lock->dirdatalist);
-			FreeFbxExAllState(fs, exallstate);
+			FreeFbxDirDataList(lock->mempool, &lock->dirdatalist);
+			FreeFbxExAllState(lock, exallstate);
 			return DOSFALSE;
 		}
 
@@ -81,8 +90,8 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 			eadsize = offset_after(struct ExAllData, ed_OwnerGID);
 			break;
 		default:
-			FreeFbxDirDataList(fs->mempool, &lock->dirdatalist);
-			FreeFbxExAllState(fs, exallstate);
+			FreeFbxDirDataList(lock->mempool, &lock->dirdatalist);
+			FreeFbxExAllState(lock, exallstate);
 			fs->r2 = ERROR_BAD_NUMBER; // unsupported ED_XXX
 			return DOSFALSE;
 		}
@@ -95,7 +104,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 	} else {
 		exallstate = (struct FbxExAllState *)ctrl->eac_LastKey;
 		// free previous exdata
-		FreeFbxDirDataList(fs->mempool, &exallstate->freelist);
+		FreeFbxDirDataList(lock->mempool, &exallstate->freelist);
 	}
 
 	curread = (struct ExAllData *)buffer;
@@ -116,13 +125,13 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 			if ((namelen = FbxUTF8ToLocal(fs, adname, ed->fsname, FBX_MAX_NAME))
 				>= FBX_MAX_NAME)
 			{
-				FreeFbxDirData(fs->mempool, ed);
+				FreeFbxDirData(lock->mempool, ed);
 				fs->r2 = ERROR_LINE_TOO_LONG;
 				return DOSFALSE;
 			}
-			ed->name = AllocVecPooled(fs->mempool, namelen + 1);
+			ed->name = AllocVecPooled(lock->mempool, namelen + 1);
 			if (ed->name == NULL) {
-				FreeFbxDirData(fs->mempool, ed);
+				FreeFbxDirData(lock->mempool, ed);
 				fs->r2 = ERROR_NO_FREE_STORE;
 				return DOSFALSE;
 			}
@@ -137,13 +146,13 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 			ctrl->eac_MatchFunc == NULL &&
 			!MatchPatternNoCase(ctrl->eac_MatchString, (STRPTR)pname))
 		{
-			FreeFbxDirData(fs->mempool, ed);
+			FreeFbxDirData(lock->mempool, ed);
 			continue;
 		}
 
 		if (type >= ED_TYPE) {
 			if (!FbxLockName2Path(fs, lock, ed->fsname, fullpath)) {
-				FreeFbxDirData(fs->mempool, ed);
+				FreeFbxDirData(lock->mempool, ed);
 				fs->r2 = ERROR_INVALID_COMPONENT_NAME;
 				return DOSFALSE;
 			}
@@ -153,7 +162,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 			} else {
 				error = Fbx_getattr(fs, fullpath, &statbuf);
 				if (error) {
-					FreeFbxDirData(fs->mempool, ed);
+					FreeFbxDirData(lock->mempool, ed);
 					fs->r2 = FbxFuseErrno2Error(error);
 					return DOSFALSE;
 				}
@@ -175,7 +184,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 					if ((srclen = FbxUTF8ToLocal(fs, adcomment, comment, FBX_MAX_COMMENT))
 						>= FBX_MAX_COMMENT)
 					{
-						FreeFbxDirData(fs->mempool, ed);
+						FreeFbxDirData(lock->mempool, ed);
 						fs->r2 = ERROR_LINE_TOO_LONG;
 						return DOSFALSE;
 					}
@@ -188,9 +197,9 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 				src = comment;
 				srclen = strlen(comment);
 #endif
-				ed->comment = AllocVecPooled(fs->mempool, srclen + 1);
+				ed->comment = AllocVecPooled(lock->mempool, srclen + 1);
 				if (ed->comment == NULL) {
-					FreeFbxDirData(fs->mempool, ed);
+					FreeFbxDirData(lock->mempool, ed);
 					fs->r2 = ERROR_NO_FREE_STORE;
 					return DOSFALSE;
 				}
@@ -234,7 +243,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 		if (ctrl->eac_MatchFunc != NULL &&
 			!CallHookPkt(ctrl->eac_MatchFunc, &type, curread))
 		{
-			FreeFbxDirData(fs->mempool, ed);
+			FreeFbxDirData(lock->mempool, ed);
 			continue;
 		}
 
@@ -249,8 +258,8 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 
 	if (IsMinListEmpty(&lock->dirdatalist)) {
 		if (ctrl->eac_Entries == 0) {
-			FreeFbxDirDataList(fs->mempool, &lock->dirdatalist);
-			FreeFbxExAllState(fs, exallstate);
+			FreeFbxDirDataList(lock->mempool, &lock->dirdatalist);
+			FreeFbxExAllState(lock, exallstate);
 			ctrl->eac_LastKey = (IPTR)-1;
 		}
 		fs->r2 = ERROR_NO_MORE_ENTRIES;

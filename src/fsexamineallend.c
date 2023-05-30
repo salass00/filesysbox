@@ -31,12 +31,9 @@ void FreeFbxDirDataList(APTR pool, struct MinList *list) {
 
 	DEBUGF("FreeFbxDirDataList(%#p)\n", list);
 
-	chain = list->mlh_Head;
-	while ((succ = chain->mln_Succ) != NULL) {
+	for (chain = list->mlh_Head; (succ = chain->mln_Succ) != NULL; chain = succ) {
 		FreeFbxDirData(pool, FSDIRDATAFROMNODE(chain));
-		chain = succ;
 	}
-
 	NEWMINLIST(list);
 }
 
@@ -52,14 +49,14 @@ int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR 
 		exallstate = (struct FbxExAllState *)ctrl->eac_LastKey;
 		if (exallstate) {
 			if (exallstate != (APTR)-1) {
-				FreeFbxDirDataList(fs->mempool, &exallstate->freelist);
-				FreeFbxExAllState(fs, exallstate);
+				FreeFbxDirDataList(lock->mempool, &exallstate->freelist);
+				FreeFbxExAllState(lock, exallstate);
 			}
 			ctrl->eac_LastKey = (IPTR)NULL;
 		}
 	}
 
-	if (lock != NULL) FreeFbxDirDataList(fs->mempool, &lock->dirdatalist);
+	if (lock != NULL) FreeFbxDirDataList(lock->mempool, &lock->dirdatalist);
 
 	fs->r2 = 0;
 	return DOSTRUE;

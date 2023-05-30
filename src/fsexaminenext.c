@@ -46,7 +46,7 @@ static STDARGS int dir_fill_func(void *udata, const char *name, const struct fbx
 	if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0) {
 		if (FbxCheckString(fs, name)) {
 			len = strlen(name) + 1;
-			ed = AllocFbxDirData(fs->mempool, len);
+			ed = AllocFbxDirData(lock->mempool, len);
 			if (ed == NULL) return 1;
 
 			ed->fsname = (char *)(ed + 1);
@@ -133,8 +133,16 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 	}
 
 	if (!lock->dirscan) {
+		if (lock->mempool == NULL) {
+			lock->mempool = CreatePool(MEMF_PUBLIC, 4096, 1024);
+			if (lock->mempool == NULL) {
+				fs->r2 = ERROR_NO_FREE_STORE;
+				return DOSFALSE;
+			}
+		}
+
 		if (!FbxReadDir(fs, lock)) {
-			FreeFbxDirDataList(fs->mempool, &lock->dirdatalist);
+			FreeFbxDirDataList(lock->mempool, &lock->dirdatalist);
 			return DOSFALSE;
 		}
 		lock->dirscan = TRUE;
@@ -153,9 +161,9 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 
 	if (fs->fsflags & FBXF_USE_FILL_DIR_STAT) {
 		statbuf = ed->stat;
-		FreeFbxDirData(fs->mempool, ed);
+		FreeFbxDirData(lock->mempool, ed);
 	} else {
-		FreeFbxDirData(fs->mempool, ed);
+		FreeFbxDirData(lock->mempool, ed);
 		error = Fbx_getattr(fs, fullpath, &statbuf);
 		if (error) {
 			fs->r2 = FbxFuseErrno2Error(error);

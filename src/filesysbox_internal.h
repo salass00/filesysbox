@@ -465,6 +465,7 @@ struct FbxLock {
 	struct FbxVolume      *fsvol;
 	struct FbxFS          *fs;
 	struct FileHandle     *fh;
+	APTR                   mempool;
 	struct MinList         dirdatalist;
 	LONG                   dirscan;
 	QUAD                   filepos;
@@ -530,8 +531,8 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 #define AllocFbxVolume() AllocStructure(FbxVolume)
 #define FreeFbxVolume(vol) FreeStructure(vol, FbxVolume)
 
-#define AllocFbxExAllState(fs) AllocStructurePooled((fs)->mempool, FbxExAllState)
-#define FreeFbxExAllState(fs,eas) FreeStructurePooled((fs)->mempool, eas, FbxExAllState)
+#define AllocFbxExAllState(lock) AllocStructurePooled((lock)->mempool, FbxExAllState)
+#define FreeFbxExAllState(lock,eas) FreeStructurePooled((lock)->mempool, eas, FbxExAllState)
 
 #define AllocFbxDirData(pool,len) (struct FbxDirData *)AllocVecPooled((pool), sizeof(struct FbxDirData) + (len))
 
