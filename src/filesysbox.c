@@ -267,7 +267,7 @@ void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock) {
 	Remove((struct Node *)&lock->entrychain);
 	Remove((struct Node *)&lock->volumechain);
 
-	FreeFbxDirDataList(fs, fs->mempool, &lock->dirdatalist);
+	FreeFbxDirDataList(fs->mempool, &lock->dirdatalist);
 
 	lock->fs = NULL; // invalidate lock
 	lock->info = NULL;

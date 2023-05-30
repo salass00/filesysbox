@@ -533,7 +533,7 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 #define AllocFbxExAllState(fs) AllocStructurePooled((fs)->mempool, FbxExAllState)
 #define FreeFbxExAllState(fs,eas) FreeStructurePooled((fs)->mempool, eas, FbxExAllState)
 
-#define AllocFbxDirData(fs,pool,len) (struct FbxDirData *)AllocVecPooled((pool), sizeof(struct FbxDirData) + (len))
+#define AllocFbxDirData(pool,len) (struct FbxDirData *)AllocVecPooled((pool), sizeof(struct FbxDirData) + (len))
 
 #define AllocFuseFileInfo(fs) AllocStructurePooled((fs)->mempool, fuse_file_info)
 #define FreeFuseFileInfo(fs,ffi) FreeStructurePooled((fs)->mempool, ffi, fuse_file_info)
@@ -647,8 +647,8 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len
 	int type, struct ExAllControl *ctrl);
 
 /* fsexamineallend.c */
-void FreeFbxDirData(struct FbxFS *fs, APTR pool, struct FbxDirData *dd);
-void FreeFbxDirDataList(struct FbxFS *fs, APTR pool, struct MinList *list);
+void FreeFbxDirData(APTR pool, struct FbxDirData *dd);
+void FreeFbxDirDataList(APTR pool, struct MinList *list);
 int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR len,
 	int type, struct ExAllControl *ctrl);
 
