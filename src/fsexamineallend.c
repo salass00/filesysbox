@@ -12,10 +12,12 @@
 
 extern struct Library *SysBase;
 
-void FreeFbxDirData(APTR pool, struct FbxDirData *dd) {
+void FreeFbxDirData(struct FbxLock *lock, struct FbxDirData *dd) {
 	DEBUGF("FreeFbxDirData(%#p)\n", dd);
 
 	if (dd != NULL) {
+		APTR pool = lock->mempool;
+
 		if (dd->name != NULL)
 			FreeVecPooled(pool, dd->name);
 
@@ -26,13 +28,13 @@ void FreeFbxDirData(APTR pool, struct FbxDirData *dd) {
 	}
 }
 
-void FreeFbxDirDataList(APTR pool, struct MinList *list) {
+void FreeFbxDirDataList(struct FbxLock *lock, struct MinList *list) {
 	struct MinNode *chain, *succ;
 
 	DEBUGF("FreeFbxDirDataList(%#p)\n", list);
 
 	for (chain = list->mlh_Head; (succ = chain->mln_Succ) != NULL; chain = succ) {
-		FreeFbxDirData(pool, FSDIRDATAFROMNODE(chain));
+		FreeFbxDirData(lock, FSDIRDATAFROMNODE(chain));
 	}
 	NEWMINLIST(list);
 }
@@ -49,14 +51,14 @@ int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR 
 		exallstate = (struct FbxExAllState *)ctrl->eac_LastKey;
 		if (exallstate) {
 			if (exallstate != (APTR)-1) {
-				FreeFbxDirDataList(lock->mempool, &exallstate->freelist);
+				FreeFbxDirDataList(lock, &exallstate->freelist);
 				FreeFbxExAllState(lock, exallstate);
 			}
 			ctrl->eac_LastKey = (IPTR)NULL;
 		}
 	}
 
-	if (lock != NULL) FreeFbxDirDataList(lock->mempool, &lock->dirdatalist);
+	if (lock != NULL) FreeFbxDirDataList(lock, &lock->dirdatalist);
 
 	fs->r2 = 0;
 	return DOSTRUE;

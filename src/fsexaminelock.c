@@ -139,7 +139,7 @@ int FbxExamineLock(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 		return DOSFALSE;
 	}
 
-	FreeFbxDirDataList(lock->mempool, &lock->dirdatalist);
+	FreeFbxDirDataList(lock, &lock->dirdatalist);
 
 	if (!lock->info) {
 		error = Fbx_getattr(fs, lock->entry->path, &statbuf);
