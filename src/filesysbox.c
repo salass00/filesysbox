@@ -514,7 +514,9 @@ void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass) {
 	inputio = CreateIORequest(inputmp, sizeof(struct IOStdReq));
 	if (inputio != NULL) {
 		if (OpenDevice((CONST_STRPTR)"input.device", 0, (struct IORequest *)inputio, 0) == 0) {
-			FbxGetUpTime(fs, &tv);
+			struct Device *TimerBase = fs->timerbase;
+
+			GetSysTime(&tv);
 
 			ie.ie_NextEvent = 0;
 			ie.ie_Class = ieclass;
