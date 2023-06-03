@@ -109,13 +109,13 @@ static void FbxGetCharsetMapTable(struct FbxFS *fs);
 
 #ifdef __AROS__
 #define FbxReturnMountMsg(msg, r1, r2) \
-	AROS_LC3(void, FbxReturnMountMsg, \
+	AROS_LC3NR(void, FbxReturnMountMsg, \
 		AROS_LCA(struct Message *, (msg), A0), \
 		AROS_LCA(LONG, (r1), D0), \
 		AROS_LCA(LONG, (r2), D1), \
 		struct FileSysBoxBase *, libBase, 9, FileSysBox)
 #define FbxCleanupFS(fs) \
-	AROS_LC1(void, FbxCleanupFS, \
+	AROS_LC1NR(void, FbxCleanupFS, \
 		AROS_LCA(struct FbxFS *, (fs), A0), \
 		struct FileSysBoxBase *, libBase, 8, FileSysBox)
 #else
