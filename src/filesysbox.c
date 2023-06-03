@@ -518,13 +518,16 @@ void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass) {
 
 			GetSysTime(&tv);
 
-			ie.ie_NextEvent = 0;
-			ie.ie_Class = ieclass;
-			ie.ie_SubClass = 0;
-			ie.ie_Code = 0;
-			ie.ie_Qualifier = IEQUALIFIER_MULTIBROADCAST;
+			ie.ie_NextEvent    = 0;
+			ie.ie_Class        = ieclass;
+			ie.ie_SubClass     = 0;
+			ie.ie_Code         = 0;
+			ie.ie_Qualifier    = IEQUALIFIER_MULTIBROADCAST;
 			ie.ie_EventAddress = 0;
-			ie.ie_TimeStamp = tv;
+
+			//ie.ie_TimeStamp = tv;
+			ie.ie_TimeStamp.tv_secs  = tv.tv_secs;
+			ie.ie_TimeStamp.tv_micro = tv.tv_micro;
 
 			inputio->io_Command = IND_WRITEEVENT;
 			inputio->io_Length  = sizeof(struct InputEvent);
