@@ -1,4 +1,4 @@
-/* Automatically generated header (sfdc 1.11e)! Do not edit! */
+/* Automatically generated header (sfdc 1.12)! Do not edit! */
 
 #ifndef _INLINE_FILESYSBOX_H
 #define _INLINE_FILESYSBOX_H
@@ -41,12 +41,12 @@ typedef ULONG _sfdc_vararg;
      struct Library *, FILESYSBOX_BASE_NAME, 7, Filesysbox)
 
 #define FbxCleanupFS(___fs) \
-      AROS_LC1(void, FbxCleanupFS, \
+      AROS_LC1NR(void, FbxCleanupFS, \
  AROS_LCA(struct FbxFS *, (___fs), A0), \
      struct Library *, FILESYSBOX_BASE_NAME, 8, Filesysbox)
 
 #define FbxReturnMountMsg(___msg, ___r1, ___r2) \
-      AROS_LC3(void, FbxReturnMountMsg, \
+      AROS_LC3NR(void, FbxReturnMountMsg, \
  AROS_LCA(struct Message *, (___msg), A0), \
  AROS_LCA(SIPTR, (___r1), D0), \
  AROS_LCA(SIPTR, (___r2), D1), \
@@ -61,7 +61,7 @@ typedef ULONG _sfdc_vararg;
      struct Library *, FILESYSBOX_BASE_NAME, 11, Filesysbox)
 
 #define FbxSetSignalCallback(___fs, ___func, ___signals) \
-      AROS_LC3(void, FbxSetSignalCallback, \
+      AROS_LC3NR(void, FbxSetSignalCallback, \
  AROS_LCA(struct FbxFS *, (___fs), A0), \
  AROS_LCA(FbxSignalCallbackFunc, (___func), A1), \
  AROS_LCA(ULONG, (___signals), D0), \
@@ -75,32 +75,32 @@ typedef ULONG _sfdc_vararg;
      struct Library *, FILESYSBOX_BASE_NAME, 13, Filesysbox)
 
 #define FbxUninstallTimerCallback(___fs, ___cb) \
-      AROS_LC2(void, FbxUninstallTimerCallback, \
+      AROS_LC2NR(void, FbxUninstallTimerCallback, \
  AROS_LCA(struct FbxFS *, (___fs), A0), \
  AROS_LCA(struct FbxTimerCallbackData *, (___cb), A1), \
      struct Library *, FILESYSBOX_BASE_NAME, 14, Filesysbox)
 
 #define FbxSignalDiskChange(___fs) \
-      AROS_LC1(void, FbxSignalDiskChange, \
+      AROS_LC1NR(void, FbxSignalDiskChange, \
  AROS_LCA(struct FbxFS *, (___fs), A0), \
      struct Library *, FILESYSBOX_BASE_NAME, 15, Filesysbox)
 
 #define FbxCopyStringBSTRToC(___src, ___dst, ___size) \
-      AROS_LC3(void, FbxCopyStringBSTRToC, \
+      AROS_LC3NR(void, FbxCopyStringBSTRToC, \
  AROS_LCA(BSTR, (___src), A0), \
  AROS_LCA(STRPTR, (___dst), A1), \
  AROS_LCA(ULONG, (___size), D0), \
      struct Library *, FILESYSBOX_BASE_NAME, 16, Filesysbox)
 
 #define FbxCopyStringCToBSTR(___src, ___dst, ___size) \
-      AROS_LC3(void, FbxCopyStringCToBSTR, \
+      AROS_LC3NR(void, FbxCopyStringCToBSTR, \
  AROS_LCA(CONST_STRPTR, (___src), A0), \
  AROS_LCA(BSTR, (___dst), A1), \
  AROS_LCA(ULONG, (___size), D0), \
      struct Library *, FILESYSBOX_BASE_NAME, 17, Filesysbox)
 
 #define FbxQueryFS(___fs, ___tags) \
-      AROS_LC2(void, FbxQueryFS, \
+      AROS_LC2NR(void, FbxQueryFS, \
  AROS_LCA(struct FbxFS *, (___fs), A0), \
  AROS_LCA(const struct TagItem *, (___tags), A1), \
      struct Library *, FILESYSBOX_BASE_NAME, 18, Filesysbox)
@@ -111,7 +111,7 @@ typedef ULONG _sfdc_vararg;
 #endif /* !NO_INLINE_STDARG */
 
 #define FbxGetSysTime(___fs, ___tv) \
-      AROS_LC2(void, FbxGetSysTime, \
+      AROS_LC2NR(void, FbxGetSysTime, \
  AROS_LCA(struct FbxFS *, (___fs), A0), \
  AROS_LCA(struct timeval *, (___tv), A1), \
      struct Library *, FILESYSBOX_BASE_NAME, 19, Filesysbox)
