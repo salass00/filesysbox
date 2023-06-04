@@ -13,8 +13,6 @@
 extern struct Library *SysBase;
 
 void FreeFbxDirData(struct FbxLock *lock, struct FbxDirData *dd) {
-	DEBUGF("FreeFbxDirData(%#p)\n", dd);
-
 	if (dd != NULL) {
 		APTR pool = lock->mempool;
 
@@ -31,11 +29,10 @@ void FreeFbxDirData(struct FbxLock *lock, struct FbxDirData *dd) {
 void FreeFbxDirDataList(struct FbxLock *lock, struct MinList *list) {
 	struct MinNode *chain, *succ;
 
-	DEBUGF("FreeFbxDirDataList(%#p)\n", list);
-
 	for (chain = list->mlh_Head; (succ = chain->mln_Succ) != NULL; chain = succ) {
 		FreeFbxDirData(lock, FSDIRDATAFROMNODE(chain));
 	}
+
 	NEWMINLIST(list);
 }
 
