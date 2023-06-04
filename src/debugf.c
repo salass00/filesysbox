@@ -9,13 +9,20 @@
 #include "filesysbox_internal.h"
 #include <clib/debug_protos.h>
 
+int debug_putc_cb(char ch, void *udata) {
+#ifdef __AROS__
+	char tmp[4];
+	tmp[0] = ch;
+	tmp[1] = '\0';
+	KPutStr((CONST_STRPTR)tmp);
+#else
+	KPutChar((unsigned char)ch);
+#endif
+	return 0;
+}
+
 int vdebugf(const char *fmt, va_list args) {
-	char buffer[256];
-
-	int retval = vsnprintf(buffer, sizeof(buffer), fmt, args);
-	KPutStr((CONST_STRPTR)buffer);
-
-	return retval;
+	return FbxDoFmt(debug_putc_cb, NULL, fmt, args);
 }
 
 int debugf(const char *fmt, ...) {

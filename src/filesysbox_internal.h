@@ -115,12 +115,9 @@ struct FileSysBoxBase {
 
 #else
 
-#ifndef __AROS__
-int fbx_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg);
-int fbx_snprintf(char *buffer, size_t size, const char *fmt, ...);
-#define vsnprintf(buffer,size,fmt,args) fbx_vsnprintf(buffer, size, fmt, args)
-#define snprintf(buffer,size,fmt,args...) fbx_snprintf(buffer, size, fmt, ## args)
-#endif
+typedef int (*fbx_putc_cb)(char ch, void *udata);
+
+int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg);
 
 int debugf(const char *fmt, ...);
 int vdebugf(const char *fmt, va_list args);

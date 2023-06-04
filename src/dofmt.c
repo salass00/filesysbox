@@ -5,29 +5,11 @@
  * See the file LICENSE.APL
  */
 
+#ifndef NODEBUG
 #include "filesysbox_internal.h"
 #include <exec/types.h>
 #include <string.h>
 #include <stdarg.h>
-
-#if !defined(__AROS__) && !defined(NODEBUG)
-struct putchdata {
-	char *buffer;
-	size_t size;
-	size_t count;
-};
-
-static void putchproc(char ch, struct putchdata *putchdata) {
-	if (putchdata->size != 0) {
-		if (--putchdata->size != 0)
-			*putchdata->buffer++ = ch;
-		else
-			*putchdata->buffer++ = '\0';
-	}
-
-	if (ch != '\0')
-		putchdata->count++;
-}
 
 static void reverse(char *str, size_t len) {
 	char *start = str;
@@ -110,17 +92,21 @@ static size_t lltoa(unsigned long long num, char *dst, unsigned base,
 	return len;
 }
 
-int fbx_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg) {
-	struct putchdata putchdata;
-	char ch;
+#define PUTC(ch) \
+	do { \
+		if (cb((ch), cb_data) == 0) \
+			count++; \
+		else \
+			return -1; \
+	} while (0)
 
-	putchdata.buffer = buffer;
-	putchdata.size   = size;
-	putchdata.count  = 0;
+int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
+	char ch;
+	int count = 0;
 
 	while ((ch = *fmt++) != '\0') {
 		if (ch != '%') {
-			putchproc(ch, &putchdata);
+			PUTC(ch);
 		} else {
 			char left = FALSE;
 			char addplus = FALSE;
@@ -134,7 +120,8 @@ int fbx_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg) {
 			const char *src;
 			size_t len;
 
-			if ((ch = *fmt++) == '\0') return putchdata.count;
+			if ((ch = *fmt++) == '\0')
+				return count;
 
 			while (TRUE) {
 				if (ch == '-')
@@ -147,34 +134,40 @@ int fbx_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg) {
 					lead = '0';
 				else
 					break;
-				if ((ch = *fmt++) == '\0') return putchdata.count;
+				if ((ch = *fmt++) == '\0')
+					return count;
 			}
 
 			while (ch >= '0' && ch <= '9') {
 				width = 10 * width + (ch - '0');
-				if ((ch = *fmt++) == '\0') return putchdata.count;
+				if ((ch = *fmt++) == '\0')
+					return count;
 			}
 
 			if (ch == '.') {
-				if ((ch = *fmt++) == '\0') return putchdata.count;
+				if ((ch = *fmt++) == '\0')
+					return count;
 
 				while (ch >= '0' && ch <= '9') {
 					limit = 10 * limit + (ch - '0');
-					if ((ch = *fmt++) == '\0') return putchdata.count;
+					if ((ch = *fmt++) == '\0')
+						return count;
 				}
 			}
 
 			if (ch == 'l' || ch == 'h') {
-				if ((ch = *fmt++) == '\0') return putchdata.count;
+				if ((ch = *fmt++) == '\0')
+					return count;
 				if (ch == 'l') {
 					longlong = TRUE;
-					if ((ch = *fmt++) == '\0') return putchdata.count;
+					if ((ch = *fmt++) == '\0')
+						return count;
 				}
 			}
 
 			switch (ch) {
 			case '%':
-				putchproc('%', &putchdata);
+				PUTC('%');
 				break;
 			case 'D':
 			case 'd':
@@ -194,14 +187,14 @@ int fbx_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg) {
 
 				if (!left)
 					while (width--)
-						putchproc(lead, &putchdata);
+						PUTC(lead);
 
 				while (len--)
-					putchproc(*src++, &putchdata);
+					PUTC(*src++);
 
 				if (left)
 					while (width--)
-						putchproc(' ', &putchdata);
+						PUTC(' ');
 				break;
 			case 'U':
 			case 'u':
@@ -219,14 +212,14 @@ int fbx_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg) {
 
 				if (!left)
 					while (width--)
-						putchproc(lead, &putchdata);
+						PUTC(lead);
 
 				while (len--)
-					putchproc(*src++, &putchdata);
+					PUTC(*src++);
 
 				if (left)
 					while (width--)
-						putchproc(' ', &putchdata);
+						PUTC(' ');
 				break;
 			case 'X':
 			case 'x':
@@ -244,14 +237,14 @@ int fbx_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg) {
 
 				if (!left)
 					while (width--)
-						putchproc(lead, &putchdata);
+						PUTC(lead);
 
 				while (len--)
-					putchproc(*src++, &putchdata);
+					PUTC(*src++);
 
 				if (left)
 					while (width--)
-						putchproc(' ', &putchdata);
+						PUTC(' ');
 				break;
 			case 'P':
 			case 'p':
@@ -270,15 +263,15 @@ int fbx_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg) {
 					width = 0;
 
 				if (alternate && tmp[0] != '0') {
-					putchproc('0', &putchdata);
-					putchproc('x', &putchdata);
+					PUTC('0');
+					PUTC('x');
 				}
 
 				while (width--)
-					putchproc(lead, &putchdata);
+					PUTC(lead);
 
 				while (len--)
-					putchproc(*src++, &putchdata);
+					PUTC(*src++);
 				break;
 			case 'S':
 			case 's':
@@ -298,31 +291,20 @@ int fbx_vsnprintf(char *buffer, size_t size, const char *fmt, va_list arg) {
 
 				if (!left)
 					while (width--)
-						putchproc(' ', &putchdata);
+						PUTC(' ');
 
 				while (len--)
-					putchproc(*src++, &putchdata);
+					PUTC(*src++);
 
 				if (left)
 					while (width--)
-						putchproc(' ', &putchdata);
+						PUTC(' ');
 				break;
 			}
 		}
 	}
 
-	/* Make sure that output is NUL terminated */
-	putchproc('\0', &putchdata);
-
-	return putchdata.count;
+	return count;
 }
-
-int fbx_snprintf(char *buffer, size_t size, const char *fmt, ...) {
-	va_list ap;
-	va_start(ap, fmt);
-	int retval = fbx_vsnprintf(buffer, size, fmt, ap);
-	va_end(ap);
-	return retval;
-}
-#endif
+#endif /* !NODEBUG */
 

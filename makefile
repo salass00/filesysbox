@@ -46,8 +46,7 @@ SRCS = $(addprefix src/, \
        fsremovenotify.c fsrename.c fssamelock.c fsseek.c fssetcomment.c \
        fssetdate.c fssetfilesize.c fssetownerinfo.c fssetprotection.c \
        fsunlock.c fswrite.c fswriteprotect.c volume.c xattrs.c utf8.c ucs4.c \
-       strlcpy.c debugf.c kputstr.c snprintf.c allocvecpooled.c codesets.c \
-       avl.c)
+       strlcpy.c debugf.c dofmt.c allocvecpooled.c codesets.c avl.c)
 
 OBJS = $(subst src/,obj/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
 DEPS = $(OBJS:.o=.d)
