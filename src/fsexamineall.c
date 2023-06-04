@@ -42,6 +42,14 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 	ctrl->eac_Entries = 0;
 
 	if (ctrl->eac_LastKey == (IPTR)NULL) {
+		if (lock->mempool == NULL) {
+			lock->mempool = CreatePool(MEMF_PUBLIC, 4096, 1024);
+			if (lock->mempool == NULL) {
+				fs->r2 = ERROR_NO_FREE_STORE;
+				return DOSFALSE;
+			}
+		}
+
 		exallstate = AllocFbxExAllState(lock);
 		if (exallstate == NULL) {
 			fs->r2 = ERROR_NO_FREE_STORE;
@@ -50,15 +58,6 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 
 		FreeFbxDirDataList(lock, &lock->dirdatalist);
 		NEWMINLIST(&exallstate->freelist);
-
-		if (lock->mempool == NULL) {
-			lock->mempool = CreatePool(MEMF_PUBLIC, 4096, 1024);
-			if (lock->mempool == NULL) {
-				FreeFbxExAllState(lock, exallstate);
-				fs->r2 = ERROR_NO_FREE_STORE;
-				return DOSFALSE;
-			}
-		}
 
 		// read in entries
 		if (!FbxReadDir(fs, lock)) {
@@ -129,7 +128,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 				fs->r2 = ERROR_LINE_TOO_LONG;
 				return DOSFALSE;
 			}
-			ed->name = AllocVecPooled(lock, namelen + 1);
+			ed->name = AllocVecPooled(lock->mempool, namelen + 1);
 			if (ed->name == NULL) {
 				FreeFbxDirData(lock, ed);
 				fs->r2 = ERROR_NO_FREE_STORE;
@@ -197,7 +196,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 				src = comment;
 				srclen = strlen(comment);
 #endif
-				ed->comment = AllocVecPooled(lock, srclen + 1);
+				ed->comment = AllocVecPooled(lock->mempool, srclen + 1);
 				if (ed->comment == NULL) {
 					FreeFbxDirData(lock, ed);
 					fs->r2 = ERROR_NO_FREE_STORE;
