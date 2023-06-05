@@ -13,6 +13,9 @@ WARNINGS = -Werror -Wall -Wwrite-strings -Wno-attributes
 
 ifneq (1,$(DEBUG))
 	DEFINES += -DNODEBUG
+	ODIR =
+else
+	ODIR = debug/
 endif
 
 DEFINES += -DENABLE_CHARSET_CONVERSION
@@ -48,7 +51,7 @@ SRCS = $(addprefix src/, \
        fsunlock.c fswrite.c fswriteprotect.c volume.c xattrs.c utf8.c ucs4.c \
        strlcpy.c debugf.c dofmt.c allocvecpooled.c codesets.c avl.c)
 
-OBJS = $(subst src/,obj/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+OBJS = $(subst src/,$(ODIR)obj/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
 DEPS = $(OBJS:.o=.d)
 
 ifeq ($(HOST),m68k-amigaos)
@@ -60,26 +63,26 @@ endif
 
 .PHONY: all
 ifeq ($(HOST),m68k-amigaos)
-all: $(TARGET).000 $(TARGET).020
+all: $(ODIR)$(TARGET).000 $(ODIR)$(TARGET).020
 else
-all: $(TARGET) $(TARGET).debug
+all: $(ODIR)$(TARGET) $(ODIR)$(TARGET).debug
 endif
 
 -include $(DEPS)
 
-obj/%.o: src/%.c
+$(ODIR)obj/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(CFLAGS) $<
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-$(TARGET).debug: $(OBJS)
+$(ODIR)$(TARGET).debug: $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 ifneq (,$(findstring -aros,$(HOST)))
-$(TARGET): $(OBJS)
+$(ODIR)$(TARGET): $(OBJS)
 	$(CC) -s $(LDFLAGS) -o $@ $^ $(LIBS)
 else
-$(TARGET): $(TARGET).debug
+$(ODIR)$(TARGET): $(TARGET).debug
 	$(STRIP) $(STRIPFLAGS) -o $@ $<
 endif
 
@@ -87,21 +90,21 @@ ifeq ($(HOST),m68k-amigaos)
 -include $(DEPS_000)
 -include $(DEPS_020)
 
-obj-000/%.o: src/%.c
+$(ODIR)obj-000/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(ARCH_000) $(CFLAGS) $<
 	$(CC) $(ARCH_000) $(CFLAGS) -c -o $@ $<
 
-obj-020/%.o: src/%.c
+$(ODIR)obj-020/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(ARCH_020) $(CFLAGS) $<
 	$(CC) $(ARCH_020) $(CFLAGS) -c -o $@ $<
 
-$(TARGET).000: $(OBJS_000)
+$(ODIR)$(TARGET).000: $(OBJS_000)
 	$(CC) $(ARCH_000) $(LDFLAGS) -o $@.debug $^ $(LIBS)
 	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
 
-$(TARGET).020: $(OBJS_020)
+$(ODIR)$(TARGET).020: $(OBJS_020)
 	$(CC) $(ARCH_020) $(LDFLAGS) -o $@.debug $^ $(LIBS)
 	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
 endif
@@ -111,6 +114,7 @@ clean:
 	rm -rf $(TARGET) $(TARGET).debug obj
 	rm -rf $(TARGET).000 $(TARGET).000.debug obj-000
 	rm -rf $(TARGET).020 $(TARGET).020.debug obj-020
+	rm -rf debug
 
 .PHONY: revision
 revision:
