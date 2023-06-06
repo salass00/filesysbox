@@ -313,6 +313,16 @@ struct FbxFS *FbxSetupFS(
 	ReleaseSemaphore(&libBase->procsema);
 	if (libBase->dlproc == NULL) goto error;
 
+	// lockhandler process
+	ObtainSemaphore(&libBase->procsema);
+	if (libBase->lhproc == NULL) libBase->lhproc = StartLockHandlerProc(libBase);
+	if (libBase->lhproc != NULL) {
+		libBase->lhproc_refcount++;
+		fs->lhproc_port = &libBase->lhproc->pr_MsgPort;
+	}
+	ReleaseSemaphore(&libBase->procsema);
+	if (libBase->lhproc == NULL) goto error;
+
 	fs->fcntx.fuse = fs;
 	fs->fcntx.private_data = udata;
 

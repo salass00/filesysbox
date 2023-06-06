@@ -77,6 +77,14 @@ void FbxCleanupFS(
 			ReleaseSemaphore(&libBase->procsema);
 		}
 
+		// lockhandler process
+		if (fs->lhproc_port != NULL) {
+			ObtainSemaphore(&libBase->procsema);
+			if (--libBase->lhproc_refcount == 0)
+				Signal(&libBase->lhproc->pr_Task, SIGBREAKF_CTRL_C);
+			ReleaseSemaphore(&libBase->procsema);
+		}
+
 		while ((chain = (struct MinNode *)RemHead((struct List *)&fs->timercallbacklist)) != NULL) {
 			FreeFbxTimerCallbackData(fs, FSTIMERCALLBACKDATAFROMFSCHAIN(chain));
 		}

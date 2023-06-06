@@ -610,6 +610,9 @@ int FbxAsyncRemVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRemFreeVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRenameVolume(struct FbxFS *fs, struct FbxVolume *vol, const char *name);
 
+/* lockhandler.c */
+struct Process *StartLockHandlerProc(struct FileSysBoxBase *libBase);
+
 /* fsaddnotify.c */
 int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify);
 

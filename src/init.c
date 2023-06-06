@@ -163,7 +163,10 @@ BPTR LibExpunge(
 	struct Library *SysBase = libBase->sysbase;
 	BPTR result = ZERO;
 
-	if (libBase->libnode.lib_OpenCnt == 0 && libBase->dlproc == NULL) {
+	if (libBase->libnode.lib_OpenCnt == 0 &&
+		libBase->dlproc == NULL &&
+		libBase->lhproc == NULL)
+	{
 		result = libBase->seglist;
 
 		/* Undo what the init code did */
