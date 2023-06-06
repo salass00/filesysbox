@@ -612,6 +612,8 @@ int FbxAsyncRenameVolume(struct FbxFS *fs, struct FbxVolume *vol, const char *na
 
 /* lockhandler.c */
 struct Process *StartLockHandlerProc(struct FileSysBoxBase *libBase);
+void FbxCollectLock(struct FbxFS *fs, struct FbxLock *lock);
+void FbxCollectNotification(struct FbxFS *fs, struct FbxNotifyNode *nn);
 
 /* fsaddnotify.c */
 int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify);

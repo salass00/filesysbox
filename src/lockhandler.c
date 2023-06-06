@@ -71,10 +71,15 @@ static int FbxLockHandlerProc(void) {
 
 				case ACTION_COLLECT:
 				{
-					struct MinList *list;
+					int type;
+					APTR item;
+					struct MinList *list = NULL;
 					struct Node *node;
 
-					switch (pkt->dp_Arg1) {
+					type = pkt->dp_Arg1;
+					item = (APTR)pkt->dp_Arg2;
+
+					switch (type) {
 						case ID_COLLECT_LOCK:
 							list = &locklist;
 							break;
@@ -86,6 +91,12 @@ static int FbxLockHandlerProc(void) {
 							break;
 					}
 
+					if (list == NULL) {
+						r1 = DOSFALSE;
+						r2 = ERROR_BAD_NUMBER;
+						break;
+					}
+
 					node = AllocMem(sizeof(*node), MEMF_ANY);
 					if (node == NULL) {
 						r1 = DOSFALSE;
@@ -93,8 +104,8 @@ static int FbxLockHandlerProc(void) {
 						break;
 					}
 
-					node->ln_Type = pkt->dp_Arg1;
-					node->ln_Name = (APTR)pkt->dp_Arg2;
+					node->ln_Type = type;
+					node->ln_Name = item;
 					AddHead((struct List *)list, node);
 					break;
 				}
@@ -325,5 +336,39 @@ struct Process *StartLockHandlerProc(struct FileSysBoxBase *libBase) {
 #endif
 
 	return lhproc;
+}
+
+void FbxCollectLock(struct FbxFS *fs, struct FbxLock *lock) {
+	struct Library *DOSBase = fs->dosbase;
+	struct MsgPort *port = fs->lhproc_port;
+	struct FileHandle *fh;
+
+	lock->taskmp = port;
+	if ((fh = lock->fh) != NULL) {
+		fh->fh_Type = port;
+	}
+
+	DoPkt(port, ACTION_COLLECT, ID_COLLECT_LOCK, (SIPTR)lock, 0, 0, 0);
+}
+
+/* void FbxCollectFileHandle(struct FbxFS *fs, struct FileHandle *fh) {
+	struct Library *DOSBase = fs->dosbase;
+	struct MsgPort *port = fs->lhproc_port;
+
+	fh->fh_Type = port;
+
+	DoPkt(port, ACTION_COLLECT, ID_COLLECT_FILEHANDLE, (SIPTR)fh, 0, 0, 0);
+} */
+
+void FbxCollectNotification(struct FbxFS *fs, struct FbxNotifyNode *nn) {
+	struct Library *DOSBase = fs->dosbase;
+	struct MsgPort *port = fs->lhproc_port;
+	struct NotifyRequest *nr;
+
+	if ((nr = nn->nr) != NULL) {
+		nr->nr_Handler = port;
+	}
+
+	DoPkt(port, ACTION_COLLECT, ID_COLLECT_NOTIFICATION, (SIPTR)nn, 0, 0, 0);
 }
 
