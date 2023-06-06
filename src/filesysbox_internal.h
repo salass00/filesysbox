@@ -486,6 +486,7 @@ struct FbxNotifyNode {
 #define nr_notifynode nr_Reserved[0]
 
 #define FSNOTIFYNODEFROMCHAIN(chain_) container_of(chain_, struct FbxNotifyNode, chain)
+#define FSNOTIFYNODEFROMVOLUMECHAIN(chain_) container_of(chain_, struct FbxNotifyNode, volumechain)
 
 struct FbxDirData {
 	struct MinNode  node;
@@ -613,7 +614,7 @@ int FbxAsyncRenameVolume(struct FbxFS *fs, struct FbxVolume *vol, const char *na
 /* lockhandler.c */
 struct Process *StartLockHandlerProc(struct FileSysBoxBase *libBase);
 void FbxCollectLock(struct FbxFS *fs, struct FbxLock *lock);
-void FbxCollectNotification(struct FbxFS *fs, struct FbxNotifyNode *nn);
+void FbxCollectNotifyNode(struct FbxFS *fs, struct FbxNotifyNode *nn);
 
 /* fsaddnotify.c */
 int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify);

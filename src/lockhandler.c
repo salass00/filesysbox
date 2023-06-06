@@ -13,8 +13,8 @@
 
 enum {
 	ID_COLLECT_LOCK = 1,
-	/* ID_COLLECT_FILEHANDLE, */
-	ID_COLLECT_NOTIFICATION
+	/* ID_COLLECT_FH, */
+	ID_COLLECT_NOTIFYNODE
 };
 
 #ifdef __AROS__
@@ -83,10 +83,10 @@ static int FbxLockHandlerProc(void) {
 						case ID_COLLECT_LOCK:
 							list = &locklist;
 							break;
-						/* case ID_COLLECT_FILEHANDLE:
+						/* case ID_COLLECT_FH:
 							list = &fhlist;
 							break; */
-						case ID_COLLECT_NOTIFICATION:
+						case ID_COLLECT_NOTIFYNODE:
 							list = &notifylist;
 							break;
 					}
@@ -351,16 +351,16 @@ void FbxCollectLock(struct FbxFS *fs, struct FbxLock *lock) {
 	DoPkt(port, ACTION_COLLECT, ID_COLLECT_LOCK, (SIPTR)lock, 0, 0, 0);
 }
 
-/* void FbxCollectFileHandle(struct FbxFS *fs, struct FileHandle *fh) {
+/* void FbxCollectFH(struct FbxFS *fs, struct FileHandle *fh) {
 	struct Library *DOSBase = fs->dosbase;
 	struct MsgPort *port = fs->lhproc_port;
 
 	fh->fh_Type = port;
 
-	DoPkt(port, ACTION_COLLECT, ID_COLLECT_FILEHANDLE, (SIPTR)fh, 0, 0, 0);
+	DoPkt(port, ACTION_COLLECT, ID_COLLECT_FH, (SIPTR)fh, 0, 0, 0);
 } */
 
-void FbxCollectNotification(struct FbxFS *fs, struct FbxNotifyNode *nn) {
+void FbxCollectNotifyNode(struct FbxFS *fs, struct FbxNotifyNode *nn) {
 	struct Library *DOSBase = fs->dosbase;
 	struct MsgPort *port = fs->lhproc_port;
 	struct NotifyRequest *nr;
@@ -369,6 +369,6 @@ void FbxCollectNotification(struct FbxFS *fs, struct FbxNotifyNode *nn) {
 		nr->nr_Handler = port;
 	}
 
-	DoPkt(port, ACTION_COLLECT, ID_COLLECT_NOTIFICATION, (SIPTR)nn, 0, 0, 0);
+	DoPkt(port, ACTION_COLLECT, ID_COLLECT_NOTIFYNODE, (SIPTR)nn, 0, 0, 0);
 }
 
