@@ -250,6 +250,7 @@ static int FbxLockHandlerProc(void) {
 				case ACTION_INFO:
 				case ACTION_FORMAT:
 				case ACTION_RENAME_DISK:
+				case ACTION_SET_OWNER:
 					r1 = DOSFALSE;
 					r2 = ERROR_NO_DISK;
 					break;
