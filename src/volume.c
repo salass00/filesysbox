@@ -214,8 +214,7 @@ void FbxCleanupVolume(struct FbxFS *fs) {
 	Fbx_destroy(fs, fs->initret);
 
 	if (IsMinListEmpty(&vol->locklist) &&
-		IsMinListEmpty(&vol->notifylist) &&
-		IsMinListEmpty(&vol->unres_notifys))
+		IsMinListEmpty(&vol->notifylist))
 	{
 		// Remove and free if no locks are pending
 		FbxAsyncRemFreeVolume(fs, vol);
