@@ -152,6 +152,40 @@ static int FbxLockHandlerProc(void) {
 					break;
 				}
 
+				case ACTION_REMOVE_NOTIFY:
+				{
+					struct NotifyRequest *nr;
+					struct FbxNotifyNode *nn;
+					struct Node *node;
+
+					nr = (struct NotifyRequest *)pkt->dp_Arg1;
+
+					nn = (struct FbxNotifyNode *)nr->nr_notifynode;
+					for (node = (struct Node *)locklist.mlh_Head; node->ln_Succ != NULL; node = node->ln_Succ) {
+						if ((struct FbxNotifyNode *)node->ln_Name == nn) {
+							Remove(node);
+							FreeMem(node, sizeof(*node));
+
+							FreeFbxNotifyNode(nn);
+
+							nr->nr_MsgCount = 0;
+							nr->nr_notifynode = (IPTR)NULL;
+
+							r1 = DOSTRUE;
+							r2 = 0;
+							break;
+						}
+					}
+
+					if (node == NULL) {
+						r1 = DOSFALSE;
+						r2 = 0;
+						break;
+					}
+
+					break;
+				}
+
 				case ACTION_READ:
 				case ACTION_WRITE:
 				case ACTION_SEEK:
@@ -187,6 +221,7 @@ static int FbxLockHandlerProc(void) {
 				case ACTION_READ_LINK:
 				case ACTION_CHANGE_MODE:
 				case ACTION_EXAMINE_ALL:
+				case ACTION_ADD_NOTIFY:
 				case ACTION_FORMAT:
 				case ACTION_RENAME_DISK:
 					r1 = DOSFALSE;
