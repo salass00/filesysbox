@@ -94,9 +94,11 @@ struct FileSysBoxBase {
 #endif
 	struct Library        *localebase;
 
+	struct SignalSemaphore procsema;
 	struct Process        *dlproc;
-	struct SignalSemaphore dlproc_sem;
+	struct Process        *lhproc;
 	volatile ULONG         dlproc_refcount;
+	volatile ULONG         lhproc_refcount;
 };
 
 #ifdef NODEBUG
@@ -363,7 +365,7 @@ struct FbxAVL {
 struct FbxFS {
 	struct FileSysBoxBase       *libbase;
 	struct MsgPort              *dlproc_port;
-//	struct MsgPort              *lhproc_port;
+	struct MsgPort              *lhproc_port;
 	struct Library              *sysbase;
 	struct Library              *dosbase;
 	struct Library              *utilitybase;

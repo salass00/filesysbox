@@ -304,13 +304,13 @@ struct FbxFS *FbxSetupFS(
 	}
 
 	// doslist process
-	ObtainSemaphore(&libBase->dlproc_sem);
+	ObtainSemaphore(&libBase->procsema);
 	if (libBase->dlproc == NULL) libBase->dlproc = StartDosListProc(libBase);
 	if (libBase->dlproc != NULL) {
 		libBase->dlproc_refcount++;
 		fs->dlproc_port = &libBase->dlproc->pr_MsgPort;
 	}
-	ReleaseSemaphore(&libBase->dlproc_sem);
+	ReleaseSemaphore(&libBase->procsema);
 	if (libBase->dlproc == NULL) goto error;
 
 	fs->fcntx.fuse = fs;

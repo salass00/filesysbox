@@ -80,7 +80,7 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 	aroscbase = libBase->aroscbase;
 #endif
 
-	InitSemaphore(&libBase->dlproc_sem);
+	InitSemaphore(&libBase->procsema);
 
 	return libBase;
 

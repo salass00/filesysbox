@@ -71,10 +71,10 @@ void FbxCleanupFS(
 
 		// doslist process
 		if (fs->dlproc_port != NULL) {
-			ObtainSemaphore(&libBase->dlproc_sem);
+			ObtainSemaphore(&libBase->procsema);
 			if (--libBase->dlproc_refcount == 0)
 				Signal(&libBase->dlproc->pr_Task, SIGBREAKF_CTRL_C);
-			ReleaseSemaphore(&libBase->dlproc_sem);
+			ReleaseSemaphore(&libBase->procsema);
 		}
 
 		while ((chain = (struct MinNode *)RemHead((struct List *)&fs->timercallbacklist)) != NULL) {
