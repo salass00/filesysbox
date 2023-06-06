@@ -7,6 +7,7 @@
 
 #include "filesysbox_internal.h"
 #include <dos/dostags.h>
+#include <string.h>
 
 #define ACTION_COLLECT 3001
 
@@ -63,6 +64,11 @@ static int FbxLockHandlerProc(void) {
 			pkt = (struct DosPacket *)msg->mn_Node.ln_Name;
 			type = pkt->dp_Type;
 			switch (type) {
+				case ACTION_IS_FILESYSTEM:
+					r1 = DOSTRUE;
+					r2 = 0;
+					break;
+
 				case ACTION_COLLECT:
 				{
 					struct MinList *list;
@@ -186,6 +192,24 @@ static int FbxLockHandlerProc(void) {
 					break;
 				}
 
+				case ACTION_DISK_INFO:
+				{
+					struct InfoData *id;
+
+					id = (struct InfoData *)BADDR(pkt->dp_Arg2);
+
+					bzero(id, sizeof(*id));
+
+					id->id_UnitNumber    = -1;
+					id->id_DiskState     = ID_VALIDATING;
+					id->id_BytesPerBlock = 512;
+					id->id_DiskType      = ID_NO_DISK_PRESENT;
+
+					r1 = DOSTRUE;
+					r2 = 0;
+					break;
+				}
+
 				case ACTION_READ:
 				case ACTION_WRITE:
 				case ACTION_SEEK:
@@ -200,6 +224,7 @@ static int FbxLockHandlerProc(void) {
 				case ACTION_CREATE_DIR:
 				case ACTION_PARENT:
 				case ACTION_PARENT_FH:
+				case ACTION_CURRENT_VOLUME:
 					r1 = (SIPTR)ZERO;
 					r2 = ERROR_NO_DISK;
 					break;
@@ -222,15 +247,11 @@ static int FbxLockHandlerProc(void) {
 				case ACTION_CHANGE_MODE:
 				case ACTION_EXAMINE_ALL:
 				case ACTION_ADD_NOTIFY:
+				case ACTION_INFO:
 				case ACTION_FORMAT:
 				case ACTION_RENAME_DISK:
 					r1 = DOSFALSE;
 					r2 = ERROR_NO_DISK;
-					break;
-
-				case ACTION_IS_FILESYSTEM:
-					r1 = DOSTRUE;
-					r2 = 0;
 					break;
 
 				default:
