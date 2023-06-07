@@ -22,8 +22,7 @@ int FbxDie(struct FbxFS *fs) {
 	if (OKVOLUME(vol))
 	{
 		if (!IsMinListEmpty(&vol->locklist) ||
-			!IsMinListEmpty(&vol->notifylist) ||
-			!IsMinListEmpty(&vol->unres_notifys))
+			!IsMinListEmpty(&vol->notifylist))
 		{
 			fs->r2 = ERROR_OBJECT_IN_USE;
 			return DOSFALSE;
