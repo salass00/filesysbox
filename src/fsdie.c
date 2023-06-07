@@ -39,7 +39,6 @@ int FbxDie(struct FbxFS *fs) {
 
 			lock->fs = NULL; /* invalidate lock */
 
-			FbxCollectLock(fs, lock);
 			/* if (lock->fh != NULL) {
 				FbxCollectFH(fs, lock->fh);
 
