@@ -13,6 +13,7 @@
 int FbxDie(struct FbxFS *fs) {
 	struct Library *SysBase = fs->sysbase;
 	struct MinNode *chain;
+	struct Message *msg;
 
 	/* check if shutdown is already in progress */
 	if (fs->shutdown) {
@@ -61,6 +62,11 @@ int FbxDie(struct FbxFS *fs) {
 		}
 
 		FreeFbxVolume(vol);
+	}
+
+	/* Redirect remaining packets to the lock handler process */
+	while ((msg = GetMsg(fs->fsport)) != NULL) {
+		PutMsg(fs->lhproc_port, msg);
 	}
 
 	fs->shutdown = TRUE;
