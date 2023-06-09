@@ -27,7 +27,8 @@ LIBS    =
 STRIPFLAGS = -R.comment
 
 ifneq (,$(findstring -aros,$(HOST)))
-	LIBS += -larosc
+	DEFINES += -DNO_AROSC_LIB
+	LIBS += -lstdc.static
 endif
 
 ifeq ($(HOST),m68k-amigaos)
