@@ -12,7 +12,7 @@ if [ "$HOST" = "m68k-amigaos" ]; then
   chmod 775 filesysbox.library.000
   chmod 775 filesysbox.library.020
 else
-  chmod 775 filesysbox.library
+  chmod 775 filesysbox.library.i386
 fi;
 
 DESTDIR='tmp'
@@ -40,7 +40,7 @@ if [ "$HOST" = "m68k-amigaos" ]; then
   cp -p filesysbox.library.020 ${DESTDIR}/filesysbox/Libs
 else
   cp -p Install-AROS ${DESTDIR}/filesysbox/Install
-  cp -p filesysbox.library ${DESTDIR}/filesysbox/Libs
+  cp -p filesysbox.library.i386 ${DESTDIR}/filesysbox/Libs/filesysbox.library
 fi;
 cp -p filesysbox.doc ${DESTDIR}/filesysbox/Developer/AutoDocs
 cp -p filesysbox_lib.sfd ${DESTDIR}/filesysbox/Developer/include/sfd
