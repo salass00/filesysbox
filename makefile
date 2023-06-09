@@ -26,7 +26,13 @@ LDFLAGS = -nostartfiles
 LIBS    = 
 STRIPFLAGS = -R.comment
 
+ifneq (,$(SYSROOT))
+	CFLAGS  := --sysroot=$(SYSROOT) $(CFLAGS)
+	LDFLAGS := --sysroot=$(SYSROOT) $(LDFLAGS)
+endif
+
 ifneq (,$(findstring -aros,$(HOST)))
+	CPU = $(patsubst %-aros,%,$(HOST))
 	DEFINES += -DNO_AROSC_LIB
 	LIBS += -lstdc.static
 endif
@@ -52,35 +58,35 @@ SRCS = $(addprefix src/, \
        fsunlock.c fswrite.c fswriteprotect.c volume.c xattrs.c utf8.c ucs4.c \
        strlcpy.c debugf.c dofmt.c allocvecpooled.c codesets.c avl.c)
 
-OBJS = $(subst src/,$(ODIR)obj/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
-DEPS = $(OBJS:.o=.d)
-
 ifeq ($(HOST),m68k-amigaos)
-	OBJS_000 = $(subst obj/,obj-000/,$(OBJS))
-	OBJS_020 = $(subst obj/,obj-020/,$(OBJS))
+	OBJS_000 = $(subst src/,$(ODIR)obj-000/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+	OBJS_020 = $(subst src/,$(ODIR)obj-020/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
 	DEPS_000 = $(OBJS_000:.o=.d)
 	DEPS_020 = $(OBJS_020:.o=.d)
+else
+	OBJS = $(subst src/,$(ODIR)obj-$(CPU)/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+	DEPS = $(OBJS:.o=.d)
 endif
 
 .PHONY: all
 ifeq ($(HOST),m68k-amigaos)
 all: $(ODIR)$(TARGET).000 $(ODIR)$(TARGET).020
 else
-all: $(ODIR)$(TARGET) $(ODIR)$(TARGET).debug
+all: $(ODIR)$(TARGET).$(CPU) $(ODIR)$(TARGET).$(CPU).debug
 endif
 
 -include $(DEPS)
 
-$(ODIR)obj/%.o: src/%.c
+$(ODIR)obj-$(CPU)/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(CFLAGS) $<
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-$(ODIR)$(TARGET).debug: $(OBJS)
+$(ODIR)$(TARGET).$(CPU).debug: $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 ifneq (,$(findstring -aros,$(HOST)))
-$(ODIR)$(TARGET): $(OBJS)
+$(ODIR)$(TARGET).$(CPU): $(OBJS)
 	$(CC) -s $(LDFLAGS) -o $@ $^ $(LIBS)
 else
 $(ODIR)$(TARGET): $(TARGET).debug
@@ -112,7 +118,8 @@ endif
 
 .PHONY: clean
 clean:
-	rm -rf $(TARGET) $(TARGET).debug obj
+	rm -rf $(TARGET).i386 $(TARGET).i386.debug obj-i386
+	rm -rf $(TARGET).x86_64 $(TARGET).x86_64.debug obj-x86_64
 	rm -rf $(TARGET).000 $(TARGET).000.debug obj-000
 	rm -rf $(TARGET).020 $(TARGET).020.debug obj-020
 	rm -rf debug

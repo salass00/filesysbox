@@ -1,7 +1,8 @@
 # Ignore object, dependency and archive files
 *.[oda]
 # Ignore generated exe file
-filesysbox.library
+filesysbox.library.i386
+filesysbox.library.x86_64
 filesysbox.library.000
 filesysbox.library.020
 *.debug
