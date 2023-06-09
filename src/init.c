@@ -17,7 +17,7 @@ struct Library *SysBase;
 //struct Library *__UtilityBase;
 struct Library *UtilityBase;
 #endif
-#ifdef __AROS__
+#if defined(__AROS__) && !defined(NO_AROSC_LIB)
 struct Library *aroscbase;
 #endif
 
@@ -63,7 +63,7 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 
 	libBase->localebase = OpenLibrary((CONST_STRPTR)"locale.library", 38);
 
-#ifdef __AROS__
+#if defined(__AROS__) && !defined(NO_AROSC_LIB)
 	libBase->aroscbase = OpenLibrary((CONST_STRPTR)"arosc.library", 41);
 	if (libBase->aroscbase == NULL) {
 		Alert(AG_OpenLib|AO_Unknown);
@@ -76,7 +76,7 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 	//__UtilityBase = libBase->utilitybase;
 	UtilityBase = libBase->utilitybase;
 #endif
-#ifdef __AROS__
+#if defined(__AROS__) && !defined(NO_AROSC_LIB)
 	aroscbase = libBase->aroscbase;
 #endif
 
@@ -170,7 +170,7 @@ BPTR LibExpunge(
 		result = libBase->seglist;
 
 		/* Undo what the init code did */
-#ifdef __AROS__
+#if defined(__AROS__) && !defined(NO_AROSC_LIB)
 		CloseLibrary(libBase->aroscbase);
 #endif
 		if (libBase->localebase) {
