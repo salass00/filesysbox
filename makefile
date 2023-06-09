@@ -23,11 +23,11 @@ DEFINES += -DENABLE_CHARSET_CONVERSION
 CFLAGS  = -O2 -g -fomit-frame-pointer -fno-strict-aliasing \
           $(INCLUDES) $(DEFINES) $(WARNINGS)
 LDFLAGS = -nostartfiles
-LIBS    = -ldebug
+LIBS    = 
 STRIPFLAGS = -R.comment
 
 ifneq (,$(findstring -aros,$(HOST)))
-	LIBS := -larosc $(LIBS)
+	LIBS += -larosc
 endif
 
 ifeq ($(HOST),m68k-amigaos)
