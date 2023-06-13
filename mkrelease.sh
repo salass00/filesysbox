@@ -4,6 +4,7 @@
 #
 
 HOST="${1:-i386-aros}"
+FORMAT="${2:-lha}"
 
 #make HOST=$HOST clean
 make HOST=$HOST all autodoc
@@ -59,15 +60,27 @@ cp -p icons/def_doc.info ${DESTDIR}/filesysbox/LICENSE.APL.info
 cp -p icons/def_doc.info ${DESTDIR}/filesysbox/releasenotes.info
 cp -p icons/def_install.info ${DESTDIR}/filesysbox/Install.info
 
-#rm -f filesysbox.${HOST}.7z
-#7za u filesysbox.${HOST}.7z ./${DESTDIR}/*
-rm -rf filesysbox.${HOST}.lha
-PREVDIR=`pwd`
-cd ${DESTDIR} && lha ao5 ../filesysbox.${HOST}.lha *
-cd ${PREVDIR}
+case "${FORMAT}" in
+  "7z")
+    rm -f filesysbox.${HOST}.7z
+    7za u filesysbox.${HOST}.7z ./${DESTDIR}/*
+    echo "filesysbox.${HOST}.7z created"
+    ;;
+  "iso")
+    rm -f filesysbox.${HOST}.iso
+    PREVDIR=`pwd`
+    cd ${DESTDIR} && mkisofs -R -o ../filesysbox.${HOST}.iso -V FILESYSBOX .
+    cd ${PREVDIR}
+    echo "filesysbox.${HOST}.iso created"
+    ;;
+  "lha")
+    rm -rf filesysbox.${HOST}.lha
+    PREVDIR=`pwd`
+    cd ${DESTDIR} && lha ao5 ../filesysbox.${HOST}.lha *
+    cd ${PREVDIR}
+    echo "filesysbox.${HOST}.lha created"
+    ;;
+esac
 
 rm -rf ${DESTDIR}
-
-#echo "filesysbox.${HOST}.7z created"
-echo "filesysbox.${HOST}.lha created"
 
