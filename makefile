@@ -13,9 +13,11 @@ WARNINGS = -Werror -Wall -Wwrite-strings -Wno-attributes
 
 ifneq (1,$(DEBUG))
 	DEFINES += -DNODEBUG
-	ODIR =
+	BINDIR = bin
+	OBJDIR = obj
 else
-	ODIR = debug/
+	BINDIR = bin/debug
+	OBJDIR = obj/debug
 endif
 
 DEFINES += -DENABLE_CHARSET_CONVERSION
@@ -59,37 +61,40 @@ SRCS = $(addprefix src/, \
        strlcpy.c debugf.c dofmt.c allocvecpooled.c codesets.c avl.c)
 
 ifeq ($(HOST),m68k-amigaos)
-	OBJS_000 = $(subst src/,$(ODIR)obj-000/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
-	OBJS_020 = $(subst src/,$(ODIR)obj-020/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+	OBJS_000 = $(subst src/,$(OBJDIR)/68000/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+	OBJS_020 = $(subst src/,$(OBJDIR)/68020/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
 	DEPS_000 = $(OBJS_000:.o=.d)
 	DEPS_020 = $(OBJS_020:.o=.d)
 else
-	OBJS = $(subst src/,$(ODIR)obj-$(CPU)/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+	OBJS = $(subst src/,$(OBJDIR)/$(CPU)/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
 	DEPS = $(OBJS:.o=.d)
 endif
 
 .PHONY: all
 ifeq ($(HOST),m68k-amigaos)
-all: $(ODIR)$(TARGET).000 $(ODIR)$(TARGET).020
+all: $(BINDIR)/$(TARGET).000 $(BINDIR)/$(TARGET).020
 else
-all: $(ODIR)$(TARGET).$(CPU) $(ODIR)$(TARGET).$(CPU).debug
+all: $(BINDIR)/$(TARGET).$(CPU) $(BINDIR)/$(TARGET).$(CPU).debug
 endif
 
 -include $(DEPS)
 
-$(ODIR)obj-$(CPU)/%.o: src/%.c
+$(OBJDIR)/$(CPU)/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(CFLAGS) $<
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-$(ODIR)$(TARGET).$(CPU).debug: $(OBJS)
+$(BINDIR)/$(TARGET).$(CPU).debug: $(OBJS)
+	@mkdir -p $(dir $@)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 ifneq (,$(findstring -aros,$(HOST)))
-$(ODIR)$(TARGET).$(CPU): $(OBJS)
+$(BINDIR)/$(TARGET).$(CPU): $(OBJS)
+	@mkdir -p $(dir $@)
 	$(CC) -s $(LDFLAGS) -o $@ $^ $(LIBS)
 else
-$(ODIR)$(TARGET): $(TARGET).debug
+$(BINDIR)/$(TARGET): $(TARGET).debug
+	@mkdir -p $(dir $@)
 	$(STRIP) $(STRIPFLAGS) -o $@ $<
 endif
 
@@ -97,32 +102,30 @@ ifeq ($(HOST),m68k-amigaos)
 -include $(DEPS_000)
 -include $(DEPS_020)
 
-$(ODIR)obj-000/%.o: src/%.c
+$(OBJDIR)/68000/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(ARCH_000) $(CFLAGS) $<
 	$(CC) $(ARCH_000) $(CFLAGS) -c -o $@ $<
 
-$(ODIR)obj-020/%.o: src/%.c
+$(OBJDIR)/68020/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(ARCH_020) $(CFLAGS) $<
 	$(CC) $(ARCH_020) $(CFLAGS) -c -o $@ $<
 
-$(ODIR)$(TARGET).000: $(OBJS_000)
+$(BINDIR)/$(TARGET).000: $(OBJS_000)
+	@mkdir -p $(dir $@)
 	$(CC) $(ARCH_000) $(LDFLAGS) -o $@.debug $^ $(LIBS)
 	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
 
-$(ODIR)$(TARGET).020: $(OBJS_020)
+$(BINDIR)/$(TARGET).020: $(OBJS_020)
+	@mkdir -p $(dir $@)
 	$(CC) $(ARCH_020) $(LDFLAGS) -o $@.debug $^ $(LIBS)
 	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
 endif
 
 .PHONY: clean
 clean:
-	rm -rf $(TARGET).i386 $(TARGET).i386.debug obj-i386
-	rm -rf $(TARGET).x86_64 $(TARGET).x86_64.debug obj-x86_64
-	rm -rf $(TARGET).000 $(TARGET).000.debug obj-000
-	rm -rf $(TARGET).020 $(TARGET).020.debug obj-020
-	rm -rf debug
+	rm -rf bin obj
 
 .PHONY: revision
 revision:
