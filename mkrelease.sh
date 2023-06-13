@@ -9,14 +9,14 @@ HOST="${1:-i386-aros}"
 make HOST=$HOST all autodoc
 
 if [ "$HOST" = "m68k-amigaos" ]; then
-  chmod 775 filesysbox.library.000
-  chmod 775 filesysbox.library.020
+  chmod 775 bin/filesysbox.library.000
+  chmod 775 bin/filesysbox.library.020
 else
-  chmod 775 filesysbox.library.i386
+  chmod 775 bin/filesysbox.library.i386
 fi;
 
 DESTDIR='tmp'
-#FULLVERS=`version filesysbox.library`
+#FULLVERS=`version bin/filesysbox.library`
 #NUMVERS=`echo "${FULLVERS}" | cut -d' ' -f2`
 
 rm -rf ${DESTDIR}
@@ -36,11 +36,11 @@ cp -p LICENSE.APL ${DESTDIR}/filesysbox
 cp -p releasenotes ${DESTDIR}/filesysbox
 if [ "$HOST" = "m68k-amigaos" ]; then
   cp -p Install ${DESTDIR}/filesysbox
-  cp -p filesysbox.library.000 ${DESTDIR}/filesysbox/Libs
-  cp -p filesysbox.library.020 ${DESTDIR}/filesysbox/Libs
+  cp -p bin/filesysbox.library.000 ${DESTDIR}/filesysbox/Libs
+  cp -p bin/filesysbox.library.020 ${DESTDIR}/filesysbox/Libs
 else
   cp -p Install-AROS ${DESTDIR}/filesysbox/Install
-  cp -p filesysbox.library.i386 ${DESTDIR}/filesysbox/Libs/filesysbox.library
+  cp -p bin/filesysbox.library.i386 ${DESTDIR}/filesysbox/Libs/filesysbox.library
 fi;
 cp -p filesysbox.doc ${DESTDIR}/filesysbox/Developer/AutoDocs
 cp -p filesysbox_lib.sfd ${DESTDIR}/filesysbox/Developer/include/sfd
