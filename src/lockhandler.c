@@ -107,6 +107,9 @@ static int FbxLockHandlerProc(void) {
 					node->ln_Type = type;
 					node->ln_Name = item;
 					AddHead((struct List *)list, node);
+
+					r1 = DOSTRUE;
+					r2 = 0;
 					break;
 				}
 
@@ -127,8 +130,6 @@ static int FbxLockHandlerProc(void) {
 							}
 							FreeFbxLock(lock);
 
-							r1 = DOSTRUE;
-							r2 = 0;
 							break;
 						}
 					}
@@ -139,6 +140,8 @@ static int FbxLockHandlerProc(void) {
 						break;
 					}
 
+					r1 = DOSTRUE;
+					r2 = 0;
 					break;
 				}
 
@@ -188,8 +191,6 @@ static int FbxLockHandlerProc(void) {
 							nr->nr_MsgCount = 0;
 							nr->nr_notifynode = (IPTR)NULL;
 
-							r1 = DOSTRUE;
-							r2 = 0;
 							break;
 						}
 					}
@@ -200,6 +201,8 @@ static int FbxLockHandlerProc(void) {
 						break;
 					}
 
+					r1 = DOSTRUE;
+					r2 = 0;
 					break;
 				}
 
