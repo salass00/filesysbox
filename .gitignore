@@ -7,4 +7,5 @@ obj
 filesysbox.doc
 # Ignore release archives
 *.7z
+*.iso
 *.lha
