@@ -153,3 +153,7 @@ filesysbox.library 54.4 (d.m.2023)
 - Implemented a lock handler process to allow file systems to be unmounted
   even if there are outstanding locks/notifications.
 
+- AmigaOS 3 versions are now compiled with -mregparm enabling the use of
+  registers d0/d1 and a0/a1 for parameter passing in internal function
+  calls.
+
