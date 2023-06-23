@@ -225,13 +225,8 @@ static const struct Resident USED_VAR lib_res = {
 	VERSION,
 	NT_LIBRARY,
 	0,
-#ifdef __AROS__
-	(STRPTR)"filesysbox.library",
-	(STRPTR)VSTRING,
-#else
-	(char *)"filesysbox.library",
-	(char *)VSTRING,
-#endif
+	(APTR)"filesysbox.library",
+	(APTR)VSTRING,
 	(APTR)LibInitTab
 };
 
