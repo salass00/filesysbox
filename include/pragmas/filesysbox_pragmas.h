@@ -125,5 +125,11 @@
 #ifdef __CLIB_PRAGMA_AMICALL
  #pragma amicall(FileSysBoxBase, 0x72, FbxGetSysTime(a0,a1))
 #endif /* __CLIB_PRAGMA_AMICALL */
+#ifdef __CLIB_PRAGMA_LIBCALL
+ #pragma libcall FileSysBoxBase FbxGetUpTime 78 9802
+#endif /* __CLIB_PRAGMA_LIBCALL */
+#ifdef __CLIB_PRAGMA_AMICALL
+ #pragma amicall(FileSysBoxBase, 0x78, FbxGetUpTime(a0,a1))
+#endif /* __CLIB_PRAGMA_AMICALL */
 
 #endif /* PRAGMAS_FILESYSBOX_PRAGMAS_H */

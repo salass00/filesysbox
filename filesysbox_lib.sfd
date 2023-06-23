@@ -27,5 +27,6 @@ void FbxQueryFS(struct FbxFS * fs, const struct TagItem * tags) (a0,a1)
 ==varargs
 void FbxQueryFSTags(struct FbxFS * fs, Tag tags, ...) (a0,a1)
 void FbxGetSysTime(struct FbxFS * fs, struct timeval * tv) (a0,a1)
+void FbxGetUpTime(struct FbxFs * fs, struct timeval * tv) (a0,a1)
 ==end
 

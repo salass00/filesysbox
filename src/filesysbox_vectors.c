@@ -27,6 +27,7 @@
 #define FbxCopyStringCToBSTR AROS_SLIB_ENTRY(FbxCopyStringCToBSTR,FileSysBox,17)
 #define FbxQueryFS AROS_SLIB_ENTRY(FbxQueryFS,FileSysBox,18)
 #define FbxGetSysTime AROS_SLIB_ENTRY(FbxGetSysTime,FileSysBox,19)
+#define FbxGetUpTime AROS_SLIB_ENTRY(FbxGetUpTime,FileSysBox,20)
 #endif
 
 static const CONST_APTR LibVectors[] = {
@@ -49,6 +50,7 @@ static const CONST_APTR LibVectors[] = {
 	FbxCopyStringCToBSTR,
 	FbxQueryFS,
 	FbxGetSysTime,
+	FbxGetUpTime,
 	(APTR)-1
 };
 

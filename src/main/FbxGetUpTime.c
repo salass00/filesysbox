@@ -12,18 +12,18 @@
 #include "filesysbox_vectors.h"
 #include "filesysbox_internal.h"
 
-/****** filesysbox.library/FbxGetSysTime ******************************************
+/****** filesysbox.library/FbxGetUpTime ******************************************
 *
 *   NAME
-*      FbxGetSysTime -- Get the current system time
+*      FbxGetUpTime -- Get the current up time. (V54.5)
 *
 *   SYNOPSIS
-*      void FbxGetSysTime(struct FbxFS *fs, struct TimeVal *tv);
+*      void FbxGetUpTime(struct FbxFS *fs, struct timeval *tv);
 *
 *   FUNCTION
-*       Reads the current system time and stores it in the supplied
-*       TimeVal structure. Basically just a convenient way to call
-*       GetSysTime() from a filesysbox filesystem that doesn't require
+*       Reads the current up time and stores it in the supplied
+*       timeval structure. Basically just a convenient way to call
+*       GetUpTime() from a filesysbox handler that doesn't require
 *       the "timer.device" to be opened again.
 *
 *   INPUTS
@@ -46,21 +46,20 @@
 */
 
 #ifdef __AROS__
-AROS_LH2(void, FbxGetSysTime,
+AROS_LH2(void, FbxGetUpTime,
 	AROS_LHA(struct FbxFS *, fs, A0),
 	AROS_LHA(struct timeval *, tv, A1),
-	struct FileSysBoxBase *, libBase, 19, FileSysBox)
+	struct FileSysBoxBase *, libBase, 20, FileSysBox)
 {
 	AROS_LIBFUNC_INIT
 #else
-void FbxGetSysTime(
+void FbxGetUpTime(
 	REG(a0, struct FbxFS *fs),
 	REG(a1, struct timeval *tv),
 	REG(a6, struct FileSysBoxBase *libBase))
 {
 #endif
-	struct Device *TimerBase = fs->timerbase;
-	GetSysTime(tv);
+	GetUpTime(fs, tv);
 #ifdef __AROS__
 	AROS_LIBFUNC_EXIT
 #endif

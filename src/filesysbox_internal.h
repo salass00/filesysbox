@@ -591,7 +591,7 @@ void FbxRemDiskChangeHandler(struct FbxFS *fs);
 struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
 void FbxCleanupTimerIO(struct FbxFS *fs);
 void FbxInitUpTime(struct FbxFS *fs);
-void FbxGetUpTime(struct FbxFS *fs, struct timeval *tv);
+void GetUpTime(struct FbxFS *fs, struct timeval *tv);
 ULONG FbxGetUpTimeMillis(struct FbxFS *fs);
 
 /* notify.c */

@@ -111,6 +111,11 @@ AROS_LD2(void, FbxGetSysTime,
 	AROS_LDA(struct timeval *, tv, A1),
 	struct FileSysBoxBase *, libBase, 19, FileSysBox);
 
+AROS_LD2(void, FbxGetUpTime,
+	AROS_LDA(struct FbxFS *, fs, A0),
+	AROS_LDA(struct timeval *, tv, A1),
+	struct FileSysBoxBase *, libBase, 20, FileSysBox);
+
 #else
 
 #include <SDI/SDI_compiler.h>
@@ -199,6 +204,11 @@ void FbxQueryFS(
 	REG(a6, struct FileSysBoxBase *libBase));
 
 void FbxGetSysTime(
+	REG(a0, struct FbxFS *fs),
+	REG(a1, struct timeval *tv),
+	REG(a6, struct FileSysBoxBase *libBase));
+
+void FbxGetUpTime(
 	REG(a0, struct FbxFS *fs),
 	REG(a1, struct timeval *tv),
 	REG(a6, struct FileSysBoxBase *libBase));

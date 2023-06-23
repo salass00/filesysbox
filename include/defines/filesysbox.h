@@ -116,4 +116,10 @@ typedef ULONG _sfdc_vararg;
  AROS_LCA(struct timeval *, (___tv), A1), \
      struct Library *, FILESYSBOX_BASE_NAME, 19, Filesysbox)
 
+#define FbxGetUpTime(___fs, ___tv) \
+      AROS_LC2NR(void, FbxGetUpTime, \
+ AROS_LCA(struct FbxFs *, (___fs), A0), \
+ AROS_LCA(struct timeval *, (___tv), A1), \
+     struct Library *, FILESYSBOX_BASE_NAME, 20, Filesysbox)
+
 #endif /* !_INLINE_FILESYSBOX_H */
