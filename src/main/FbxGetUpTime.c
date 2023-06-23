@@ -59,7 +59,7 @@ void FbxGetUpTime(
 	REG(a6, struct FileSysBoxBase *libBase))
 {
 #endif
-	GetUpTime(fs, tv);
+	_FbxGetUpTime(fs, tv);
 #ifdef __AROS__
 	AROS_LIBFUNC_EXIT
 #endif

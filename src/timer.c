@@ -56,7 +56,7 @@ void FbxInitUpTime(struct FbxFS *fs) {
 	fs->eclock_initial = ((UQUAD)ev.ev_hi << 32)|((UQUAD)ev.ev_lo);
 }
 
-void GetUpTime(struct FbxFS *fs, struct timeval *tv) {
+void _FbxGetUpTime(struct FbxFS *fs, struct timeval *tv) {
 	struct Device *TimerBase = fs->timerbase;
 	struct EClockVal ev;
 	UQUAD eclock_current;
@@ -92,7 +92,7 @@ void GetUpTime(struct FbxFS *fs, struct timeval *tv) {
 ULONG FbxGetUpTimeMillis(struct FbxFS *fs) {
 	struct timeval tv;
 
-	GetUpTime(fs, &tv);
+	_FbxGetUpTime(fs, &tv);
 #ifdef __mc68020
 	ULONG result;
 	__asm__("mulul #1000,%0\n"
