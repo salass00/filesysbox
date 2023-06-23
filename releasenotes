@@ -150,3 +150,6 @@ filesysbox.library 54.4 (d.m.2023)
   are removed from the dirdatalist but not freed) that was already there in
   the 0.730 version of the library.
 
+- Implemented a lock handler process to allow file systems to be unmounted
+  even if there are outstanding locks/notifications.
+

@@ -94,9 +94,11 @@ struct FileSysBoxBase {
 #endif
 	struct Library        *localebase;
 
+	struct SignalSemaphore procsema;
 	struct Process        *dlproc;
-	struct SignalSemaphore dlproc_sem;
+	struct Process        *lhproc;
 	volatile ULONG         dlproc_refcount;
+	volatile ULONG         lhproc_refcount;
 };
 
 #ifdef NODEBUG
@@ -363,7 +365,7 @@ struct FbxAVL {
 struct FbxFS {
 	struct FileSysBoxBase       *libbase;
 	struct MsgPort              *dlproc_port;
-//	struct MsgPort              *lhproc_port;
+	struct MsgPort              *lhproc_port;
 	struct Library              *sysbase;
 	struct Library              *dosbase;
 	struct Library              *utilitybase;
@@ -484,6 +486,7 @@ struct FbxNotifyNode {
 #define nr_notifynode nr_Reserved[0]
 
 #define FSNOTIFYNODEFROMCHAIN(chain_) container_of(chain_, struct FbxNotifyNode, chain)
+#define FSNOTIFYNODEFROMVOLUMECHAIN(chain_) container_of(chain_, struct FbxNotifyNode, volumechain)
 
 struct FbxDirData {
 	struct MinNode  node;
@@ -607,6 +610,11 @@ int FbxAsyncAddVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRemVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRemFreeVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRenameVolume(struct FbxFS *fs, struct FbxVolume *vol, const char *name);
+
+/* lockhandler.c */
+struct Process *StartLockHandlerProc(struct FileSysBoxBase *libBase);
+void FbxCollectLock(struct FbxFS *fs, struct FbxLock *lock);
+void FbxCollectNotifyNode(struct FbxFS *fs, struct FbxNotifyNode *nn);
 
 /* fsaddnotify.c */
 int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify);

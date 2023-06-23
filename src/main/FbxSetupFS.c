@@ -304,14 +304,24 @@ struct FbxFS *FbxSetupFS(
 	}
 
 	// doslist process
-	ObtainSemaphore(&libBase->dlproc_sem);
+	ObtainSemaphore(&libBase->procsema);
 	if (libBase->dlproc == NULL) libBase->dlproc = StartDosListProc(libBase);
 	if (libBase->dlproc != NULL) {
 		libBase->dlproc_refcount++;
 		fs->dlproc_port = &libBase->dlproc->pr_MsgPort;
 	}
-	ReleaseSemaphore(&libBase->dlproc_sem);
+	ReleaseSemaphore(&libBase->procsema);
 	if (libBase->dlproc == NULL) goto error;
+
+	// lockhandler process
+	ObtainSemaphore(&libBase->procsema);
+	if (libBase->lhproc == NULL) libBase->lhproc = StartLockHandlerProc(libBase);
+	if (libBase->lhproc != NULL) {
+		libBase->lhproc_refcount++;
+		fs->lhproc_port = &libBase->lhproc->pr_MsgPort;
+	}
+	ReleaseSemaphore(&libBase->procsema);
+	if (libBase->lhproc == NULL) goto error;
 
 	fs->fcntx.fuse = fs;
 	fs->fcntx.private_data = udata;

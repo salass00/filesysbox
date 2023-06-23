@@ -94,10 +94,10 @@ static int FbxDosListProc(void) {
 		}
 
 		if (libBase->dlproc_refcount == 0) {
-			ObtainSemaphore(&libBase->dlproc_sem);
+			ObtainSemaphore(&libBase->procsema);
 			if (libBase->dlproc_refcount == 0)
 				break;
-			ReleaseSemaphore(&libBase->dlproc_sem);
+			ReleaseSemaphore(&libBase->procsema);
 		}
 	}
 
@@ -106,7 +106,7 @@ static int FbxDosListProc(void) {
 
 	Forbid();
 	libBase->dlproc = NULL;
-	ReleaseSemaphore(&libBase->dlproc_sem);
+	ReleaseSemaphore(&libBase->procsema);
 	return RETURN_OK;
 
 #ifdef __AROS__

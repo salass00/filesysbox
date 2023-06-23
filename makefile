@@ -49,7 +49,7 @@ endif
 main_SRCS = $(wildcard src/main/*.c)
 
 SRCS = $(addprefix src/, \
-       init.c filesysbox.c diskchange.c timer.c notify.c doslist.c \
+       init.c filesysbox.c diskchange.c timer.c notify.c doslist.c lockhandler.c \
        fuse_stubs.c dopacket.c fsaddnotify.c fschangemode.c fsclose.c \
        fscreatedir.c fscreatehardlink.c fscreatesoftlink.c fscurrentvolume.c \
        fsdelete.c fsdie.c fsduplock.c fsexamineall.c fsexamineallend.c fsexaminelock.c \
