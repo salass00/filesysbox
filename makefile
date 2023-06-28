@@ -93,7 +93,7 @@ $(BINDIR)/$(TARGET).$(CPU): $(OBJS)
 	@mkdir -p $(dir $@)
 	$(CC) -s $(LDFLAGS) -o $@ $^ $(LIBS)
 else
-$(BINDIR)/$(TARGET): $(TARGET).debug
+$(BINDIR)/$(TARGET).$(CPU): $(BINDIR)/$(TARGET).$(CPU).debug
 	@mkdir -p $(dir $@)
 	$(STRIP) $(STRIPFLAGS) -o $@ $<
 endif
