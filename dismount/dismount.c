@@ -48,12 +48,15 @@ int _start(void)
 {
 	struct Library *SysBase = *(struct Library **)4;
 #endif
+	struct Process *me = (struct Process *)FindTask(NULL);
 	struct Library *DOSBase;
 	struct RDArgs *rda;
 	SIPTR args[NUM_ARGS];
 	TEXT devname[256];
+	struct DosPacket *pkt = NULL;
 	struct DosList *dol;
 	struct DeviceNode *dn;
+	BOOL pktsent = FALSE;
 	LONG error;
 	int rc = RETURN_ERROR;
 
@@ -74,8 +77,21 @@ int _start(void)
 
 	SplitName((CONST_STRPTR)args[ARG_DEVICE], ':', devname, 0, sizeof(devname));
 
+	pkt = AllocDosObject(DOS_STDPKT, NULL);
+	if (pkt == NULL)
+	{
+		PrintFault(error = ERROR_NO_FREE_STORE, progName);
+		goto cleanup;
+	}
+
 	dol = LockDosList(LDF_DEVICES | LDF_READ);
 	dn = (struct DeviceNode *)FindDosEntry(dol, devname, LDF_DEVICES | LDF_READ);
+	if (dn != NULL && dn->dn_Task != NULL)
+	{
+		pkt->dp_Type = ACTION_DIE;
+		SendPkt(pkt, dn->dn_Task, &me->pr_MsgPort);
+		pktsent = TRUE;
+	}
 	UnLockDosList(LDF_DEVICES | LDF_READ);
 
 	if (dn == NULL)
@@ -84,25 +100,28 @@ int _start(void)
 		goto cleanup;
 	}
 
-	if (dn->dn_Task != NULL)
+	if (pktsent)
 	{
-		/* FIXME: Use SendPkt() while doslist is locked and then WaitPkt()
-		 * after UnLockDosList() to wait for packet completion. */
-		if (DoPkt(dn->dn_Task, ACTION_DIE, 0, 0, 0, 0, 0) == DOSFALSE)
+		WaitPkt();
+		if (pkt->dp_Res1 == DOSFALSE)
 		{
-			PrintFault(error = IoErr(), pktName);
+			PrintFault(error = pkt->dp_Res2, pktName);
 			goto cleanup;
 		}
 	}
 
 	dol = LockDosList(LDF_DEVICES | LDF_WRITE);
 	dn = (struct DeviceNode *)FindDosEntry(dol, devname, LDF_DEVICES | LDF_WRITE);
-	if (dn != NULL) RemDosEntry((struct DosList *)dn);
+	if (dn != NULL)
+	{
+		RemDosEntry((struct DosList *)dn);
+	}
 	UnLockDosList(LDF_DEVICES | LDF_WRITE);
 
 	rc = RETURN_OK;
 
 cleanup:
+	if (pkt != NULL) FreeDosObject(DOS_STDPKT, pkt);
 	if (rda != NULL) FreeArgs(rda);
 
 	if (rc != RETURN_OK && error != 0)
