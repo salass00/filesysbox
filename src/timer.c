@@ -93,11 +93,12 @@ ULONG FbxGetUpTimeMillis(struct FbxFS *fs) {
 	struct timeval tv;
 
 	_FbxGetUpTime(fs, &tv);
-#ifdef __mc68020
+#if defined(__mc68020) || defined(__mc68060)
 	ULONG result;
 	__asm__("mulul #1000,%0\n"
 		"divuw #1000,%2\n"
-		"addw %2,%0"
+		"extl %2\n"
+		"addl %2,%0"
 		: "=&d" (result)
 		: "0" (tv.tv_secs), "d" (tv.tv_micro)
 		: "2", "cc"
