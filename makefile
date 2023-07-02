@@ -42,6 +42,7 @@ endif
 ifeq ($(HOST),m68k-amigaos)
 	ARCH_000 = -mcpu=68000 -mtune=68000
 	ARCH_020 = -mcpu=68020 -mtune=68020-60
+	ARCH_060 = -mcpu=68060 -mtune=68060
 	CFLAGS  := -noixemul -fno-common -mregparm $(CFLAGS)
 	LDFLAGS := -noixemul $(LDFLAGS)
 endif
@@ -63,8 +64,10 @@ SRCS = $(addprefix src/, \
 ifeq ($(HOST),m68k-amigaos)
 	OBJS_000 = $(subst src/,$(OBJDIR)/68000/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
 	OBJS_020 = $(subst src/,$(OBJDIR)/68020/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+	OBJS_060 = $(subst src/,$(OBJDIR)/68060/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
 	DEPS_000 = $(OBJS_000:.o=.d)
 	DEPS_020 = $(OBJS_020:.o=.d)
+	DEPS_060 = $(OBJS_060:.o=.d)
 else
 	OBJS = $(subst src/,$(OBJDIR)/$(CPU)/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
 	DEPS = $(OBJS:.o=.d)
@@ -72,7 +75,7 @@ endif
 
 .PHONY: all
 ifeq ($(HOST),m68k-amigaos)
-all: $(BINDIR)/$(TARGET).000 $(BINDIR)/$(TARGET).020
+all: $(BINDIR)/$(TARGET).000 $(BINDIR)/$(TARGET).020 $(BINDIR)/$(TARGET).060
 else
 all: $(BINDIR)/$(TARGET).$(CPU) $(BINDIR)/$(TARGET).$(CPU).debug
 endif
@@ -101,6 +104,7 @@ endif
 ifeq ($(HOST),m68k-amigaos)
 -include $(DEPS_000)
 -include $(DEPS_020)
+-include $(DEPS_060)
 
 $(OBJDIR)/68000/%.o: src/%.c
 	@mkdir -p $(dir $@)
@@ -112,6 +116,11 @@ $(OBJDIR)/68020/%.o: src/%.c
 	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(ARCH_020) $(CFLAGS) $<
 	$(CC) $(ARCH_020) $(CFLAGS) -c -o $@ $<
 
+$(OBJDIR)/68060/%.o: src/%.c
+	@mkdir -p $(dir $@)
+	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(ARCH_060) $(CFLAGS) $<
+	$(CC) $(ARCH_060) $(CFLAGS) -c -o $@ $<
+
 $(BINDIR)/$(TARGET).000: $(OBJS_000)
 	@mkdir -p $(dir $@)
 	$(CC) $(ARCH_000) $(LDFLAGS) -o $@.debug $^ $(LIBS)
@@ -120,6 +129,11 @@ $(BINDIR)/$(TARGET).000: $(OBJS_000)
 $(BINDIR)/$(TARGET).020: $(OBJS_020)
 	@mkdir -p $(dir $@)
 	$(CC) $(ARCH_020) $(LDFLAGS) -o $@.debug $^ $(LIBS)
+	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
+
+$(BINDIR)/$(TARGET).060: $(OBJS_060)
+	@mkdir -p $(dir $@)
+	$(CC) $(ARCH_060) $(LDFLAGS) -o $@.debug $^ $(LIBS)
 	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
 endif
 
