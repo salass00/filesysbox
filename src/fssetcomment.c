@@ -59,7 +59,10 @@ int FbxSetComment(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	CHECKSTRING(comment, DOSFALSE);
 #endif
 
-	FbxLockName2Path(fs, lock, name, fullpath);
+	if (!FbxLockName2Path(fs, lock, name, fullpath)) {
+		fs->r2 = ERROR_OBJECT_NOT_FOUND;
+		return DOSFALSE;
+	}
 
 	if (comment[0] != '\0') {
 		error = Fbx_setxattr(fs, fullpath, fs->xattr_amiga_comment,
