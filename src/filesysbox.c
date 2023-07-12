@@ -301,7 +301,7 @@ static const char *FbxSkipColon(const char *s) {
 }
 
 BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, char *fullpathbuf) {
-	char tname[256];
+	char tname[FBX_MAX_NAME];
 	char *p;
 	size_t len;
 
