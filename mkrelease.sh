@@ -12,6 +12,7 @@ make HOST=$HOST all autodoc
 if [ "$HOST" = "m68k-amigaos" ]; then
   chmod 775 bin/filesysbox.library.000
   chmod 775 bin/filesysbox.library.020
+  chmod 775 bin/filesysbox.library.060
 else
   CPU=`echo "${HOST}" | cut -d'-' -f1`
   chmod 775 bin/filesysbox.library.${CPU}
@@ -40,6 +41,7 @@ if [ "$HOST" = "m68k-amigaos" ]; then
   cp -p Install ${DESTDIR}/filesysbox
   cp -p bin/filesysbox.library.000 ${DESTDIR}/filesysbox/Libs
   cp -p bin/filesysbox.library.020 ${DESTDIR}/filesysbox/Libs
+  cp -p bin/filesysbox.library.060 ${DESTDIR}/filesysbox/Libs
 else
   cp -p Install-AROS ${DESTDIR}/filesysbox/Install
   cp -p bin/filesysbox.library.${CPU} ${DESTDIR}/filesysbox/Libs/filesysbox.library
