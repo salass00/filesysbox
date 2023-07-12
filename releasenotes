@@ -162,3 +162,6 @@ filesysbox.library 54.5 (d.m.2023)
 
 - Added the FbxGetUpTime() function to the jumptable.
 
+- Made FbxLockName2Path() return FALSE for any paths containing "." or ".." as
+  a file or directory name.
+
