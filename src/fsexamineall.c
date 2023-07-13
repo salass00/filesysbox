@@ -257,7 +257,6 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 
 	if (IsMinListEmpty(&lock->dirdatalist)) {
 		if (ctrl->eac_Entries == 0) {
-			FreeFbxDirDataList(lock, &lock->dirdatalist);
 			FreeFbxExAllState(lock, exallstate);
 			ctrl->eac_LastKey = (IPTR)-1;
 		}
