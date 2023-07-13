@@ -155,6 +155,7 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 	}
 
 	if (!FbxLockName2Path(fs, lock, ed->fsname, fullpath)) {
+		FreeFbxDirData(lock, ed);
 		fs->r2 = ERROR_OBJECT_NOT_FOUND;
 		return DOSFALSE;
 	}
