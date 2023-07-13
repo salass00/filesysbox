@@ -165,3 +165,5 @@ filesysbox.library 54.5 (d.m.2023)
 - Made FbxLockName2Path() return FALSE for any paths containing "." or ".." as
   a file or directory name.
 
+- AmigaOS 3: Added a version compiled for the 68060 CPU.
+
