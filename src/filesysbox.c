@@ -491,7 +491,7 @@ void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStam
 
 	ds->ds_Days = sec / (60*60*24);
 	ds->ds_Minute = (sec % (60*60*24)) / 60;
-	ds->ds_Tick = (sec % 60) * 50 + nsec / (1000*1000*1000/50);
+	ds->ds_Tick = (sec % 60) * TICKS_PER_SECOND + nsec / ((1000*1000*1000) / TICKS_PER_SECOND);
 }
 
 int FbxFlushAll(struct FbxFS *fs) {

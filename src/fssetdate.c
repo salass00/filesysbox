@@ -31,8 +31,8 @@ static void FbxDS2TimeSpec(struct FbxFS *fs, const struct DateStamp *ds,
 
 	sec = ds->ds_Days * (60*60*24);
 	sec += ds->ds_Minute * 60;
-	sec += ds->ds_Tick / 50;
-	nsec = (ds->ds_Tick % 50) * (1000*1000*1000/50);
+	sec += ds->ds_Tick / TICKS_PER_SECOND;
+	nsec = (ds->ds_Tick % TICKS_PER_SECOND) * ((1000*1000*1000) / TICKS_PER_SECOND);
 
 	// add 8 years of seconds to adjust for different epoch.
 	sec += UNIXTIMEOFFSET;
