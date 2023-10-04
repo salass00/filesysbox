@@ -191,7 +191,7 @@ SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
 		r1 = DOSTRUE;
 		fs->r2 = 0;
 		break;
-	case 0:
+	case ACTION_NIL:
 		r1 = DOSFALSE;
 		fs->r2 = 0;
 		break;
