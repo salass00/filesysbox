@@ -43,7 +43,7 @@ static STDARGS int dir_fill_func(void *udata, const char *name, const struct fbx
 
 	if (name == NULL) return 2;
 
-	if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0) {
+	if (!IsDotOrDotDot(name)) {
 		if (FbxCheckString(fs, name)) {
 			len = strlen(name) + 1;
 			ed = AllocFbxDirData(lock, len);

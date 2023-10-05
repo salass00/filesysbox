@@ -547,6 +547,10 @@ struct FbxExAllState { // exallctrl->lastkey points to this
 #define FbxUTF8ToLocal(fs, dst, src, dst_size) utf8_to_local(dst, src, dst_size, (fs)->maptree)
 #define FbxLocalToUTF8(fs, dst, src, dst_size) local_to_utf8(dst, src, dst_size, (fs)->maptable)
 
+static inline BOOL IsDotOrDotDot(const char *name) {
+	return (name[0] == '.' && (name[1] == '\0' || (name[1] == '.' && name[2] == '\0')));
+}
+
 /* main/FbxSetupFS.c */
 #ifndef NODEBUG
 void FbxReadDebugFlags(struct FbxFS *fs);

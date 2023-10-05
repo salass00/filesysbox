@@ -332,7 +332,7 @@ BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, 
 
 			FbxStrlcpy(fs, tname, name, len);
 
-			if (strcmp(tname, ".") == 0 || strcmp(tname, "..") == 0)
+			if (IsDotOrDotDot(tname))
 				return FALSE;
 
 			if (strcmp(fullpathbuf, "/") != 0 && tname[0])
