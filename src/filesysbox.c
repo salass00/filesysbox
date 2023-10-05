@@ -326,16 +326,16 @@ BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, 
 			p = strchr(name, '/');
 			if (p == NULL) p = strchr(name, '\0');
 
-			len = p - name + 1;
-			if (len > sizeof(tname))
+			len = p - name;
+			if (len >= sizeof(tname))
 				return FALSE;
 
-			FbxStrlcpy(fs, tname, name, len);
+			FbxStrlcpy(fs, tname, name, len + 1);
 
 			if (IsDotOrDotDot(tname))
 				return FALSE;
 
-			if (strcmp(fullpathbuf, "/") != 0 && tname[0])
+			if (strcmp(fullpathbuf, "/") != 0)
 				FbxStrlcat(fs, fullpathbuf, "/", FBX_MAX_PATH);
 
 			FbxStrlcat(fs, fullpathbuf, tname, FBX_MAX_PATH);
