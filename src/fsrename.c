@@ -32,7 +32,7 @@ static void FbxUpdatePaths(struct FbxFS *fs, const char *oldpath, const char *ne
 	// global hashtable and compare entry->path
 	int plen = FbxStrlen(fs, oldpath);
 	int a;
-	if (strcmp(oldpath, "/") == 0) plen = 0;
+	if (IsRoot(oldpath)) plen = 0;
 	for (a = 0; a < ENTRYHASHSIZE; a++) {
 		chain = fs->currvol->entrytab[a].mlh_Head;
 		while ((succ = chain->mln_Succ) != NULL) {
@@ -110,7 +110,7 @@ int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 		return DOSFALSE;
 	}
 
-	if (strcmp(fullpath, "/") == 0) {
+	if (IsRoot(fullpath)) {
 		// can't rename root
 		fs->r2 = ERROR_OBJECT_WRONG_TYPE;
 		return DOSFALSE;

@@ -23,7 +23,7 @@ static void FbxClearArchiveFlags(struct FbxFS *fs, const char *fullpath) {
 			prot &= ~FIBF_ARCHIVE;
 			FbxSetAmigaProtectionFlags(fs, pathbuf, prot);
 		}
-	} while (FbxParentPath(fs, pathbuf) && strcmp(pathbuf, "/") != 0);
+	} while (FbxParentPath(fs, pathbuf) && !IsRoot(pathbuf));
 }
 
 int FbxCloseFile(struct FbxFS *fs, struct FbxLock *lock) {

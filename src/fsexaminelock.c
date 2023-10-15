@@ -63,7 +63,7 @@ void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *st
 	const char *name, *pcomment;
 	LONG type;
 
-	if (strcmp(fullpath, "/") == 0) {
+	if (IsRoot(fullpath)) {
 		name = fs->currvol->volname;
 		type = ST_ROOT;
 	} else {

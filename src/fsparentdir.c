@@ -12,7 +12,7 @@
 #include <string.h>
 
 BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf) {
-	if (strcmp(pathbuf, "/") == 0) {
+	if (IsRoot(pathbuf)) {
 		// can't parent root
 		return FALSE;
 	}

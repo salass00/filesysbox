@@ -335,7 +335,7 @@ BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, 
 			if (IsDotOrDotDot(tname))
 				return FALSE;
 
-			if (strcmp(fullpathbuf, "/") != 0)
+			if (!IsRoot(fullpathbuf))
 				FbxStrlcat(fs, fullpathbuf, "/", FBX_MAX_PATH);
 
 			FbxStrlcat(fs, fullpathbuf, tname, FBX_MAX_PATH);
@@ -464,7 +464,7 @@ void FbxSetModifyState(struct FbxFS *fs, int state) {
 
 BOOL FbxIsParent(struct FbxFS *fs, const char *parent, const char *child) {
 	int plen = FbxStrlen(fs, parent);
-	if (strcmp(parent, "/") == 0) plen = 0;
+	if (IsRoot(parent)) plen = 0;
 	if (FbxStrncmp(fs, parent, child, plen) == 0 && child[plen] == '/')
 		return TRUE;
 	else
