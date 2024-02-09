@@ -86,7 +86,7 @@ int FbxSetDate(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	}
 
 	FbxDS2TimeSpec(fs, date, &tv[0]);
-	FbxDS2TimeSpec(fs, date, &tv[1]);
+	tv[1] = tv[0];
 
 	if (FSOP utimens) {
 		error = Fbx_utimens(fs, fullpath, tv);
