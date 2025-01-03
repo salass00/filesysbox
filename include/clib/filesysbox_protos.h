@@ -40,7 +40,7 @@ void FbxCopyStringCToBSTR(CONST_STRPTR src, BSTR dst, ULONG size);
 void FbxQueryFS(struct FbxFS * fs, const struct TagItem * tags);
 void FbxQueryFSTags(struct FbxFS * fs, Tag tags, ...);
 void FbxGetSysTime(struct FbxFS * fs, struct timeval * tv);
-void FbxGetUpTime(struct FbxFs * fs, struct timeval * tv);
+void FbxGetUpTime(struct FbxFS * fs, struct timeval * tv);
 
 #ifdef __cplusplus
 }

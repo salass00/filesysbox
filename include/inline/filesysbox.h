@@ -86,7 +86,7 @@ typedef ULONG _sfdc_vararg;
       , FILESYSBOX_BASE_NAME)
 
 #define FbxGetUpTime(___fs, ___tv) \
-      LP2NR(0x78, FbxGetUpTime , struct FbxFs *, ___fs, a0, struct timeval *, ___tv, a1,\
+      LP2NR(0x78, FbxGetUpTime , struct FbxFS *, ___fs, a0, struct timeval *, ___tv, a1,\
       , FILESYSBOX_BASE_NAME)
 
 #endif /* !_INLINE_FILESYSBOX_H */
