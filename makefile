@@ -1,3 +1,4 @@
+#HOST  ?= x86_64-aros
 HOST  ?= i386-aros
 DEBUG ?= 0
 
