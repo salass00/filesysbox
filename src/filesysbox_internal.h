@@ -89,9 +89,6 @@ struct FileSysBoxBase {
 	struct Library        *sysbase;
 	struct Library        *dosbase;
 	struct Library        *utilitybase;
-#if defined(__AROS__) && !defined(NO_AROSC_LIB)
-	struct Library        *aroscbase;
-#endif
 	struct Library        *localebase;
 
 	struct SignalSemaphore procsema;

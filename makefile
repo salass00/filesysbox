@@ -35,7 +35,6 @@ endif
 
 ifneq (,$(findstring -aros,$(HOST)))
 	CPU = $(patsubst %-aros,%,$(HOST))
-	DEFINES += -DNO_AROSC_LIB
 	LIBS += -lstdc.static
 endif
 

@@ -17,10 +17,6 @@ struct Library *SysBase;
 //struct Library *__UtilityBase;
 struct Library *UtilityBase;
 #endif
-#if defined(__AROS__) && !defined(NO_AROSC_LIB)
-struct Library *aroscbase;
-#endif
-
 static inline void SetGlobalSysBase(struct Library *sysbase) {
 	SysBase = sysbase;
 }
@@ -63,21 +59,10 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 
 	libBase->localebase = OpenLibrary((CONST_STRPTR)"locale.library", 38);
 
-#if defined(__AROS__) && !defined(NO_AROSC_LIB)
-	libBase->aroscbase = OpenLibrary((CONST_STRPTR)"arosc.library", 41);
-	if (libBase->aroscbase == NULL) {
-		Alert(AG_OpenLib|AO_Unknown);
-		goto error;
-	}
-#endif
-
 	SetGlobalSysBase(SysBase);
 #ifdef libnix
 	//__UtilityBase = libBase->utilitybase;
 	UtilityBase = libBase->utilitybase;
-#endif
-#if defined(__AROS__) && !defined(NO_AROSC_LIB)
-	aroscbase = libBase->aroscbase;
 #endif
 
 	InitSemaphore(&libBase->procsema);
@@ -170,9 +155,6 @@ BPTR LibExpunge(
 		result = libBase->seglist;
 
 		/* Undo what the init code did */
-#if defined(__AROS__) && !defined(NO_AROSC_LIB)
-		CloseLibrary(libBase->aroscbase);
-#endif
 		if (libBase->localebase) {
 			CloseLibrary(libBase->localebase);
 		}
