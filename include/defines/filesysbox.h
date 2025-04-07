@@ -3,14 +3,7 @@
 #ifndef _INLINE_FILESYSBOX_H
 #define _INLINE_FILESYSBOX_H
 
-#ifndef _SFDC_VARARG_DEFINED
-#define _SFDC_VARARG_DEFINED
-#ifdef __HAVE_IPTR_ATTR__
-typedef APTR _sfdc_vararg __attribute__((iptr));
-#else
-typedef ULONG _sfdc_vararg;
-#endif /* __HAVE_IPTR_ATTR__ */
-#endif /* _SFDC_VARARG_DEFINED */
+#include <aros/preprocessor/variadic/cast2iptr.hpp>
 
 #ifndef AROS_LIBCALL_H
 #include <aros/libcall.h>
@@ -106,8 +99,11 @@ typedef ULONG _sfdc_vararg;
      struct Library *, FILESYSBOX_BASE_NAME, 18, Filesysbox)
 
 #ifndef NO_INLINE_STDARG
-#define FbxQueryFSTags(___fs, ___tags, ...) \
-    ({_sfdc_vararg _tags[] = { ___tags, __VA_ARGS__ }; FbxQueryFS((___fs), (const struct TagItem *) _tags); })
+#define FbxQueryFSTags(___fs, ...) \
+({ \
+    const IPTR FbxQueryFSTags_args[] = { AROS_PP_VARIADIC_CAST2IPTR(__VA_ARGS__) };\
+    FbxQueryFS((___fs), (struct TagItem *)(FbxQueryFSTags_args)); \
+})
 #endif /* !NO_INLINE_STDARG */
 
 #define FbxGetSysTime(___fs, ___tv) \

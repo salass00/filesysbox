@@ -1,3 +1,4 @@
+#HOST  ?= x86_64-aros
 HOST  ?= i386-aros
 DEBUG ?= 0
 
@@ -35,7 +36,6 @@ endif
 
 ifneq (,$(findstring -aros,$(HOST)))
 	CPU = $(patsubst %-aros,%,$(HOST))
-	DEFINES += -DNO_AROSC_LIB
 	LIBS += -lstdc.static
 endif
 
