@@ -661,6 +661,11 @@ int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify);
 int FbxChangeFilePosition(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode);
 #endif
 
+/* fschangefilesize.c */
+#ifdef ENABLE_DP64_SUPPORT
+int FbxChangeFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode);
+#endif
+
 /* fschangemode.c */
 int FbxChangeMode(struct FbxFS *fs, struct FbxLock *lock, int mode);
 
