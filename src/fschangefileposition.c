@@ -12,7 +12,7 @@
 #include "filesysbox_internal.h"
 
 int FbxChangeFilePosition(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode) {
-	if (FbxSeekFile(fs, lock, pos, mode) == -1) {
+	if (FbxSeekFile64(fs, lock, pos, mode) == -1) {
 		return DOSFALSE;
 	}
 

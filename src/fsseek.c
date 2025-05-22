@@ -10,7 +10,7 @@
 
 #include "filesysbox_internal.h"
 
-QUAD FbxSeekFile(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode) {
+QUAD FbxSeekFile64(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode) {
 	QUAD newpos, oldpos, size;
 
 	PDEBUGF("FbxSeekFile(%#p, %#p, %lld, %d)\n", fs, lock, pos, mode);
@@ -44,5 +44,17 @@ QUAD FbxSeekFile(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode) {
 	lock->filepos = newpos;
 	fs->r2 = 0;
 	return oldpos;
+}
+
+SIPTR FbxSeekFile(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode) {
+	QUAD oldpos;
+
+	oldpos = FbxSeekFile64(fs, lock, pos, mode);
+	if (oldpos != (SIPTR)oldpos) {
+		fs->r2 = ERROR_OBJECT_TOO_LARGE;
+		return -1;
+	}
+
+	return (SIPTR)oldpos;
 }
 

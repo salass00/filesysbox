@@ -12,7 +12,7 @@
 #include "filesysbox_internal.h"
 
 int FbxChangeFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode) {
-	if (FbxSetFileSize(fs, lock, offs, mode) == -1) {
+	if (FbxSetFileSize64(fs, lock, offs, mode) == -1) {
 		return DOSFALSE;
 	}
 

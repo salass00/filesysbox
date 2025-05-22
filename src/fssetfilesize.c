@@ -35,7 +35,7 @@ static QUAD FbxTruncNewSize(struct FbxFS *fs, struct FbxLock *lock, QUAD newsize
 	return newsize;
 }
 
-QUAD FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode) {
+QUAD FbxSetFileSize64(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode) {
 	QUAD oldsize, newsize;
 	int error;
 
@@ -88,5 +88,17 @@ QUAD FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode)
 
 	fs->r2 = 0;
 	return newsize;
+}
+
+SIPTR FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode) {
+	QUAD newsize;
+
+	newsize = FbxSetFileSize(fs, lock, offs, mode);
+	if (newsize != (SIPTR)newsize) {
+		fs->r2 = ERROR_OBJECT_TOO_LARGE;
+		return -1;
+	}
+
+	return (SIPTR)newsize;
 }
 
