@@ -35,6 +35,31 @@
 #error "FIXME: Implement DOS64 support"
 #endif
 
+struct DosPacket64
+{
+	struct Message *dp_Link;
+	struct MsgPort *dp_Port;
+
+	LONG dp_Type;
+	LONG dp_Res0;
+
+	LONG dp_Res2;
+	BYTE dp_pad1[4];
+	QUAD dp_Res1;
+
+	LONG dp_Arg1;
+	BYTE dp_pad2[4];
+	QUAD dp_Arg2;
+	LONG dp_Arg3;
+	LONG dp_Arg4;
+	QUAD dp_Arg5;
+};
+
+#define ACTION_CHANGE_FILE_POSITION64 8001
+#define ACTION_GET_FILE_POSITION64    8002
+#define ACTION_CHANGE_FILE_SIZE64     8003
+#define ACTION_GET_FILE_SIZE64        8004
+
 #define DOS_OWNER_ROOT 65535
 #define DOS_OWNER_NONE 0
 
@@ -609,6 +634,9 @@ void FbxUnResolveNotifys(struct FbxFS *fs, struct FbxEntry *e);
 /* dopacket.c */
 SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt);
 
+/* dopacket64.c */
+QUAD FbxDoPacket64(struct FbxFS *fs, struct DosPacket64 *pkt);
+
 /* doslist.c */
 struct Process *StartDosListProc(struct FileSysBoxBase *libBase);
 int FbxAsyncAddVolume(struct FbxFS *fs, struct FbxVolume *vol);
@@ -677,6 +705,9 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 
 /* fsformat.c */
 int FbxFormat(struct FbxFS *fs, const char *volname, ULONG dostype);
+
+/* fsgetfilesize.c */
+QUAD FbxGetFileSize(struct FbxFS *fs, struct FbxLock *lock);
 
 /* fsinfodata.c */
 int FbxDiskInfo(struct FbxFS *fs, struct InfoData *info);

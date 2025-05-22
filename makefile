@@ -51,11 +51,11 @@ main_SRCS = $(wildcard src/main/*.c)
 
 SRCS = $(addprefix src/, \
        init.c filesysbox.c diskchange.c timer.c notify.c doslist.c lockhandler.c \
-       fuse_stubs.c dopacket.c fsaddnotify.c fschangemode.c fsclose.c \
+       fuse_stubs.c dopacket.c dopacket64.c fsaddnotify.c fschangemode.c fsclose.c \
        fscreatedir.c fscreatehardlink.c fscreatesoftlink.c fscurrentvolume.c \
        fsdelete.c fsdie.c fsduplock.c fsexamineall.c fsexamineallend.c fsexaminelock.c \
-       fsexaminenext.c fsformat.c fsinfodata.c fsinhibit.c fslock.c fsopen.c \
-       fsopenfromlock.c fsparentdir.c fsread.c fsreadlink.c fsrelabel.c \
+       fsexaminenext.c fsformat.c fsgetfilesize.c fsinfodata.c fsinhibit.c fslock.c \
+       fsopen.c fsopenfromlock.c fsparentdir.c fsread.c fsreadlink.c fsrelabel.c \
        fsremovenotify.c fsrename.c fssamelock.c fsseek.c fssetcomment.c \
        fssetdate.c fssetfilesize.c fssetownerinfo.c fssetprotection.c \
        fsunlock.c fswrite.c fswriteprotect.c volume.c xattrs.c utf8.c ucs4.c \

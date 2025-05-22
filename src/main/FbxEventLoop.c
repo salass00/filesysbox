@@ -159,23 +159,40 @@ static void FbxStopTimer(struct FbxFS *fs) {
 }
 
 static void FbxReturnPacket(struct FbxFS *fs, struct DosPacket *pkt, SIPTR r1, SIPTR r2) {
-	struct Library *DOSBase   = fs->dosbase;
+	struct Library *DOSBase = fs->dosbase;
 
-	ReplyPkt(pkt, r1, r2);
+	pkt->dp_Res1 = r1;
+	pkt->dp_Res2 = r2;
+
+	SendPkt(pkt, pkt->dp_Port, fs->fsport);
+}
+
+static void FbxReturnPacket64(struct FbxFS *fs, struct DosPacket64 *pkt, QUAD r1, SIPTR r2) {
+	struct Library *DOSBase = fs->dosbase;
+
+	pkt->dp_Res1 = r1;
+	pkt->dp_Res2 = r2;
+
+	SendPkt((struct DosPacket *)pkt, pkt->dp_Port, fs->fsport);
 }
 
 static void FbxHandlePackets(struct FbxFS *fs) {
 	struct Library *SysBase = fs->sysbase;
 	struct Message *msg;
 	struct DosPacket *pkt;
-	SIPTR r1;
 
 	DEBUGF("FbxHandlePackets(%#p)\n", fs);
 
 	while ((msg = GetMsg(fs->fsport)) != NULL) {
 		pkt = (struct DosPacket *)msg->mn_Node.ln_Name;
-		r1 = FbxDoPacket(fs, pkt);
-		FbxReturnPacket(fs, pkt, r1, fs->r2);
+		if (pkt->dp_Type > 8000 && pkt->dp_Type < 9000) {
+			struct DosPacket64 *pkt64 = (struct DosPacket64 *)pkt;
+			QUAD r1 = FbxDoPacket64(fs, pkt64);
+			FbxReturnPacket64(fs, pkt64, r1, fs->r2);
+		} else {
+			SIPTR r1 = FbxDoPacket(fs, pkt);
+			FbxReturnPacket(fs, pkt, r1, fs->r2);
+		}
 	}
 }
 
