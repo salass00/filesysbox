@@ -656,6 +656,11 @@ void FbxCollectNotifyNode(struct FbxFS *fs, struct FbxNotifyNode *nn);
 /* fsaddnotify.c */
 int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify);
 
+/* fschangefileposition.c */
+#ifdef ENABLE_DP64_SUPPORT
+int FbxChangeFilePosition(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode);
+#endif
+
 /* fschangemode.c */
 int FbxChangeMode(struct FbxFS *fs, struct FbxLock *lock, int mode);
 

@@ -24,6 +24,9 @@ QUAD FbxDoPacket64(struct FbxFS *fs, struct DosPacket64 *pkt) {
 
 	type = pkt->dp_Type;
 	switch (type) {
+	case ACTION_CHANGE_FILE_POSITION64:
+		r1 = FbxChangeFilePosition(fs, (struct FbxLock *)BADDR(pkt->dp_Arg1), pkt->dp_Arg2, pkt->dp_Arg3);
+		break;
 	case ACTION_GET_FILE_POSITION64:
 		r1 = FbxGetFilePosition(fs, (struct FbxLock *)BADDR(pkt->dp_Arg1));
 		break;
