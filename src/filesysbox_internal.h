@@ -770,7 +770,7 @@ int FbxSameLock(struct FbxFS *fs, struct FbxLock *lock, struct FbxLock *lock2);
 
 /* fsseek.c */
 QUAD FbxSeekFile64(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode);
-SIPTR FbxSeekFile(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode);
+SIPTR FbxSeekFile(struct FbxFS *fs, struct FbxLock *lock, SIPTR pos, int mode);
 
 /* fssetcomment.c */
 int FbxSetComment(struct FbxFS *fs, struct FbxLock *lock, const char *name,
@@ -782,7 +782,7 @@ int FbxSetDate(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 
 /* fssetfilesize.c */
 QUAD FbxSetFileSize64(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode);
-SIPTR FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode);
+SIPTR FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, SIPTR offs, int mode);
 
 /* fssetownerinfo.c */
 int FbxSetOwnerInfo(struct FbxFS *fs, struct FbxLock *lock, const char *name,

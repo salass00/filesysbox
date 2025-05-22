@@ -46,7 +46,7 @@ QUAD FbxSeekFile64(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode) {
 	return oldpos;
 }
 
-SIPTR FbxSeekFile(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode) {
+SIPTR FbxSeekFile(struct FbxFS *fs, struct FbxLock *lock, SIPTR pos, int mode) {
 	QUAD oldpos;
 
 	oldpos = FbxSeekFile64(fs, lock, pos, mode);

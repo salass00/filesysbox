@@ -90,7 +90,7 @@ QUAD FbxSetFileSize64(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mod
 	return newsize;
 }
 
-SIPTR FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode) {
+SIPTR FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, SIPTR offs, int mode) {
 	QUAD newsize;
 
 	newsize = FbxSetFileSize(fs, lock, offs, mode);
