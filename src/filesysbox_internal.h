@@ -710,6 +710,11 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 /* fsformat.c */
 int FbxFormat(struct FbxFS *fs, const char *volname, ULONG dostype);
 
+/* fsgetfileposition.c */
+#ifdef ENABLE_DP64_SUPPORT
+QUAD FbxGetFilePosition(struct FbxFS *fs, struct FbxLock *lock);
+#endif
+
 /* fsgetfilesize.c */
 #ifdef ENABLE_DP64_SUPPORT
 QUAD FbxGetFileSize(struct FbxFS *fs, struct FbxLock *lock);
