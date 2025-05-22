@@ -40,6 +40,7 @@ ifneq (,$(findstring -aros,$(HOST)))
 endif
 
 ifeq ($(HOST),m68k-amigaos)
+	DEFINES += -DENABLE_DP64_SUPPORT
 	ARCH_000 = -mcpu=68000 -mtune=68000
 	ARCH_020 = -mcpu=68020 -mtune=68020-60
 	ARCH_060 = -mcpu=68060 -mtune=68060

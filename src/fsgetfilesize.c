@@ -8,6 +8,7 @@
  * See the file LICENSE.APL
  */
 
+#ifdef ENABLE_DP64_SUPPORT
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
 
@@ -35,3 +36,6 @@ QUAD FbxGetFileSize(struct FbxFS *fs, struct FbxLock *lock) {
 	fs->r2 = 0;
 	return statbuf.st_size;
 }
+
+#endif /* #ifdef ENABLE_DP64_SUPPORT */
+

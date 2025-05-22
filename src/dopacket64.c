@@ -8,6 +8,7 @@
  * See the file LICENSE.APL
  */
 
+#ifdef ENABLE_DP64_SUPPORT
 #include "filesysbox_internal.h"
 
 QUAD FbxDoPacket64(struct FbxFS *fs, struct DosPacket64 *pkt) {
@@ -36,4 +37,6 @@ QUAD FbxDoPacket64(struct FbxFS *fs, struct DosPacket64 *pkt) {
 
 	return r1;
 }
+
+#endif /* ENABLE_DP64_SUPPORT */
 

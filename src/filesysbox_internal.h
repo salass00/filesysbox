@@ -35,6 +35,7 @@
 #error "FIXME: Implement DOS64 support"
 #endif
 
+#ifdef ENABLE_DP64_SUPPORT
 struct DosPacket64
 {
 	struct Message *dp_Link;
@@ -59,6 +60,7 @@ struct DosPacket64
 #define ACTION_GET_FILE_POSITION64    8002
 #define ACTION_CHANGE_FILE_SIZE64     8003
 #define ACTION_GET_FILE_SIZE64        8004
+#endif /* ENABLE_DP64_SUPPORT */
 
 #define DOS_OWNER_ROOT 65535
 #define DOS_OWNER_NONE 0
@@ -635,7 +637,9 @@ void FbxUnResolveNotifys(struct FbxFS *fs, struct FbxEntry *e);
 SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt);
 
 /* dopacket64.c */
+#ifdef ENABLE_DP64_SUPPORT
 QUAD FbxDoPacket64(struct FbxFS *fs, struct DosPacket64 *pkt);
+#endif
 
 /* doslist.c */
 struct Process *StartDosListProc(struct FileSysBoxBase *libBase);
@@ -707,7 +711,9 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 int FbxFormat(struct FbxFS *fs, const char *volname, ULONG dostype);
 
 /* fsgetfilesize.c */
+#ifdef ENABLE_DP64_SUPPORT
 QUAD FbxGetFileSize(struct FbxFS *fs, struct FbxLock *lock);
+#endif
 
 /* fsinfodata.c */
 int FbxDiskInfo(struct FbxFS *fs, struct InfoData *info);

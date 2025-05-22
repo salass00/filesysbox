@@ -167,6 +167,7 @@ static void FbxReturnPacket(struct FbxFS *fs, struct DosPacket *pkt, SIPTR r1, S
 	SendPkt(pkt, pkt->dp_Port, fs->fsport);
 }
 
+#ifdef ENABLE_DP64_SUPPORT
 static void FbxReturnPacket64(struct FbxFS *fs, struct DosPacket64 *pkt, QUAD r1, SIPTR r2) {
 	struct Library *DOSBase = fs->dosbase;
 
@@ -175,6 +176,7 @@ static void FbxReturnPacket64(struct FbxFS *fs, struct DosPacket64 *pkt, QUAD r1
 
 	SendPkt((struct DosPacket *)pkt, pkt->dp_Port, fs->fsport);
 }
+#endif /* ENABLE_DP64_SUPPORT */
 
 static void FbxHandlePackets(struct FbxFS *fs) {
 	struct Library *SysBase = fs->sysbase;
@@ -185,11 +187,16 @@ static void FbxHandlePackets(struct FbxFS *fs) {
 
 	while ((msg = GetMsg(fs->fsport)) != NULL) {
 		pkt = (struct DosPacket *)msg->mn_Node.ln_Name;
-		if (pkt->dp_Type > 8000 && pkt->dp_Type < 9000) {
+#ifdef ENABLE_DP64_SUPPORT
+		if (pkt->dp_Type > 8000 && pkt->dp_Type < 9000)
+		{
 			struct DosPacket64 *pkt64 = (struct DosPacket64 *)pkt;
 			QUAD r1 = FbxDoPacket64(fs, pkt64);
 			FbxReturnPacket64(fs, pkt64, r1, fs->r2);
-		} else {
+		}
+		else
+#endif /* ENABLE_DP64_SUPPORT */
+		{
 			SIPTR r1 = FbxDoPacket(fs, pkt);
 			FbxReturnPacket(fs, pkt, r1, fs->r2);
 		}
