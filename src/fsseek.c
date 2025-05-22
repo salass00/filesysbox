@@ -9,36 +9,17 @@
  */
 
 #include "filesysbox_internal.h"
-#include "fuse_stubs.h"
 
 QUAD FbxSeekFile(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode) {
-	QUAD newpos, oldpos;
-	int error;
-	struct fbx_stat statbuf;
+	QUAD newpos, oldpos, size;
 
 	PDEBUGF("FbxSeekFile(%#p, %#p, %lld, %d)\n", fs, lock, pos, mode);
 
-	CHECKVOLUME(-1);
+	oldpos = FbxGetFilePosition(fs, lock);
+	if (oldpos == -1) return -1;
 
-	CHECKLOCK(lock, -1);
-
-	if (lock->fsvol != fs->currvol) {
-		fs->r2 = ERROR_NO_DISK;
-		return -1;
-	}
-
-	if (lock->info->nonseekable) {
-		fs->r2 = ERROR_ACTION_NOT_KNOWN;
-		return -1;
-	}
-
-	oldpos = lock->filepos;
-
-	error = Fbx_fgetattr(fs, lock->entry->path, &statbuf, lock->info);
-	if (error) {
-		fs->r2 = FbxFuseErrno2Error(error);
-		return -1;
-	}
+	size = FbxGetFileSize(fs, lock);
+	if (size == -1) return -1;
 
 	switch (mode) {
 	case OFFSET_BEGINNING:
@@ -48,19 +29,20 @@ QUAD FbxSeekFile(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode) {
 		newpos = oldpos + pos;
 		break;
 	case OFFSET_END:
-		newpos = statbuf.st_size + pos;
+		newpos = size + pos;
 		break;
 	default:
 		fs->r2 = ERROR_SEEK_ERROR;
 		return -1;
 	}
 
-	if (newpos < 0 || newpos > statbuf.st_size) {
+	if (newpos < 0 || newpos > size) {
 		fs->r2 = ERROR_SEEK_ERROR;
 		return -1;
 	}
 
 	lock->filepos = newpos;
+	fs->r2 = 0;
 	return oldpos;
 }
 
