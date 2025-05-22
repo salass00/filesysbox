@@ -167,3 +167,13 @@ filesysbox.library 54.5 (21.7.2023)
 
 - AmigaOS 3: Added a version compiled for the 68060 CPU.
 
+
+filesysbox.library 54.6 (d.m.2025)
+
+- AmigaOS 3: Added support for ACTION_CHANGE_FILE_POSITION64,
+  ACTION_CHANGE_FILE_SIZE64, ACTION_GET_FILE_POSITION64 and
+  ACTION_GET_FILE_SIZE64 packets.
+
+- ACTION_SEEK and ACTION_SET_FILE_SIZE now fail with ERROR_OBJECT_TOO_LARGE if
+  the return value is too large to fit into dp_Res1.
+
