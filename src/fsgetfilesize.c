@@ -14,7 +14,7 @@
 
 QUAD FbxGetFileSize(struct FbxFS *fs, struct FbxLock *lock) {
 	struct fbx_stat statbuf;
-	LONG error;
+	int error;
 
 	PDEBUGF("FbxGetFileSize(%#p, %#p)\n", fs, lock);
 

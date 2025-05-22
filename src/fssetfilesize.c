@@ -9,7 +9,6 @@
  */
 
 #include "filesysbox_internal.h"
-#include "fuse_stubs.h"
 
 static int Fbx_ftruncate(struct FbxFS *fs, const char *path, QUAD size, struct fuse_file_info *fi)
 {
@@ -27,10 +26,8 @@ static QUAD FbxTruncNewSize(struct FbxFS *fs, struct FbxLock *lock, QUAD newsize
 	chain = lock->entry->locklist.mlh_Head;
 	while ((succ = chain->mln_Succ) != NULL) {
 		fslock = FSLOCKFROMENTRYCHAIN(chain);
-		if (fslock != lock) {
-			if (fslock->filepos > newsize) {
-				newsize = fslock->filepos;
-			}
+		if (fslock != lock && fslock->filepos > newsize) {
+			newsize = fslock->filepos;
 		}
 		chain = succ;
 	}
@@ -41,26 +38,11 @@ static QUAD FbxTruncNewSize(struct FbxFS *fs, struct FbxLock *lock, QUAD newsize
 QUAD FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode) {
 	QUAD oldsize, newsize;
 	int error;
-	struct fbx_stat statbuf;
 
 	PDEBUGF("FbxSetFileSize(%#p, %#p, %lld, %d)\n", fs, lock, offs, mode);
 
-	CHECKVOLUME(-1);
-
-	CHECKLOCK(lock, -1);
-
-	if (lock->fsvol != fs->currvol) {
-		fs->r2 = ERROR_NO_DISK;
-		return -1;
-	}
-
-	error = Fbx_fgetattr(fs, lock->entry->path, &statbuf, lock->info);
-	if (error) {
-		fs->r2 = FbxFuseErrno2Error(error);
-		return -1;
-	}
-
-	oldsize = statbuf.st_size;
+	oldsize = FbxGetFileSize(fs, lock);
+	if (oldsize == -1) return -1;
 
 	switch (mode) {
 	case OFFSET_BEGINNING:
@@ -84,15 +66,15 @@ QUAD FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode)
 
 	CHECKWRITABLE(-1);
 
-	// check if there are other locks to this file and
-	// if any of their positions are above newsize.
+	/* check if there are other locks to this file and
+	 * if any of their positions are above newsize. */
 	if (FbxTruncNewSize(fs, lock, newsize) > newsize) {
 		fs->r2 = ERROR_OBJECT_IN_USE;
 		return -1;
 	}
 
-	// check if our lock's position points beyond new filesize
-	// if so, truncate position to new filesize..
+	/* check if our lock's position points beyond new filesize
+	 * if so, truncate position to new filesize.. */
 	if (lock->filepos > newsize) lock->filepos = newsize;
 
 	error = Fbx_ftruncate(fs, lock->entry->path, newsize, lock->info);
@@ -101,7 +83,7 @@ QUAD FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mode)
 		return -1;
 	}
 
-	lock->flags |= LOCKFLAG_MODIFIED; // for notification
+	lock->flags |= LOCKFLAG_MODIFIED; /* for notification */
 	FbxSetModifyState(fs, 1);
 
 	fs->r2 = 0;

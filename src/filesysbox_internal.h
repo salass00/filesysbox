@@ -726,9 +726,7 @@ QUAD FbxGetFilePosition(struct FbxFS *fs, struct FbxLock *lock);
 #endif
 
 /* fsgetfilesize.c */
-#ifdef ENABLE_DP64_SUPPORT
 QUAD FbxGetFileSize(struct FbxFS *fs, struct FbxLock *lock);
-#endif
 
 /* fsinfodata.c */
 int FbxDiskInfo(struct FbxFS *fs, struct InfoData *info);
