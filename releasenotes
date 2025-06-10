@@ -178,7 +178,7 @@ filesysbox.library 54.6 (3.6.2025)
   the return value is too large to fit into dp_Res1.
 
 
-filesysbox.library 54.7 (d.m.2025)
+filesysbox.library 54.7 (10.6.2025)
 
 - Fixed an infinite recursion bug in the new V54.6 ACTION_SET_FILE_SIZE
   implementation caused by the FbxSetFileSize() function calling itself
