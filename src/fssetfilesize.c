@@ -93,7 +93,7 @@ QUAD FbxSetFileSize64(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mod
 SIPTR FbxSetFileSize(struct FbxFS *fs, struct FbxLock *lock, SIPTR offs, int mode) {
 	QUAD newsize;
 
-	newsize = FbxSetFileSize(fs, lock, offs, mode);
+	newsize = FbxSetFileSize64(fs, lock, offs, mode);
 	if (newsize != (SIPTR)newsize) {
 		fs->r2 = ERROR_OBJECT_TOO_LARGE;
 		return -1;

@@ -177,3 +177,10 @@ filesysbox.library 54.6 (3.6.2025)
 - ACTION_SEEK and ACTION_SET_FILE_SIZE now fail with ERROR_OBJECT_TOO_LARGE if
   the return value is too large to fit into dp_Res1.
 
+
+filesysbox.library 54.7 (d.m.2025)
+
+- Fixed an infinite recursion bug in the new V54.6 ACTION_SET_FILE_SIZE
+  implementation caused by the FbxSetFileSize() function calling itself
+  instead of FbxSetFileSize64() as it was supposed to.
+
