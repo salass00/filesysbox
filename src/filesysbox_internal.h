@@ -31,6 +31,13 @@
 #include <stddef.h>
 #include <SDI/SDI_compiler.h>
 
+/* Compiler compatibility */
+#ifdef __VBCC__
+  #ifndef inline
+    #define inline __inline
+  #endif
+#endif
+
 #if defined(__AROS__) && defined(__DOS64)
 #error "FIXME: Implement DOS64 support"
 #endif
