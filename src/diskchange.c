@@ -66,7 +66,7 @@ struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskCh
 	interrupt = AllocPooled(fs->mempool, sizeof(*interrupt));
 	if (interrupt == NULL) goto cleanup;
 
-	bzero(interrupt, sizeof(*interrupt));
+	memset(interrupt, 0, sizeof(*interrupt));
 	interrupt->is_Node.ln_Type = NT_INTERRUPT;
 #ifdef __AROS__
 	interrupt->is_Node.ln_Name = (char *)AROS_BSTR_ADDR(fs->devnode->dn_Name);

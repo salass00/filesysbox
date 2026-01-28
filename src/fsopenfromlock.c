@@ -48,7 +48,7 @@ int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock) {
 		fs->r2 = ERROR_NO_FREE_STORE;
 		return DOSFALSE;
 	}
-	bzero(lock->info, sizeof(*lock->info));
+	memset(lock->info, 0, sizeof(*lock->info));
 
 	if (fs->currvol->vflags & FBXVF_READ_ONLY)
 		lock->info->flags = O_RDONLY;

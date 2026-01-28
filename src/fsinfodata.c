@@ -21,14 +21,14 @@
 static void FbxFillInfoData(struct FbxFS *fs, struct InfoData *info) {
 	struct FbxVolume *vol = fs->currvol;
 
-	bzero(info, sizeof(*info));
+	memset(info, 0, sizeof(*info));
 
 	info->id_UnitNumber = fs->fssm ? fs->fssm->fssm_Unit : -1;
 
 	if (OKVOLUME(vol)) {
 		struct statvfs st;
 
-		bzero(&st, sizeof(st));
+		memset(&st, 0, sizeof(st));
 
 		Fbx_statfs(fs, "/", &st);
 

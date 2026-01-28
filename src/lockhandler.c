@@ -212,7 +212,7 @@ static int FbxLockHandlerProc(void) {
 
 					id = (struct InfoData *)BADDR(pkt->dp_Arg2);
 
-					bzero(id, sizeof(*id));
+					memset(id, 0, sizeof(*id));
 
 					id->id_UnitNumber    = -1;
 					id->id_DiskState     = ID_VALIDATING;
@@ -330,7 +330,7 @@ struct Process *StartLockHandlerProc(struct FileSysBoxBase *libBase) {
 		struct Library *SysBase = libBase->sysbase;
 		static struct Message msg;
 
-		bzero(&msg, sizeof(msg));
+		memset(&msg, 0, sizeof(msg));
 		msg.mn_Node.ln_Type = NT_MESSAGE;
 		msg.mn_Node.ln_Name = (char *)libBase;
 		msg.mn_Length = sizeof(msg);

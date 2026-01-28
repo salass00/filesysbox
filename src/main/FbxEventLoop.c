@@ -90,7 +90,7 @@ LONG FbxEventLoop(
 	FbxStartTimer(fs);
 
 #ifndef NODEBUG
-	bzero(&nr, sizeof(nr));
+	memset(&nr, 0, sizeof(nr));
 	nr.nr_Name = (STRPTR)"ENV:FBX_DBGFLAGS";
 	nr.nr_Flags = NRF_SEND_SIGNAL;
 	nr.nr_stuff.nr_Signal.nr_Task = FindTask(NULL);
