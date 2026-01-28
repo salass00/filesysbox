@@ -217,7 +217,7 @@ static int FbxAsyncDosListCmd(struct FbxFS *fs, struct FbxVolume *vol, int cmd, 
 			msg->fs = fs;
 			msg->vol = vol;
 			msg->cmd = cmd;
-			if (name != NULL) strcpy(msg->name, name);
+			if (name != NULL) memcpy(msg->name, name, strlen(name) + 1);
 			PutMsg(fs->dlproc_port, &msg->msg);
 			res = TRUE;
 		} else {
