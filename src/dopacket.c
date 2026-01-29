@@ -17,13 +17,9 @@ SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
 	#define BTOC(arg) ((const char *)(arg))
 	#define BTOC2(arg) ((const char *)(arg))
 #else
-	char namebuf[256], namebuf2[256];
-	#define BTOC(arg) ({ \
-		CopyStringBSTRToC((arg), namebuf, sizeof(namebuf)); \
-		namebuf;})
-	#define BTOC2(arg) ({ \
-		CopyStringBSTRToC((arg), namebuf2, sizeof(namebuf2)); \
-		namebuf2;})
+    char namebuf[256], namebuf2[256];
+    #define BTOC(arg)  (CopyStringBSTRToC((arg), namebuf,  sizeof(namebuf)),  namebuf)
+    #define BTOC2(arg) (CopyStringBSTRToC((arg), namebuf2, sizeof(namebuf2)), namebuf2)
 #endif
 
 	PDEBUGF("FbxDoPacket(%#p, %#p)\n", fs, pkt);
