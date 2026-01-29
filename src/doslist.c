@@ -200,24 +200,27 @@ static int FbxAsyncDosListCmd(struct FbxFS *fs, struct FbxVolume *vol, int cmd, 
 		UnLockDosList(LDF_ALL|LDF_WRITE);
 	} else {
 		struct FbxAsyncMsg *msg;
-		int len;
+		int msglen;
+		int namelen;
 
-		len = sizeof(struct FbxAsyncMsg);
-		if (name != NULL) len += strlen(name) + 1;
+		namelen = 0;
+		if (name != NULL) namelen = strlen(name) + 1;
+
+		msglen = sizeof(struct FbxAsyncMsg) + namelen;
 
 		for (i = 0; i < 10; i++) {
-			msg = AllocMem(len, MEMF_PUBLIC|MEMF_CLEAR);
+			msg = AllocMem(msglen, MEMF_PUBLIC|MEMF_CLEAR);
 			if (msg != NULL)
 				break;
 			Delay(10);
 		}
 		if (msg != NULL) {
 			msg->msg.mn_Node.ln_Type = NT_MESSAGE;
-			msg->msg.mn_Length = len;
+			msg->msg.mn_Length = msglen;
 			msg->fs = fs;
 			msg->vol = vol;
 			msg->cmd = cmd;
-			if (name != NULL) strcpy(msg->name, name);
+			if (name != NULL) memcpy(msg->name, name, namelen);
 			PutMsg(fs->dlproc_port, &msg->msg);
 			res = TRUE;
 		} else {
