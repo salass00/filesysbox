@@ -71,7 +71,7 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 		return fs->currvol = NULL;
 	}
 
-	bzero(conn, sizeof(*conn));
+	memset(conn, 0, sizeof(*conn));
 
 	initret = Fbx_init(fs, conn);
 	if (initret == (APTR)-2) {

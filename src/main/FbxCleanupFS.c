@@ -115,7 +115,7 @@ void FbxCleanupFS(
 
 		FbxCleanupTimerIO(fs);
 
-		bzero(fs, sizeof(*fs));
+		memset(fs, 0, sizeof(*fs));
 
 		FreeFbxFS(fs);
 	}
