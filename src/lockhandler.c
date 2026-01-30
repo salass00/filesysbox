@@ -123,26 +123,27 @@ static int FbxLockHandlerProc(void) {
 					lock = (struct FbxLock *)BADDR(pkt->dp_Arg1);
 					for (node = (struct Node *)locklist.mlh_Head; node->ln_Succ != NULL; node = node->ln_Succ) {
 						if ((struct FbxLock *)node->ln_Name == lock) {
-							Remove(node);
-							FreeMem(node, sizeof(*node));
-
-							if (lock->mempool != NULL) {
-								DeletePool(lock->mempool);
-							}
-							FreeFbxLock(lock);
-
 							found = TRUE;
 							break;
 						}
 					}
 
-					if (found) {
-						r1 = DOSTRUE;
-						r2 = 0;
-					} else {
+					if (!found) {
 						r1 = DOSFALSE;
 						r2 = ERROR_INVALID_LOCK;
+						break;
 					}
+
+					Remove(node);
+					FreeMem(node, sizeof(*node));
+
+					if (lock->mempool != NULL) {
+						DeletePool(lock->mempool);
+					}
+					FreeFbxLock(lock);
+
+					r1 = DOSTRUE;
+					r2 = 0;
 					break;
 				}
 
@@ -185,26 +186,27 @@ static int FbxLockHandlerProc(void) {
 					nn = (struct FbxNotifyNode *)nr->nr_notifynode;
 					for (node = (struct Node *)notifylist.mlh_Head; node->ln_Succ != NULL; node = node->ln_Succ) {
 						if ((struct FbxNotifyNode *)node->ln_Name == nn) {
-							Remove(node);
-							FreeMem(node, sizeof(*node));
-
-							FreeFbxNotifyNode(nn);
-
-							nr->nr_MsgCount = 0;
-							nr->nr_notifynode = (IPTR)NULL;
-
 							found = TRUE;
 							break;
 						}
 					}
 
-					if (found) {
-						r1 = DOSTRUE;
-						r2 = 0;
-					} else {
+					if (!found) {
 						r1 = DOSFALSE;
 						r2 = 0;
+						break;
 					}
+
+					Remove(node);
+					FreeMem(node, sizeof(*node));
+
+					FreeFbxNotifyNode(nn);
+
+					nr->nr_MsgCount = 0;
+					nr->nr_notifynode = (IPTR)NULL;
+
+					r1 = DOSTRUE;
+					r2 = 0;
 					break;
 				}
 
