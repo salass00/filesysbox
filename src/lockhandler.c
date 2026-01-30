@@ -118,34 +118,31 @@ static int FbxLockHandlerProc(void) {
 				{
 					struct FbxLock *lock;
 					struct Node *node;
+					BOOL found = FALSE;
 
 					lock = (struct FbxLock *)BADDR(pkt->dp_Arg1);
-					{
-						BOOL found = FALSE;
-						for (node = (struct Node *)locklist.mlh_Head; node->ln_Succ != NULL; node = node->ln_Succ) {
-							if ((struct FbxLock *)node->ln_Name == lock) {
-								Remove(node);
-								FreeMem(node, sizeof(*node));
+					for (node = (struct Node *)locklist.mlh_Head; node->ln_Succ != NULL; node = node->ln_Succ) {
+						if ((struct FbxLock *)node->ln_Name == lock) {
+							Remove(node);
+							FreeMem(node, sizeof(*node));
 
-								if (lock->mempool != NULL) {
-									DeletePool(lock->mempool);
-								}
-								FreeFbxLock(lock);
-
-								found = TRUE;
-								break;
+							if (lock->mempool != NULL) {
+								DeletePool(lock->mempool);
 							}
-						}
+							FreeFbxLock(lock);
 
-						if (!found) {
-							r1 = DOSFALSE;
-							r2 = ERROR_INVALID_LOCK;
+							found = TRUE;
 							break;
 						}
 					}
 
-					r1 = DOSTRUE;
-					r2 = 0;
+					if (found) {
+						r1 = DOSTRUE;
+						r2 = 0;
+					} else {
+						r1 = DOSFALSE;
+						r2 = ERROR_INVALID_LOCK;
+					}
 					break;
 				}
 
@@ -181,36 +178,33 @@ static int FbxLockHandlerProc(void) {
 					struct NotifyRequest *nr;
 					struct FbxNotifyNode *nn;
 					struct Node *node;
+					BOOL found = FALSE;
 
 					nr = (struct NotifyRequest *)pkt->dp_Arg1;
 
 					nn = (struct FbxNotifyNode *)nr->nr_notifynode;
-					{
-						BOOL found = FALSE;
-						for (node = (struct Node *)notifylist.mlh_Head; node->ln_Succ != NULL; node = node->ln_Succ) {
-							if ((struct FbxNotifyNode *)node->ln_Name == nn) {
-								Remove(node);
-								FreeMem(node, sizeof(*node));
+					for (node = (struct Node *)notifylist.mlh_Head; node->ln_Succ != NULL; node = node->ln_Succ) {
+						if ((struct FbxNotifyNode *)node->ln_Name == nn) {
+							Remove(node);
+							FreeMem(node, sizeof(*node));
 
-								FreeFbxNotifyNode(nn);
+							FreeFbxNotifyNode(nn);
 
-								nr->nr_MsgCount = 0;
-								nr->nr_notifynode = (IPTR)NULL;
+							nr->nr_MsgCount = 0;
+							nr->nr_notifynode = (IPTR)NULL;
 
-								found = TRUE;
-								break;
-							}
-						}
-
-						if (!found) {
-							r1 = DOSFALSE;
-							r2 = 0;
+							found = TRUE;
 							break;
 						}
 					}
 
-					r1 = DOSTRUE;
-					r2 = 0;
+					if (found) {
+						r1 = DOSTRUE;
+						r2 = 0;
+					} else {
+						r1 = DOSFALSE;
+						r2 = 0;
+					}
 					break;
 				}
 
