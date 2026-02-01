@@ -8,6 +8,7 @@
 #include "filesysbox_internal.h"
 #include <dos/dostags.h>
 #include <string.h>
+#include <stdalign.h>
 
 #define ACTION_COLLECT 3001
 
@@ -313,7 +314,7 @@ struct DeviceList *StartLockHandlerProc(struct FileSysBoxBase *libBase) {
 #endif
 	struct DeviceList *volume;
 	struct Process *proc;
-	__attribute__((aligned(4))) static const UBYTE volumename[] = {6,'N','U','L','L','E','D',0};
+	alignas(4) static const UBYTE volumename[] = {6,'N','U','L','L','E','D',0};
 
 	volume = AllocStructure(DeviceList);
 	if (volume == NULL)
