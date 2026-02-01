@@ -30,10 +30,10 @@ enum {
 	NUM_ARGS
 };
 
-static TEXT dosName[];
-static TEXT template[];
-static TEXT progName[];
-static TEXT pktName[];
+static const TEXT dosName[];
+static const TEXT template[];
+static const TEXT progName[];
+static const TEXT pktName[];
 
 #ifdef __AROS__
 AROS_UFH3(int, _start,
@@ -146,9 +146,9 @@ cleanup:
 #endif
 }
 
-static TEXT USED verstag[] = VERSTAG;
-static TEXT dosName[] = "dos.library";
-static TEXT template[] = TEMPLATE;
-static TEXT progName[] = "FbxDismount";
-static TEXT pktName[] = "ACTION_DIE";
+static const TEXT USED verstag[] = VERSTAG;
+static const TEXT dosName[] = "dos.library";
+static const TEXT template[] = TEMPLATE;
+static const TEXT progName[] = "FbxDismount";
+static const TEXT pktName[] = "ACTION_DIE";
 
