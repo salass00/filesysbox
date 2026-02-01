@@ -23,6 +23,7 @@ DESTDIR='tmp'
 #NUMVERS=`echo "${FULLVERS}" | cut -d' ' -f2`
 
 rm -rf ${DESTDIR}
+mkdir -p ${DESTDIR}/filesysbox/C
 mkdir -p ${DESTDIR}/filesysbox/Libs
 mkdir -p ${DESTDIR}/filesysbox/Developer/AutoDocs
 mkdir -p ${DESTDIR}/filesysbox/Developer/include/sfd
@@ -42,9 +43,11 @@ if [ "$HOST" = "m68k-amigaos" ]; then
   cp -p bin/filesysbox.library.000 ${DESTDIR}/filesysbox/Libs
   cp -p bin/filesysbox.library.020 ${DESTDIR}/filesysbox/Libs
   cp -p bin/filesysbox.library.060 ${DESTDIR}/filesysbox/Libs
+  cp -p dismount/bin/FbxDismount ${DESTDIR}/filesysbox/C
 else
   cp -p Install-AROS ${DESTDIR}/filesysbox/Install
   cp -p bin/filesysbox.library.${CPU} ${DESTDIR}/filesysbox/Libs/filesysbox.library
+  cp -p dismount/bin/FbxDismount.${CPU} ${DESTDIR}/filesysbox/C/FbxDismount
 fi;
 cp -p filesysbox.doc ${DESTDIR}/filesysbox/Developer/AutoDocs
 cp -p filesysbox_lib.sfd ${DESTDIR}/filesysbox/Developer/include/sfd
