@@ -114,7 +114,8 @@ int _start(void)
 	dn = (struct DeviceNode *)FindDosEntry(dol, devname, LDF_DEVICES | LDF_WRITE);
 	if (dn != NULL)
 	{
-		RemDosEntry((struct DosList *)dn);
+		if (dn->dn_Task == NULL)
+			RemDosEntry((struct DosList *)dn);
 	}
 	UnLockDosList(LDF_DEVICES | LDF_WRITE);
 
