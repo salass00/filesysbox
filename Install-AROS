@@ -6,12 +6,12 @@
   (source "Libs/filesysbox.library")
   (dest @default-dest)
 )
-(copyfiles
+(copylib
   (prompt "Copying FbxDismount command")
-  (help @copyfiles-help)
+  (help @copylib-help)
   (source "C/FbxDismount")
   (dest "SYS:C")
-  (confirm)
 )
+(protect "SYS:C/FbxDismount" "+p")
 (exit)
 
