@@ -35,6 +35,12 @@
 #error "FIXME: Implement DOS64 support"
 #endif
 
+#ifdef __GNUC__
+#define STATIC_ASSERT(cond,msg) _Static_assert(cond, msg)
+#else
+#define STATIC_ASSERT(cond,msg)
+#endif
+
 #ifdef ENABLE_DP64_SUPPORT
 struct DosPacket64
 {
@@ -499,6 +505,17 @@ struct FbxLock {
 	QUAD                   filepos;
 	ULONG                  flags; // LOCKFLAG_XXX
 };
+
+STATIC_ASSERT(offsetof(struct FbxLock, link) == offsetof(struct FileLock, fl_Link),
+              "offset of fl_Link differs between FbxLock and FileLock.");
+STATIC_ASSERT(offsetof(struct FbxLock, diskid) == offsetof(struct FileLock, fl_Key),
+              "offset of fl_Key differs between FbxLock and FileLock.");
+STATIC_ASSERT(offsetof(struct FbxLock, access) == offsetof(struct FileLock, fl_Access),
+              "offset of fl_Access differs between FbxLock and FileLock.");
+STATIC_ASSERT(offsetof(struct FbxLock, taskmp) == offsetof(struct FileLock, fl_Task),
+              "offset of fl_Task differs between FbxLock and FileLock.");
+STATIC_ASSERT(offsetof(struct FbxLock, volumebptr) == offsetof(struct FileLock, fl_Volume),
+              "offset of fl_Volume differs between FbxLock and FileLock.");
 
 #define LOCKFLAG_MODIFIED 1
 
