@@ -123,6 +123,10 @@ struct FileSysBoxBase {
 	struct Process        *lhproc;
 	volatile ULONG         dlproc_refcount;
 	volatile ULONG         lhproc_refcount;
+#ifndef __AROS__
+	struct Message         dlproc_startmsg;
+	struct Message         lhproc_startmsg;
+#endif
 };
 
 #ifdef NODEBUG

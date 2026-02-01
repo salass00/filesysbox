@@ -143,13 +143,13 @@ struct Process *StartDosListProc(struct FileSysBoxBase *libBase) {
 #ifndef __AROS__
 	if (dlproc != NULL) {
 		struct Library *SysBase = libBase->sysbase;
-		static struct Message msg;
+		struct Message *msg = &libBase->dlproc_startmsg;
 
-		memset(&msg, 0, sizeof(msg));
-		msg.mn_Node.ln_Type = NT_MESSAGE;
-		msg.mn_Node.ln_Name = (char *)libBase;
-		msg.mn_Length = sizeof(msg);
-		PutMsg(&dlproc->pr_MsgPort, &msg);
+		memset(msg, 0, sizeof(*msg));
+		msg->mn_Node.ln_Type = NT_MESSAGE;
+		msg->mn_Node.ln_Name = (char *)libBase;
+		msg->mn_Length = sizeof(*msg);
+		PutMsg(&dlproc->pr_MsgPort, msg);
 	}
 #endif
 
