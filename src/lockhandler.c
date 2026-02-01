@@ -293,8 +293,10 @@ static int FbxLockHandlerProc(void) {
 		}
 	}
 
+	FreeStructure(libBase->lhvolume, DeviceList);
+
 	Forbid();
-	libBase->lhproc = NULL;
+	libBase->lhvolume = NULL;
 	ReleaseSemaphore(&libBase->procsema);
 	return RETURN_OK;
 
@@ -303,11 +305,19 @@ static int FbxLockHandlerProc(void) {
 #endif
 }
 
-struct Process *StartLockHandlerProc(struct FileSysBoxBase *libBase) {
+struct DeviceList *StartLockHandlerProc(struct FileSysBoxBase *libBase) {
+	struct Library *SysBase = libBase->sysbase;
 	struct Library *DOSBase = libBase->dosbase;
-	struct Process *lhproc;
+	struct Message *msg = &libBase->lhproc_startmsg;
+	struct DeviceList *volume;
+	struct Process *proc;
+	__attribute__((aligned(4))) static const UBYTE volumename[] = {6,'N','U','L','L','E','D',0};
 
-	lhproc = CreateNewProcTags(
+	volume = AllocStructure(DeviceList);
+	if (volume == NULL)
+		return NULL;
+
+	proc = CreateNewProcTags(
 		NP_Entry,       (IPTR)FbxLockHandlerProc,
 #ifdef __AROS__
 		NP_UserData,    (IPTR)libBase,
@@ -328,29 +338,36 @@ struct Process *StartLockHandlerProc(struct FileSysBoxBase *libBase) {
 		NP_CloseOutput, FALSE,
 		NP_ConsoleTask, 0,
 		TAG_END);
+	if (proc == NULL) {
+		FreeStructure(volume, DeviceList);
+		return NULL;
+	}
 
 #ifndef __AROS__
-	if (lhproc != NULL) {
-		struct Library *SysBase = libBase->sysbase;
-		struct Message *msg = &libBase->lhproc_startmsg;
-
-		memset(msg, 0, sizeof(*msg));
-		msg->mn_Node.ln_Type = NT_MESSAGE;
-		msg->mn_Node.ln_Name = (char *)libBase;
-		msg->mn_Length = sizeof(*msg);
-		PutMsg(&lhproc->pr_MsgPort, msg);
-	}
+	msg->mn_Node.ln_Type = NT_MESSAGE;
+	msg->mn_Node.ln_Pri = 0;
+	msg->mn_Node.ln_Name = (char *)libBase;
+	msg->mn_Length = sizeof(*msg);
+	PutMsg(&proc->pr_MsgPort, msg);
 #endif
 
-	return lhproc;
+	volume->dl_Type = DLT_VOLUME;
+	volume->dl_Task = &proc->pr_MsgPort;
+	DateStamp(&volume->dl_VolumeDate);
+	volume->dl_DiskType = ID_NOT_REALLY_DOS;
+	volume->dl_Name = MKBADDR(volumename);
+
+	return volume;
 }
 
 void FbxCollectLock(struct FbxFS *fs, struct FbxLock *lock) {
 	struct Library *DOSBase = fs->dosbase;
 	struct MsgPort *port = fs->lhproc_port;
+	BPTR volumebptr = fs->lhproc_volumebptr;
 	struct FileHandle *fh;
 
 	lock->taskmp = port;
+	lock->volumebptr = volumebptr;
 	if ((fh = lock->fh) != NULL) {
 		fh->fh_Type = port;
 	}

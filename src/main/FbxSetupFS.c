@@ -306,22 +306,21 @@ struct FbxFS *FbxSetupFS(
 	// doslist process
 	ObtainSemaphore(&libBase->procsema);
 	if (libBase->dlproc == NULL) libBase->dlproc = StartDosListProc(libBase);
-	if (libBase->dlproc != NULL) {
-		libBase->dlproc_refcount++;
-		fs->dlproc_port = &libBase->dlproc->pr_MsgPort;
-	}
+	if (libBase->dlproc != NULL) libBase->dlproc_refcount++;
 	ReleaseSemaphore(&libBase->procsema);
 	if (libBase->dlproc == NULL) goto error;
 
+	fs->dlproc_port = &libBase->dlproc->pr_MsgPort;
+
 	// lockhandler process
 	ObtainSemaphore(&libBase->procsema);
-	if (libBase->lhproc == NULL) libBase->lhproc = StartLockHandlerProc(libBase);
-	if (libBase->lhproc != NULL) {
-		libBase->lhproc_refcount++;
-		fs->lhproc_port = &libBase->lhproc->pr_MsgPort;
-	}
+	if (libBase->lhvolume == NULL) libBase->lhvolume = StartLockHandlerProc(libBase);
+	if (libBase->lhvolume != NULL) libBase->lhproc_refcount++;
 	ReleaseSemaphore(&libBase->procsema);
-	if (libBase->lhproc == NULL) goto error;
+	if (libBase->lhvolume == NULL) goto error;
+
+	fs->lhproc_volumebptr = MKBADDR(libBase->lhvolume);
+	fs->lhproc_port = libBase->lhvolume->dl_Task;
 
 	fs->fcntx.fuse = fs;
 	fs->fcntx.private_data = udata;

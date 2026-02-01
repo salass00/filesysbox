@@ -120,7 +120,7 @@ struct FileSysBoxBase {
 
 	struct SignalSemaphore procsema;
 	struct Process        *dlproc;
-	struct Process        *lhproc;
+	struct DeviceList     *lhvolume;
 	volatile ULONG         dlproc_refcount;
 	volatile ULONG         lhproc_refcount;
 #ifndef __AROS__
@@ -393,6 +393,7 @@ struct FbxAVL {
 struct FbxFS {
 	struct FileSysBoxBase       *libbase;
 	struct MsgPort              *dlproc_port;
+	BPTR                         lhproc_volumebptr;
 	struct MsgPort              *lhproc_port;
 	struct Library              *sysbase;
 	struct Library              *dosbase;
@@ -479,11 +480,11 @@ struct FbxFS {
 	}
 
 struct FbxLock {
-	BPTR                   link; // not used
-	IPTR                   diskid;
-	LONG                   access; // exclusive or shared
-	struct MsgPort        *taskmp; // handler task's port
-	BPTR                   volumebptr; // BPTR to DLT_VOLUME DosList entry
+	BPTR                   link; // not used (fl_Link)
+	IPTR                   diskid; // ino (fl_Key)
+	LONG                   access; // exclusive or shared (fl_Access)
+	struct MsgPort        *taskmp; // handler task's port (fl_Task)
+	BPTR                   volumebptr; // BPTR to DLT_VOLUME DosList entry (fl_Volume)
 	struct FbxEntry       *entry;
 	struct fuse_file_info *info; // if file and opened
 	ULONG                  dostype;
@@ -653,7 +654,7 @@ int FbxAsyncRemFreeVolume(struct FbxFS *fs, struct FbxVolume *vol);
 int FbxAsyncRenameVolume(struct FbxFS *fs, struct FbxVolume *vol, const char *name);
 
 /* lockhandler.c */
-struct Process *StartLockHandlerProc(struct FileSysBoxBase *libBase);
+struct DeviceList *StartLockHandlerProc(struct FileSysBoxBase *libBase);
 void FbxCollectLock(struct FbxFS *fs, struct FbxLock *lock);
 void FbxCollectNotifyNode(struct FbxFS *fs, struct FbxNotifyNode *nn);
 

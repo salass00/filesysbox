@@ -81,7 +81,7 @@ void FbxCleanupFS(
 		if (fs->lhproc_port != NULL) {
 			ObtainSemaphore(&libBase->procsema);
 			if (--libBase->lhproc_refcount == 0)
-				Signal(&libBase->lhproc->pr_Task, SIGBREAKF_CTRL_C);
+				Signal(fs->lhproc_port->mp_SigTask, SIGBREAKF_CTRL_C);
 			ReleaseSemaphore(&libBase->procsema);
 		}
 

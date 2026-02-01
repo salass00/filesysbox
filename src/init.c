@@ -150,7 +150,7 @@ BPTR LibExpunge(
 
 	if (libBase->libnode.lib_OpenCnt == 0 &&
 		libBase->dlproc == NULL &&
-		libBase->lhproc == NULL)
+		libBase->lhvolume == NULL)
 	{
 		result = libBase->seglist;
 

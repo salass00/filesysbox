@@ -116,9 +116,9 @@ static int FbxDosListProc(void) {
 
 struct Process *StartDosListProc(struct FileSysBoxBase *libBase) {
 	struct Library *DOSBase = libBase->dosbase;
-	struct Process *dlproc;
+	struct Process *proc;
 
-	dlproc = CreateNewProcTags(
+	proc = CreateNewProcTags(
 		NP_Entry,       (IPTR)FbxDosListProc,
 #ifdef __AROS__
 		NP_UserData,    (IPTR)libBase,
@@ -141,19 +141,19 @@ struct Process *StartDosListProc(struct FileSysBoxBase *libBase) {
 		TAG_END);
 
 #ifndef __AROS__
-	if (dlproc != NULL) {
+	if (proc != NULL) {
 		struct Library *SysBase = libBase->sysbase;
 		struct Message *msg = &libBase->dlproc_startmsg;
 
-		memset(msg, 0, sizeof(*msg));
 		msg->mn_Node.ln_Type = NT_MESSAGE;
+		msg->mn_Node.ln_Pri = 0;
 		msg->mn_Node.ln_Name = (char *)libBase;
 		msg->mn_Length = sizeof(*msg);
-		PutMsg(&dlproc->pr_MsgPort, msg);
+		PutMsg(&proc->pr_MsgPort, msg);
 	}
 #endif
 
-	return dlproc;
+	return proc;
 }
 
 static int FbxAsyncDosListCmd(struct FbxFS *fs, struct FbxVolume *vol, int cmd, const char *name) {
