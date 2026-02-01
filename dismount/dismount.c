@@ -59,6 +59,7 @@ int _start(void)
 	BOOL pktsent = FALSE;
 	LONG error;
 	int rc = RETURN_ERROR;
+	BOOL freedevnode = FALSE;
 
 	DOSBase = OpenLibrary(dosName, 39);
 	if (DOSBase == NULL)
@@ -112,12 +113,18 @@ int _start(void)
 
 	dol = LockDosList(LDF_DEVICES | LDF_WRITE);
 	dn = (struct DeviceNode *)FindDosEntry(dol, devname, LDF_DEVICES | LDF_WRITE);
-	if (dn != NULL)
+	if (dn != NULL && dn->dn_Task == NULL)
 	{
-		if (dn->dn_Task == NULL)
-			RemDosEntry((struct DosList *)dn);
+		RemDosEntry((struct DosList *)dn);
+		freedevnode = TRUE;
 	}
 	UnLockDosList(LDF_DEVICES | LDF_WRITE);
+
+	if (freedevnode)
+	{
+		FreeDosEntry((struct DosList *)dn);
+		dn = NULL;
+	}
 
 	rc = RETURN_OK;
 
