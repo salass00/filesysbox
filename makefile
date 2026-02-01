@@ -29,9 +29,12 @@ LDFLAGS = -nostartfiles
 LIBS    = 
 STRIPFLAGS = -R.comment
 
+MKFLAGS = HOST=$(HOST)
+
 ifneq (,$(SYSROOT))
 	CFLAGS  := --sysroot=$(SYSROOT) $(CFLAGS)
 	LDFLAGS := --sysroot=$(SYSROOT) $(LDFLAGS)
+	MKFLAGS += SYSROOT=$(SYSROOT)
 endif
 
 ifneq (,$(findstring -aros,$(HOST)))
@@ -77,9 +80,9 @@ endif
 
 .PHONY: all
 ifeq ($(HOST),m68k-amigaos)
-all: $(BINDIR)/$(TARGET).000 $(BINDIR)/$(TARGET).020 $(BINDIR)/$(TARGET).060
+all: $(BINDIR)/$(TARGET).000 $(BINDIR)/$(TARGET).020 $(BINDIR)/$(TARGET).060 build-dismount
 else
-all: $(BINDIR)/$(TARGET).$(CPU) $(BINDIR)/$(TARGET).$(CPU).debug
+all: $(BINDIR)/$(TARGET).$(CPU) $(BINDIR)/$(TARGET).$(CPU).debug build-dismount
 endif
 
 -include $(DEPS)
@@ -139,9 +142,14 @@ $(BINDIR)/$(TARGET).060: $(OBJS_060)
 	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
 endif
 
+.PHONY: build-dismount
+build-dismount:
+	$(MAKE) -C dismount $(MKFLAGS)
+
 .PHONY: clean
 clean:
 	rm -rf bin obj
+	$(MAKE) -C dismount clean
 
 .PHONY: revision
 revision:
