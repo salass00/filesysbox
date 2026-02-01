@@ -308,7 +308,9 @@ static int FbxLockHandlerProc(void) {
 struct DeviceList *StartLockHandlerProc(struct FileSysBoxBase *libBase) {
 	struct Library *SysBase = libBase->sysbase;
 	struct Library *DOSBase = libBase->dosbase;
+#ifndef __AROS__
 	struct Message *msg = &libBase->lhproc_startmsg;
+#endif
 	struct DeviceList *volume;
 	struct Process *proc;
 	__attribute__((aligned(4))) static const UBYTE volumename[] = {6,'N','U','L','L','E','D',0};
