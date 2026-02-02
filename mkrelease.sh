@@ -37,7 +37,8 @@ mkdir -p ${DESTDIR}/filesysbox/Developer/include/include_h/sys
 
 cp -p README ${DESTDIR}/filesysbox
 cp -p LICENSE.APL ${DESTDIR}/filesysbox
-cp -p releasenotes ${DESTDIR}/filesysbox
+cp -p releasenotes ${DESTDIR}/filesysbox/filesysbox_lib_relnotes
+cp -p dismount/releasenotes ${DESTDIR}/filesysbox/FbxDismount_cmd_relnotes
 if [ "$HOST" = "m68k-amigaos" ]; then
   cp -p Install ${DESTDIR}/filesysbox
   cp -p bin/filesysbox.library.000 ${DESTDIR}/filesysbox/Libs
@@ -62,7 +63,8 @@ cp -p include/sys/statvfs.h ${DESTDIR}/filesysbox/Developer/include/include_h/sy
 cp -p icons/def_drawer.info ${DESTDIR}/filesysbox.info
 cp -p icons/def_doc.info ${DESTDIR}/filesysbox/README.info
 cp -p icons/def_doc.info ${DESTDIR}/filesysbox/LICENSE.APL.info
-cp -p icons/def_doc.info ${DESTDIR}/filesysbox/releasenotes.info
+cp -p icons/def_doc.info ${DESTDIR}/filesysbox/filesysbox_lib_relnotes.info
+cp -p icons/def_doc.info ${DESTDIR}/filesysbox/FbxDismount_cmd_relnotes.info
 cp -p icons/def_install.info ${DESTDIR}/filesysbox/Install.info
 
 case "${FORMAT}" in
