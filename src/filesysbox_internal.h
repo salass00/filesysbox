@@ -62,6 +62,17 @@ struct DosPacket64
 	QUAD  dp_Arg5;
 };
 
+STATIC_ASSERT(offsetof(struct DosPacket64, dp_Link) == offsetof(struct DosPacket, dp_Link),
+              "offset of dp_Link differs between DosPacket64 and DosPacket.");
+STATIC_ASSERT(offsetof(struct DosPacket64, dp_Port) == offsetof(struct DosPacket, dp_Port),
+              "offset of dp_Port differs between DosPacket64 and DosPacket.");
+STATIC_ASSERT(offsetof(struct DosPacket64, dp_Type) == offsetof(struct DosPacket, dp_Type),
+              "offset of dp_Type differs between DosPacket64 and DosPacket.");
+STATIC_ASSERT(offsetof(struct DosPacket64, dp_Res0) == offsetof(struct DosPacket, dp_Res1),
+              "offset of dp_Res0 and dp_Res1 differs between DosPacket64 and DosPacket.");
+STATIC_ASSERT(offsetof(struct DosPacket64, dp_Res2) == offsetof(struct DosPacket, dp_Res2),
+              "offset of dp_Res2 differs between DosPacket64 and DosPacket.");
+
 #define ACTION_CHANGE_FILE_POSITION64 8001
 #define ACTION_GET_FILE_POSITION64    8002
 #define ACTION_CHANGE_FILE_SIZE64     8003
