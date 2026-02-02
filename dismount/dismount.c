@@ -33,7 +33,6 @@ enum {
 static const TEXT dosName[];
 static const TEXT template[];
 static const TEXT progName[];
-static const TEXT pktName[];
 
 #ifdef __AROS__
 AROS_UFH3(int, _start,
@@ -106,7 +105,7 @@ int _start(void)
 		WaitPkt();
 		if (pkt->dp_Res1 == DOSFALSE)
 		{
-			PrintFault(error = pkt->dp_Res2, pktName);
+			PrintFault(error = pkt->dp_Res2, devname);
 			goto cleanup;
 		}
 	}
@@ -150,5 +149,4 @@ static const TEXT USED verstag[] = VERSTAG;
 static const TEXT dosName[] = "dos.library";
 static const TEXT template[] = TEMPLATE;
 static const TEXT progName[] = "FbxDismount";
-static const TEXT pktName[] = "ACTION_DIE";
 
