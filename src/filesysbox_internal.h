@@ -47,19 +47,19 @@ struct DosPacket64
 	struct Message *dp_Link;
 	struct MsgPort *dp_Port;
 
-	LONG dp_Type;
-	LONG dp_Res0;
+	LONG  dp_Type;
+	SIPTR dp_Res0;
 
-	LONG dp_Res2;
-	BYTE dp_pad1[4];
-	QUAD dp_Res1;
+	SIPTR dp_Res2;
+	BYTE  dp_pad1[4];
+	QUAD  dp_Res1;
 
-	LONG dp_Arg1;
-	BYTE dp_pad2[4];
-	QUAD dp_Arg2;
-	LONG dp_Arg3;
-	LONG dp_Arg4;
-	QUAD dp_Arg5;
+	SIPTR dp_Arg1;
+	BYTE  dp_pad2[4];
+	QUAD  dp_Arg2;
+	SIPTR dp_Arg3;
+	SIPTR dp_Arg4;
+	QUAD  dp_Arg5;
 };
 
 #define ACTION_CHANGE_FILE_POSITION64 8001
