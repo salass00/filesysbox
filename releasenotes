@@ -185,8 +185,10 @@ filesysbox.library 54.7 (10.6.2025)
   instead of FbxSetFileSize64() as it was supposed to.
 
 
-filesysbox.library 54.8 (d.m.2026)
+filesysbox.library 54.8 (2.2.2026)
 
 - FbxCollectLock() now overwrites fl_Volume with a BPTR to the lockhandler's
   own volume structure instead of leaving it pointing to freed memory.
+
+- Added the new FbxDismount command for cleanly unmounting FUSE file systems.
 
