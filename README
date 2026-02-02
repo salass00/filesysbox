@@ -4,9 +4,19 @@ update timeouts and more, freeing the file system of these jobs. Version 0.730
 of the library was released as open source and was used as a basis for this
 version.
 
+The included FbxDismount command can be used to cleanly unmount FUSE file
+systems even if there are outstanding locks/notify requests. Any outstanding
+locks and notify requests will be passed to and handled by the filesysbox
+lockhandler process.
+
+NOTE: This is not the same as "Assign DISMOUNT" that only removes the visible
+device/volume node but leaves the actual handler/file system running in the
+background.
+
 Installation:
 
 Copy Libs/filesysbox.library LIBS:
+Copy C/FbxDismount SYS:C
 
 Source code:
 
