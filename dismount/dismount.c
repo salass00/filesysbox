@@ -33,6 +33,7 @@ enum {
 static const TEXT dosName[];
 static const TEXT template[];
 static const TEXT progName[];
+static const TEXT unexpectedPktMsg[];
 
 #ifdef __AROS__
 AROS_UFH3(int, _start,
@@ -52,7 +53,7 @@ int _start(void)
 	struct RDArgs *rda;
 	SIPTR args[NUM_ARGS];
 	TEXT devname[256];
-	struct DosPacket *pkt = NULL;
+	struct DosPacket *pkt = NULL, *rp;
 	struct DosList *dol;
 	struct DeviceNode *dn;
 	BOOL pktsent = FALSE;
@@ -102,10 +103,13 @@ int _start(void)
 
 	if (pktsent)
 	{
-		WaitPkt();
-		if (pkt->dp_Res1 == DOSFALSE)
+		while ((rp = WaitPkt()) != pkt)
 		{
-			PrintFault(error = pkt->dp_Res2, devname);
+			Printf(unexpectedPktMsg, (IPTR)rp, rp->dp_Type);
+		}
+		if (rp->dp_Res1 == DOSFALSE)
+		{
+			PrintFault(error = rp->dp_Res2, devname);
 			goto cleanup;
 		}
 	}
@@ -149,4 +153,5 @@ static const TEXT USED verstag[] = VERSTAG;
 static const TEXT dosName[] = "dos.library";
 static const TEXT template[] = TEMPLATE;
 static const TEXT progName[] = "FbxDismount";
+static const TEXT unexpectedPktMsg[] = "Received unexpected packet: 0x%lx (dp_Type: %ld)\n";
 
