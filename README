@@ -4,6 +4,8 @@ update timeouts and more, freeing the file system of these jobs. Version 0.730
 of the library was released as open source and was used as a basis for this
 version.
 
+Build notes: see docs/building.md.
+
 The included FbxDismount command can be used to cleanly unmount FUSE file
 systems even if there are outstanding locks/notify requests. Any outstanding
 locks and notify requests will be passed to and handled by the filesysbox
