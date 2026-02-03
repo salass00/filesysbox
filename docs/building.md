@@ -9,14 +9,12 @@ When building with vbcc, make sure C99 mode is enabled.
 
 ## Compiler notes
 
-### vbcc (m68k)
+### m68k-amigaos
 
-Use `-c99` when compiling C sources, for example:
+Currently, the only officially supported compiler for building filesysbox on m68k-amigaos is GCC.
+The maintainer recommends bebbo's GCC 6.5.0b (this is what is used for releases).
 
-- Add `-c99` to your `CFLAGS`
-- Or compile with: `vc -c99 ...`
+### vbcc
 
-### GCC / Clang
-
-GCC/Clang default settings are typically sufficient, but ensure your build uses a C99 (or later) mode if you override the standard.
-
+Building with vbcc is not officially supported at this time.
+A dedicated vbcc build setup (ideally a makefile.vbcc) would be needed before it can be recommended.
