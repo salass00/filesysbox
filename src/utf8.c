@@ -1,7 +1,7 @@
 /*
  * UTF-8 support routines
  *
- * Copyright (c) 2013-2025 Fredrik Wikstrom
+ * Copyright (c) 2013-2026 Fredrik Wikstrom
  *
  * This code is released under AROS PUBLIC LICENSE 1.1
  * See the file LICENSE.APL
