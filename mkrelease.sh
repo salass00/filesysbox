@@ -52,7 +52,7 @@ else
 fi;
 cp -p filesysbox.doc ${DESTDIR}/filesysbox/Developer/AutoDocs
 cp -p filesysbox_lib.sfd ${DESTDIR}/filesysbox/Developer/include/sfd
-cp -p include/fd/filesysbox_lib.fd ${DESTDIR}/filesysbox/Developer/include/fd
+cp -p fd/filesysbox_lib.fd ${DESTDIR}/filesysbox/Developer/include/fd
 cp -p include/clib/filesysbox_protos.h ${DESTDIR}/filesysbox/Developer/include/include_h/clib
 cp -p include/defines/filesysbox.h ${DESTDIR}/filesysbox/Developer/include/include_h/defines
 cp -p include/inline/filesysbox.h ${DESTDIR}/filesysbox/Developer/include/include_h/inline
