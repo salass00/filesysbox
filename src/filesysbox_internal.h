@@ -418,7 +418,9 @@ struct FbxFS {
 	struct Library              *localebase;
 	struct Device               *timerbase;
 	struct timerequest          *timerio;
+#ifndef __AROS__
 	UQUAD                        eclock_initial;
+#endif
 	struct DeviceNode           *devnode;
 	struct FileSysStartupMsg    *fssm;
 	struct Process              *thisproc;
@@ -655,8 +657,10 @@ void FbxRemDiskChangeHandler(struct FbxFS *fs);
 /* timer.c */
 struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
 void FbxCleanupTimerIO(struct FbxFS *fs);
+#ifndef __AROS__
 void FbxInitUpTime(struct FbxFS *fs);
 void _FbxGetUpTime(struct FbxFS *fs, struct timeval *tv);
+#endif
 ULONG FbxGetUpTimeMillis(struct FbxFS *fs);
 
 /* notify.c */

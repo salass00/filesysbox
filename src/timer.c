@@ -48,6 +48,7 @@ void FbxCleanupTimerIO(struct FbxFS *fs) {
 	}
 }
 
+#ifndef __AROS__
 void FbxInitUpTime(struct FbxFS *fs) {
 	struct Device *TimerBase = fs->timerbase;
 	struct EClockVal ev;
@@ -67,7 +68,7 @@ void _FbxGetUpTime(struct FbxFS *fs, struct timeval *tv) {
 	eclock_current = ((UQUAD)ev.ev_hi << 32)|((UQUAD)ev.ev_lo);
 	eclock_elapsed = eclock_current - fs->eclock_initial;
 
-#ifdef __mc68020
+#ifdef defined(__mc68020) || defined(__mc68040)
 	ULONG dummy;
 	__asm__("divul %4,%0:%1"
 		: "=d" (remainder), "=d" (seconds)
@@ -88,12 +89,18 @@ void _FbxGetUpTime(struct FbxFS *fs, struct timeval *tv) {
 	tv->tv_secs = seconds;
 	tv->tv_micro = micros;
 }
+#endif
 
 ULONG FbxGetUpTimeMillis(struct FbxFS *fs) {
 	struct timeval tv;
 
+#ifdef __AROS__
+	struct Device *TimerBase = fs->timerbase;
+	GetUpTime(&tv);
+#else
 	_FbxGetUpTime(fs, &tv);
-#if defined(__mc68020) || defined(__mc68060)
+#endif
+#if defined(__mc68020) || defined(__mc68040) || defined(__mc68060)
 	ULONG result;
 	__asm__("mulul #1000,%0\n"
 		"divuw #1000,%2\n"

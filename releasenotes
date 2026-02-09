@@ -192,3 +192,8 @@ filesysbox.library 54.8 (2.2.2026)
 
 - Added the new FbxDismount command for cleanly unmounting FUSE file systems.
 
+
+filesysbox.library 54.9 (d.m.2026)
+
+- Use timer.device GetUpTime() function on AROS.
+

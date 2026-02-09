@@ -208,7 +208,9 @@ struct FbxFS *FbxSetupFS(
 
 	InitSemaphore(&fs->fssema);
 
+#ifndef __AROS__
 	FbxInitUpTime(fs);
+#endif
 
 	fs->mempool = CreatePool(MEMF_PUBLIC, 4096, 1024);
 	if (fs->mempool == NULL) goto error;

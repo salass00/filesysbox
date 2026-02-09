@@ -52,16 +52,19 @@ AROS_LH2(void, FbxGetUpTime,
 	struct FileSysBoxBase *, libBase, 20, FileSysBox)
 {
 	AROS_LIBFUNC_INIT
+
+	struct Device *TimerBase = fs->timerbase;
+	GetUpTime(tv);
+
+	AROS_LIBFUNC_EXIT
+}
 #else
 void FbxGetUpTime(
 	REG(a0, struct FbxFS *fs),
 	REG(a1, struct timeval *tv),
 	REG(a6, struct FileSysBoxBase *libBase))
 {
-#endif
 	_FbxGetUpTime(fs, tv);
-#ifdef __AROS__
-	AROS_LIBFUNC_EXIT
-#endif
 }
+#endif
 
