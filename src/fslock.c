@@ -11,7 +11,7 @@
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
 
-struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock,
+struct FbxLock *FbxInternalLocateObject(struct FbxFS *fs, struct FbxLock *lock,
 	const char *name, int lockmode)
 {
 	struct fbx_stat statbuf;
@@ -20,34 +20,8 @@ struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock,
 	struct FbxEntry *e;
 	struct FbxLock *lock2;
 	char fullpath[FBX_MAX_PATH];
-#ifdef ENABLE_CHARSET_CONVERSION
-	char fsname[FBX_MAX_NAME];
-#endif
 
-	PDEBUGF("FbxLocateObject(%#p, %#p, '%s', %d)\n", fs, lock, name, lockmode);
-
-	CHECKVOLUME(NULL);
-
-	if (lock != NULL) {
-		CHECKLOCK(lock, NULL);
-
-		if (lock->fsvol != fs->currvol) {
-			fs->r2 = ERROR_NO_DISK;
-			return NULL;
-		}
-	}
-
-#ifdef ENABLE_CHARSET_CONVERSION
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		if (FbxLocalToUTF8(fs, fsname, name, FBX_MAX_NAME) >= FBX_MAX_NAME) {
-			fs->r2 = ERROR_LINE_TOO_LONG;
-			return NULL;
-		}
-		name = fsname;
-	}
-#else
-	CHECKSTRING(name, NULL);
-#endif
+	PDEBUGF("FbxInternalLocateObject(%#p, %#p, '%s', %d)\n", fs, lock, name, lockmode);
 
 	if (!FbxLockName2Path(fs, lock, name, fullpath)) {
 		fs->r2 = ERROR_OBJECT_NOT_FOUND;
@@ -83,5 +57,40 @@ struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock,
 
 	fs->r2 = 0;
 	return lock2;
+}
+
+struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock,
+	const char *name, int lockmode)
+{
+#ifdef ENABLE_CHARSET_CONVERSION
+	char fsname[FBX_MAX_NAME];
+#endif
+
+	PDEBUGF("FbxLocateObject(%#p, %#p, '%s', %d)\n", fs, lock, name, lockmode);
+
+	CHECKVOLUME(NULL);
+
+	if (lock != NULL) {
+		CHECKLOCK(lock, NULL);
+
+		if (lock->fsvol != fs->currvol) {
+			fs->r2 = ERROR_NO_DISK;
+			return NULL;
+		}
+	}
+
+#ifdef ENABLE_CHARSET_CONVERSION
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		if (FbxLocalToUTF8(fs, fsname, name, FBX_MAX_NAME) >= FBX_MAX_NAME) {
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return NULL;
+		}
+		name = fsname;
+	}
+#else
+	CHECKSTRING(name, NULL);
+#endif
+
+	return FbxInternalLocateObject(fs, lock, name, lockmode);
 }
 

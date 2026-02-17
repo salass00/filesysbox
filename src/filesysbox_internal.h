@@ -772,6 +772,8 @@ int FbxInfo(struct FbxFS *fs, struct FbxLock *lock, struct InfoData *info);
 int FbxInhibit(struct FbxFS *fs, int inhibit);
 
 /* fslock.c */
+struct FbxLock *FbxInternalLocateObject(struct FbxFS *fs, struct FbxLock *lock,
+	const char *name, int lockmode);
 struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock,
 	const char *name, int lockmode);
 

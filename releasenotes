@@ -201,3 +201,7 @@ filesysbox.library 54.9 (d.m.2026)
   number of characters is the same as the number of bytes and that lower and
   upper case letters are always encoded as the same size.
 
+- FbxParentDir() now calls a new FbxInternalLocateObject() function to avoid
+  the already UTF-8 encoded path erroneously being interpreted as being in the
+  local charset.
+

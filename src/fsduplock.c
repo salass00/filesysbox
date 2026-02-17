@@ -26,7 +26,7 @@ struct FbxLock *FbxDupLock(struct FbxFS *fs, struct FbxLock *lock) {
 		lock = FbxLockEntry(fs, lock->entry, SHARED_LOCK);
 		if (lock == NULL) return NULL;
 	} else {
-		lock = FbxLocateObject(fs, NULL, "", SHARED_LOCK);
+		lock = FbxInternalLocateObject(fs, NULL, "", SHARED_LOCK);
 		if (lock == NULL) return NULL;
 	}
 

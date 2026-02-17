@@ -17,13 +17,10 @@ BOOL FbxParentPath(struct FbxFS *fs, char *pathbuf) {
 		return FALSE;
 	}
 	char *p = strrchr(pathbuf, '/');
-	if (p != NULL) {
-		if (p == pathbuf) p++; // leave the root '/' alone
-		*p = '\0';
-		return TRUE;
-	}
-	// should never happen
-	return FALSE;
+	if (p == NULL) return FALSE; // should never happen
+	if (p == pathbuf) p++; // leave the root '/' alone
+	*p = '\0';
+	return TRUE;
 }
 
 struct FbxLock *FbxLocateParent(struct FbxFS *fs, struct FbxLock *lock) {
@@ -55,7 +52,7 @@ struct FbxLock *FbxLocateParent(struct FbxFS *fs, struct FbxLock *lock) {
 
 	name = pname;
 	if (*name == '/') name++; // skip preceding slash character
-	lock = FbxLocateObject(fs, NULL, name, SHARED_LOCK);
+	lock = FbxInternalLocateObject(fs, NULL, name, SHARED_LOCK);
 	if (lock == NULL) return NULL;
 
 	fs->r2 = 0;
