@@ -68,7 +68,7 @@ void _FbxGetUpTime(struct FbxFS *fs, struct timeval *tv) {
 	eclock_current = ((UQUAD)ev.ev_hi << 32)|((UQUAD)ev.ev_lo);
 	eclock_elapsed = eclock_current - fs->eclock_initial;
 
-#ifdef defined(__mc68020) || defined(__mc68040)
+#if defined(__mc68020) || defined(__mc68040)
 	ULONG dummy;
 	__asm__("divul %4,%0:%1"
 		: "=d" (remainder), "=d" (seconds)
