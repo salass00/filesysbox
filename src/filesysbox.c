@@ -82,6 +82,14 @@ size_t FbxStrlen(struct FbxFS *fs, const char *str) {
 	}
 }
 
+char *FbxStrskip(struct FbxFS *fs, const char *str, size_t n) {
+	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+		return utf8_strskip(str, n);
+	} else {
+		return (char *)(str + n);
+	}
+}
+
 int FbxStrcmp(struct FbxFS *fs, const char *s1, const char *s2) {
 	if (fs->currvol->vflags & FBXVF_CASE_SENSITIVE) {
 		return strcmp(s1, s2);
@@ -97,7 +105,11 @@ int FbxStrcmp(struct FbxFS *fs, const char *s1, const char *s2) {
 
 int FbxStrncmp(struct FbxFS *fs, const char *s1, const char *s2, size_t n) {
 	if (fs->currvol->vflags & FBXVF_CASE_SENSITIVE) {
-		return strncmp(s1, s2, n);
+		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
+			return utf8_strncmp(s1, s2, n);
+		} else {
+			return strncmp(s1, s2, n);
+		}
 	} else {
 		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
 			return utf8_strnicmp(s1, s2, n);
@@ -463,9 +475,8 @@ void FbxSetModifyState(struct FbxFS *fs, int state) {
 }
 
 BOOL FbxIsParent(struct FbxFS *fs, const char *parent, const char *child) {
-	int plen = FbxStrlen(fs, parent);
-	if (IsRoot(parent)) plen = 0;
-	if (FbxStrncmp(fs, parent, child, plen) == 0 && child[plen] == '/')
+	int plen = IsRoot(parent) ? 0 : FbxStrlen(fs, parent);
+	if (FbxStrncmp(fs, parent, child, plen) == 0 && *FbxStrskip(fs, child, plen) == '/')
 		return TRUE;
 	else
 		return FALSE;

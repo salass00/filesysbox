@@ -103,12 +103,32 @@ size_t utf8_strlen(const char *str) {
 	return len;
 }
 
+char *utf8_strskip(const char *str, size_t n) {
+	int byte;
+	if (n == 0) return (char *)str;
+	while ((byte = (unsigned char)*str) != '\0') {
+		str += 1 + utf8_trailing_bytes[byte];
+		if (--n == 0) return (char *)str;
+	}
+	return NULL;
+}
+
 int utf8_stricmp(const char *s1, const char *s2) {
 	LONG c1, c2;
 	do {
 		c1 = ucs4_toupper(utf8_decode_fast(&s1));
 		c2 = ucs4_toupper(utf8_decode_fast(&s2));
 	} while (c1 != '\0' && c1 == c2);
+	return c1 - c2;
+}
+
+int utf8_strncmp(const char *s1, const char *s2, size_t n) {
+	LONG c1, c2;
+	if (n == 0) return 0;
+	do {
+		c1 = utf8_decode_fast(&s1);
+		c2 = utf8_decode_fast(&s2);
+	} while (c1 != '\0' && --n > 0 && c1 == c2);
 	return c1 - c2;
 }
 
