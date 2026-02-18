@@ -660,7 +660,7 @@ struct timerequest *FbxSetupTimerIO(struct FbxFS *fs);
 void FbxCleanupTimerIO(struct FbxFS *fs);
 #ifndef __AROS__
 void FbxInitUpTime(struct FbxFS *fs);
-void _FbxGetUpTime(struct FbxFS *fs, struct timeval *tv);
+void FbxInternalGetUpTime(struct FbxFS *fs, struct timeval *tv);
 #endif
 ULONG FbxGetUpTimeMillis(struct FbxFS *fs);
 

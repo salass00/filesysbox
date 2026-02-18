@@ -64,7 +64,7 @@ void FbxGetUpTime(
 	REG(a1, struct timeval *tv),
 	REG(a6, struct FileSysBoxBase *libBase))
 {
-	_FbxGetUpTime(fs, tv);
+	FbxInternalGetUpTime(fs, tv);
 }
 #endif
 
