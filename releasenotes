@@ -205,3 +205,10 @@ filesysbox.library 54.9 (18.2.2026)
   the already UTF-8 encoded path erroneously being interpreted as being in the
   local charset.
 
+
+filesysbox.library 54.10 (d.m.2026)
+
+- Removed all support for non-UTF8 file systems (FBXF_ENABLE_UTF8_NAMES flag
+  not set) as nothing was using it and it was just needlessly complicating
+  things.
+
