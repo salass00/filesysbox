@@ -52,7 +52,9 @@ static STDARGS int dir_fill_func(void *udata, const char *name, const struct fbx
 			ed->fsname = (char *)(ed + 1);
 
 			/* Only used by ExAll() */
+#ifdef ENABLE_CHARSET_CONVERSION
 			ed->name    = NULL;
+#endif
 			ed->comment = NULL;
 
 			FbxStrlcpy(fs, ed->fsname, name, len);

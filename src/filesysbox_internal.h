@@ -552,7 +552,9 @@ struct FbxDirData {
 	char           *fsname;
 
 	/* Only used by ExAll() */
+#ifdef ENABLE_CHARSET_CONVERSION
 	char           *name;
+#endif
 	char           *comment;
 
 	struct fbx_stat stat;

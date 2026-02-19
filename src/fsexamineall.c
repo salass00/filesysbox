@@ -13,6 +13,21 @@
 #include <string.h>
 #include <stdint.h>
 
+static char *FbxExAllStrdup(struct FbxFS *fs, struct FbxLock *lock, const char *src, size_t srclen) {
+	struct Library *SysBase = fs->sysbase;
+	char *dst;
+
+	if (src == NULL)
+		return NULL;
+
+	dst = AllocVecPooled(lock->mempool, srclen + 1);
+	if (dst == NULL)
+		return NULL;
+
+	CopyMem(src, dst, srclen + 1);
+	return dst;
+}
+
 #define offset_after(type,member) (offsetof(type, member) + sizeof(((type *)0)->member))
 
 int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR bufsize,
@@ -28,7 +43,12 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 	struct DateStamp ds;
 	struct fbx_stat statbuf;
 	char fullpath[FBX_MAX_PATH];
-	const char *pname, *pcomment;
+#ifdef ENABLE_CHARSET_CONVERSION
+	char name[FBX_MAX_NAME];
+	size_t namelen;
+#else
+	const char *name;
+#endif
 
 	CHECKVOLUME(DOSFALSE);
 
@@ -114,36 +134,21 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 		ed = (struct FbxDirData *)RemHead((struct List *)&lock->dirdatalist);
 		if (ed == NULL) break;
 
-		pname = ed->name;
-		pcomment = NULL;
-
 #ifdef ENABLE_CHARSET_CONVERSION
-		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-			char adname[FBX_MAX_NAME];
-			size_t namelen;
-			if ((namelen = FbxUTF8ToLocal(fs, adname, ed->fsname, FBX_MAX_NAME))
-				>= FBX_MAX_NAME)
-			{
-				FreeFbxDirData(lock, ed);
-				fs->r2 = ERROR_LINE_TOO_LONG;
-				return DOSFALSE;
-			}
-			ed->name = AllocVecPooled(lock->mempool, namelen + 1);
-			if (ed->name == NULL) {
-				FreeFbxDirData(lock, ed);
-				fs->r2 = ERROR_NO_FREE_STORE;
-				return DOSFALSE;
-			}
-			strlcpy(ed->name, adname, namelen + 1);
-			pname = ed->name;
+		if ((namelen = FbxUTF8ToLocal(fs, name, ed->fsname, FBX_MAX_NAME)) >= FBX_MAX_NAME)	{
+			FreeFbxDirData(lock, ed);
+			fs->r2 = ERROR_LINE_TOO_LONG;
+			return DOSFALSE;
 		}
+#else
+		name = ed->fsname;
 #endif
 
 		curread->ed_Next = NULL;
 
 		if (ctrl->eac_MatchString != NULL &&
 			ctrl->eac_MatchFunc == NULL &&
-			!MatchPatternNoCase(ctrl->eac_MatchString, (STRPTR)pname))
+			!MatchPatternNoCase(ctrl->eac_MatchString, (STRPTR)name))
 		{
 			FreeFbxDirData(lock, ed);
 			continue;
@@ -168,50 +173,19 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 			}
 		}
 
-		if (type >= ED_COMMENT) {
-			char comment[FBX_MAX_COMMENT];
-
-			FbxGetComment(fs, fullpath, comment, FBX_MAX_COMMENT);
-			if (comment[0] != '\0') {
-				const char *src;
-				size_t srclen;
+		if (type >= ED_NAME) {
 #ifdef ENABLE_CHARSET_CONVERSION
-				char adcomment[FBX_MAX_COMMENT];
-
-				if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-
-					if ((srclen = FbxUTF8ToLocal(fs, adcomment, comment, FBX_MAX_COMMENT))
-						>= FBX_MAX_COMMENT)
-					{
-						FreeFbxDirData(lock, ed);
-						fs->r2 = ERROR_LINE_TOO_LONG;
-						return DOSFALSE;
-					}
-					src = adcomment;
-				} else {
-					src = comment;
-					srclen = strlen(comment);
-				}
-#else
-				src = comment;
-				srclen = strlen(comment);
-#endif
-				ed->comment = AllocVecPooled(lock->mempool, srclen + 1);
-				if (ed->comment == NULL) {
-					FreeFbxDirData(lock, ed);
-					fs->r2 = ERROR_NO_FREE_STORE;
-					return DOSFALSE;
-				}
-#ifdef ENABLE_CHARSET_CONVERSION
-				strlcpy(ed->comment, src, srclen + 1);
-#else
-				FbxStrlcpy(fs, ed->comment, src, srclen + 1);
-#endif
-				pcomment = ed->comment;
+			ed->name = FbxExAllStrdup(fs, lock, name, namelen);
+			if (ed->name == NULL) {
+				FreeFbxDirData(lock, ed);
+				fs->r2 = ERROR_NO_FREE_STORE;
+				return DOSFALSE;
 			}
+			curread->ed_Name = (STRPTR)ed->name;
+#else
+			curread->ed_Name = (STRPTR)name;
+#endif
 		}
-
-		if (type >= ED_NAME) curread->ed_Name = (STRPTR)pname;
 		if (type >= ED_TYPE) curread->ed_Type = FbxMode2EntryType(statbuf.st_mode);
 		if (type >= ED_SIZE) {
 			if (statbuf.st_size < 0)
@@ -232,7 +206,34 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 			curread->ed_Ticks = ds.ds_Tick;
 		}
 		if (type >= ED_COMMENT) {
-			curread->ed_Comment = (STRPTR)((pcomment != NULL) ? pcomment : "");
+#ifdef ENABLE_CHARSET_CONVERSION
+			char fscomment[FBX_MAX_COMMENT];
+#endif
+			char comment[FBX_MAX_COMMENT];
+			size_t commentlen;
+#ifdef ENABLE_CHARSET_CONVERSION
+			FbxGetComment(fs, fullpath, fscomment, FBX_MAX_COMMENT);
+			if ((commentlen = FbxUTF8ToLocal(fs, comment, fscomment, FBX_MAX_COMMENT)) >= FBX_MAX_COMMENT) {
+				FreeFbxDirData(lock, ed);
+				fs->r2 = ERROR_LINE_TOO_LONG;
+				return DOSFALSE;
+			}
+#else
+			FbxGetComment(fs, fullpath, comment, FBX_MAX_COMMENT);
+			commentlen = strlen(comment);
+#endif
+			if (comment[0] != '\0') {
+				ed->comment = FbxExAllStrdup(fs, lock, comment, commentlen);
+				if (ed->comment == NULL) {
+					FreeFbxDirData(lock, ed);
+					fs->r2 = ERROR_NO_FREE_STORE;
+					return DOSFALSE;
+				}
+			}
+			if (ed->comment != NULL)
+				curread->ed_Comment = (STRPTR)ed->comment;
+			else
+				curread->ed_Comment = (STRPTR)"";
 		}
 		if (type >= ED_OWNER) {
 			curread->ed_OwnerUID = FbxUnix2AmigaOwner(statbuf.st_uid);
