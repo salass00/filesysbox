@@ -33,7 +33,7 @@
 *       If "msg" is given, it will get replied with either success or failure.
 *
 *   INPUTS
-*       msg - mount message, or NULL if no mesage is available.
+*       msg - mount message, or NULL if no message is available.
 *       tags - taglist for additional parameters.
 *       ops - pointer to fuse_operations table.
 *       opssize - size of above table.
@@ -436,4 +436,3 @@ static void FbxGetCharsetMapTable(struct FbxFS *fs) {
 	}
 }
 #endif
-
