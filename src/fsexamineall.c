@@ -222,7 +222,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 			FbxGetComment(fs, fullpath, comment, FBX_MAX_COMMENT);
 			commentlen = strlen(comment);
 #endif
-			if (comment[0] != '\0') {
+			if (commentlen > 0) {
 				ed->comment = FbxExAllStrdup(fs, lock, comment, commentlen);
 				if (ed->comment == NULL) {
 					FreeFbxDirData(lock, ed);
