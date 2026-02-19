@@ -61,79 +61,50 @@ struct FileSysStartupMsg *FbxGetFSSM(struct Library *sysbase, struct DeviceNode 
 }
 
 BOOL FbxCheckString(struct FbxFS *fs, const char *str) {
+	const char *s = str;
+	int c;
+
 	CDEBUGF("FbxCheckString(%#p, '%s')\n", fs, str);
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		const char *s = str;
-		int c;
-		while ((c = utf8_decode_slow(&s)) > 0);
-		if (c != '\0') {
-			CDEBUGF("Invalid UTF-8 sequence detected at character position: %d\n", (int)(s - str));
-			return FALSE;
-		}
+
+	while ((c = utf8_decode_slow(&s)) > 0);
+	if (c != '\0') {
+		CDEBUGF("Invalid UTF-8 sequence detected at character position: %d\n", (int)(s - str));
+		return FALSE;
 	}
+
 	return TRUE;
 }
 
 size_t FbxStrlen(struct FbxFS *fs, const char *str) {
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		return utf8_strlen(str);
-	} else {
-		return strlen(str);
-	}
+	return utf8_strlen(str);
 }
 
 char *FbxStrskip(struct FbxFS *fs, const char *str, size_t n) {
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		return utf8_strskip(str, n);
-	} else {
-		return (char *)(str + n);
-	}
+	return utf8_strskip(str, n);
 }
 
 int FbxStrcmp(struct FbxFS *fs, const char *s1, const char *s2) {
 	if (fs->currvol->vflags & FBXVF_CASE_SENSITIVE) {
 		return strcmp(s1, s2);
 	} else {
-		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-			return utf8_stricmp(s1, s2);
-		} else {
-			struct Library *UtilityBase = fs->utilitybase;
-			return Stricmp((CONST_STRPTR)s1, (CONST_STRPTR)s2);
-		}
+		return utf8_stricmp(s1, s2);
 	}
 }
 
 int FbxStrncmp(struct FbxFS *fs, const char *s1, const char *s2, size_t n) {
 	if (fs->currvol->vflags & FBXVF_CASE_SENSITIVE) {
-		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-			return utf8_strncmp(s1, s2, n);
-		} else {
-			return strncmp(s1, s2, n);
-		}
+		return utf8_strncmp(s1, s2, n);
 	} else {
-		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-			return utf8_strnicmp(s1, s2, n);
-		} else {
-			struct Library *UtilityBase = fs->utilitybase;
-			return Strnicmp((CONST_STRPTR)s1, (CONST_STRPTR)s2, n);
-		}
+		return utf8_strnicmp(s1, s2, n);
 	}
 }
 
 size_t FbxStrlcpy(struct FbxFS *fs, char *dst, const char *src, size_t dst_size) {
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		return utf8_strlcpy(dst, src, dst_size);
-	} else {
-		return strlcpy(dst, src, dst_size);
-	}
+	return utf8_strlcpy(dst, src, dst_size);
 }
 
 size_t FbxStrlcat(struct FbxFS *fs, char *dst, const char *src, size_t dst_size) {
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		return utf8_strlcat(dst, src, dst_size);
-	} else {
-		return strlcat(dst, src, dst_size);
-	}
+	return utf8_strlcat(dst, src, dst_size);
 }
 
 static unsigned int FbxHashPathCase(struct FbxFS *fs, const char *str) {
@@ -145,14 +116,8 @@ static unsigned int FbxHashPathCase(struct FbxFS *fs, const char *str) {
 	v = FbxStrlen(fs, str);
 
 	// compute hash
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		while ((c = utf8_decode_fast(&str)) != '\0') {
-			v = v * 13 + c;
-		}
-	} else {
-		while ((c = str[v]) != '\0') {
-			v = v * 13 + c;
-		}
+	while ((c = utf8_decode_fast(&str)) != '\0') {
+		v = v * 13 + c;
 	}
 
 	// and mask away excess bits
@@ -170,17 +135,9 @@ static unsigned int FbxHashPathNoCase(struct FbxFS *fs, const char *str) {
 	v = FbxStrlen(fs, str);
 
 	// compute hash
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		while ((c = utf8_decode_fast(&str)) != '\0') {
-			c = ucs4_toupper(c);
-			v = v * 13 + c;
-		}
-	} else {
-		while ((c = str[v]) != '\0') {
-			if (c >= 'a' && c <= 'z') c -= 32;
-			if (c >= 224 && c <= 254 && c != 247) c -= 32;
-			v = v * 13 + c;
-		}
+	while ((c = utf8_decode_fast(&str)) != '\0') {
+		c = ucs4_toupper(c);
+		v = v * 13 + c;
 	}
 
 	// and mask away excess bits

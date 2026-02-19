@@ -42,18 +42,16 @@ int FbxSetComment(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	}
 
 #ifdef ENABLE_CHARSET_CONVERSION
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		if (FbxLocalToUTF8(fs, fsname, name, FBX_MAX_NAME) >= FBX_MAX_NAME) {
-			fs->r2 = ERROR_LINE_TOO_LONG;
-			return DOSFALSE;
-		}
-		name = fsname;
-		if (FbxLocalToUTF8(fs, fscomment, comment, FBX_MAX_COMMENT) >= FBX_MAX_COMMENT) {
-			fs->r2 = ERROR_LINE_TOO_LONG;
-			return DOSFALSE;
-		}
-		comment = fscomment;
+	if (FbxLocalToUTF8(fs, fsname, name, FBX_MAX_NAME) >= FBX_MAX_NAME) {
+		fs->r2 = ERROR_LINE_TOO_LONG;
+		return DOSFALSE;
 	}
+	name = fsname;
+	if (FbxLocalToUTF8(fs, fscomment, comment, FBX_MAX_COMMENT) >= FBX_MAX_COMMENT) {
+		fs->r2 = ERROR_LINE_TOO_LONG;
+		return DOSFALSE;
+	}
+	comment = fscomment;
 #else
 	CHECKSTRING(name, DOSFALSE);
 	CHECKSTRING(comment, DOSFALSE);

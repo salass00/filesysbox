@@ -19,10 +19,11 @@ int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify) {
 	struct FbxNotifyNode *nn;
 	LONG etype;
 	int error;
-	const char *fullname;
 	char fullpath[FBX_MAX_PATH];
 #ifdef ENABLE_CHARSET_CONVERSION
-	char fsfullname[FBX_MAX_PATH];
+	char fullname[FBX_MAX_PATH];
+#else
+	const char *fullname;
 #endif
 
 	PDEBUGF("FbxAddNotify(%#p, %#p)\n", fs, notify);
@@ -32,16 +33,13 @@ int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify) {
 	notify->nr_notifynode = (IPTR)NULL;
 	notify->nr_MsgCount = 0;
 
-	fullname = (const char *)notify->nr_FullName;
 #ifdef ENABLE_CHARSET_CONVERSION
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		if (FbxLocalToUTF8(fs, fsfullname, fullname, FBX_MAX_PATH) >= FBX_MAX_PATH) {
-			fs->r2 = ERROR_LINE_TOO_LONG;
-			return DOSFALSE;
-		}
-		fullname = fsfullname;
+	if (FbxLocalToUTF8(fs, fullname, (const char *)notify->nr_FullName, FBX_MAX_PATH) >= FBX_MAX_PATH) {
+		fs->r2 = ERROR_LINE_TOO_LONG;
+		return DOSFALSE;
 	}
 #else
+	fullname = (const char *)notify->nr_FullName;
 	CHECKSTRING(fullname, DOSFALSE);
 #endif
 

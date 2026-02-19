@@ -23,8 +23,9 @@ int FbxRelabel(struct FbxFS *fs, const char *volname) {
 	int error;
 #ifdef ENABLE_CHARSET_CONVERSION
 	char fsvolname[FBX_MAX_NAME];
+#else
+	const char *fsvolname = volname;
 #endif
-	const char *advolname = volname;
 
 	PDEBUGF("FbxRelabel(%#p, '%s')\n", fs, volname);
 
@@ -32,24 +33,21 @@ int FbxRelabel(struct FbxFS *fs, const char *volname) {
 	CHECKWRITABLE(DOSFALSE);
 
 #ifdef ENABLE_CHARSET_CONVERSION
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		if (FbxLocalToUTF8(fs, fsvolname, volname, FBX_MAX_NAME) >= FBX_MAX_NAME) {
-			fs->r2 = ERROR_LINE_TOO_LONG;
-			return DOSFALSE;
-		}
-		volname = fsvolname;
+	if (FbxLocalToUTF8(fs, fsvolname, volname, FBX_MAX_NAME) >= FBX_MAX_NAME) {
+		fs->r2 = ERROR_LINE_TOO_LONG;
+		return DOSFALSE;
 	}
 #else
-	CHECKSTRING(volname, DOSFALSE);
+	CHECKSTRING(fsvolname, DOSFALSE);
 #endif
 
-	error = Fbx_relabel(fs, volname);
+	error = Fbx_relabel(fs, fsvolname);
 	if (error) {
 		fs->r2 = FbxFuseErrno2Error(error);
 		return DOSFALSE;
 	}
 
-	FbxAsyncRenameVolume(fs, vol, advolname);
+	FbxAsyncRenameVolume(fs, vol, volname);
 
 	FbxNotifyDiskChange(fs, IECLASS_DISKINSERTED);
 

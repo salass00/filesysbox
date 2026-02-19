@@ -56,49 +56,31 @@ void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *st
 	struct FileInfoBlock *fib)
 {
 	char comment[FBX_MAX_COMMENT];
-#ifdef ENABLE_CHARSET_CONVERSION
-	char adname[FBX_MAX_NAME];
-	char adcomment[FBX_MAX_COMMENT];
-#endif
-	const char *name, *pcomment;
 	LONG type;
 
 	if (IsRoot(fullpath)) {
-		name = fs->currvol->volname;
+#ifdef ENABLE_CHARSET_CONVERSION
+		strlcpy((char *)fib->fib_FileName + 1, fs->currvol->volname, sizeof(fib->fib_FileName));
+#else
+		FbxStrlcpy(fs, (char *)fib->fib_FileName + 1, fs->currvol->volname, sizeof(fib->fib_FileName));
+#endif
 		type = ST_ROOT;
 	} else {
-		name = FbxFilePart(fullpath);
-		type = FbxMode2EntryType(stat->st_mode);
 #ifdef ENABLE_CHARSET_CONVERSION
-		if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-			FbxUTF8ToLocal(fs, adname, name, FBX_MAX_NAME);
-			name = adname;
-		}
-#endif
-	}
-
-#ifdef ENABLE_CHARSET_CONVERSION
-	strlcpy((char *)fib->fib_FileName + 1, name, sizeof(fib->fib_FileName));
+		FbxUTF8ToLocal(fs, (char *)fib->fib_FileName + 1, FbxFilePart(fullpath), sizeof(fib->fib_FileName));
 #else
-	FbxStrlcpy(fs, (char *)fib->fib_FileName + 1, name, sizeof(fib->fib_FileName));
+		FbxStrlcpy(fs, (char *)fib->fib_FileName + 1, FbxFilePart(fullpath), sizeof(fib->fib_FileName));
 #endif
+		type = FbxMode2EntryType(stat->st_mode);
+	}
 	fib->fib_FileName[0] = strlen((char *)fib->fib_FileName + 1);
-
 	fib->fib_DirEntryType = fib->fib_EntryType = type;
 
-	pcomment = comment;
 	FbxGetComment(fs, fullpath, comment, FBX_MAX_COMMENT);
 #ifdef ENABLE_CHARSET_CONVERSION
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		FbxUTF8ToLocal(fs, adcomment, comment, FBX_MAX_COMMENT);
-		pcomment = adcomment;
-	}
-#endif
-
-#ifdef ENABLE_CHARSET_CONVERSION
-	strlcpy((char *)fib->fib_Comment + 1, pcomment, sizeof(fib->fib_Comment));
+	FbxUTF8ToLocal(fs, (char *)fib->fib_Comment + 1, comment, sizeof(fib->fib_Comment));
 #else
-	FbxStrlcpy(fs, (char *)fib->fib_Comment + 1, pcomment, sizeof(fib->fib_Comment));
+	FbxStrlcpy(fs, (char *)fib->fib_Comment + 1, comment, sizeof(fib->fib_Comment));
 #endif
 	fib->fib_Comment[0] = strlen((char *)fib->fib_Comment + 1);
 

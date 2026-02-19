@@ -88,18 +88,16 @@ int FbxRenameObject(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	}
 
 #ifdef ENABLE_CHARSET_CONVERSION
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		if (FbxLocalToUTF8(fs, fsname, name, FBX_MAX_NAME) >= FBX_MAX_NAME) {
-			fs->r2 = ERROR_LINE_TOO_LONG;
-			return DOSFALSE;
-		}
-		name = fsname;
-		if (FbxLocalToUTF8(fs, fsname2, name2, FBX_MAX_NAME) >= FBX_MAX_NAME) {
-			fs->r2 = ERROR_LINE_TOO_LONG;
-			return DOSFALSE;
-		}
-		name2 = fsname2;
+	if (FbxLocalToUTF8(fs, fsname, name, FBX_MAX_NAME) >= FBX_MAX_NAME) {
+		fs->r2 = ERROR_LINE_TOO_LONG;
+		return DOSFALSE;
 	}
+	name = fsname;
+	if (FbxLocalToUTF8(fs, fsname2, name2, FBX_MAX_NAME) >= FBX_MAX_NAME) {
+		fs->r2 = ERROR_LINE_TOO_LONG;
+		return DOSFALSE;
+	}
+	name2 = fsname2;
 #else
 	CHECKSTRING(name, DOSFALSE);
 	CHECKSTRING(name2, DOSFALSE);

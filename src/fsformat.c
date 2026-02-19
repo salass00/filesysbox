@@ -31,13 +31,11 @@ int FbxFormat(struct FbxFS *fs, const char *volname, ULONG dostype) {
 	}
 
 #ifdef ENABLE_CHARSET_CONVERSION
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		if (FbxLocalToUTF8(fs, fsvolname, volname, FBX_MAX_NAME) >= FBX_MAX_NAME) {
-			fs->r2 = ERROR_LINE_TOO_LONG;
-			return DOSFALSE;
-		}
-		volname = fsvolname;
+	if (FbxLocalToUTF8(fs, fsvolname, volname, FBX_MAX_NAME) >= FBX_MAX_NAME) {
+		fs->r2 = ERROR_LINE_TOO_LONG;
+		return DOSFALSE;
 	}
+	volname = fsvolname;
 #else
 	CHECKSTRING(volname, DOSFALSE);
 #endif

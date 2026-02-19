@@ -296,9 +296,7 @@ struct FbxFS *FbxSetupFS(
 	}
 
 #ifdef ENABLE_CHARSET_CONVERSION
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		FbxGetCharsetMapTable(fs);
-	}
+	FbxGetCharsetMapTable(fs);
 #endif
 
 	if (fs->fsflags & FBXF_ENABLE_DISK_CHANGE_DETECTION) {

@@ -80,13 +80,11 @@ struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock,
 	}
 
 #ifdef ENABLE_CHARSET_CONVERSION
-	if (fs->fsflags & FBXF_ENABLE_UTF8_NAMES) {
-		if (FbxLocalToUTF8(fs, fsname, name, FBX_MAX_NAME) >= FBX_MAX_NAME) {
-			fs->r2 = ERROR_LINE_TOO_LONG;
-			return NULL;
-		}
-		name = fsname;
+	if (FbxLocalToUTF8(fs, fsname, name, FBX_MAX_NAME) >= FBX_MAX_NAME) {
+		fs->r2 = ERROR_LINE_TOO_LONG;
+		return NULL;
 	}
+	name = fsname;
 #else
 	CHECKSTRING(name, NULL);
 #endif
