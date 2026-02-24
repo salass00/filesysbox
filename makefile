@@ -17,6 +17,7 @@ ifneq (1,$(DEBUG))
 	BINDIR = bin
 	OBJDIR = obj
 else
+	DEFINES += -DADEBUG
 	BINDIR = bin/debug
 	OBJDIR = obj/debug
 endif
