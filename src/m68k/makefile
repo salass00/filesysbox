@@ -1,6 +1,6 @@
 HOST ?= m68k-amigaos
 
-INCDIR ?= /home/salass00/Development/NDK3.9/include/include_i
+INCDIR ?= $(HOME)/Development/NDK3.9/include/include_i
 
 OBJCOPY = $(HOST)-objcopy
 
