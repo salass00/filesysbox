@@ -160,6 +160,7 @@ build-getfssm:
 
 .PHONY: clean
 clean:
+	$(MAKE) -C src/m68k clean
 	rm -rf bin obj
 	$(MAKE) -C dismount clean
 	$(MAKE) -C getfssm clean
