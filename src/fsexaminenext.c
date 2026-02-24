@@ -39,14 +39,14 @@ static STDARGS int dir_fill_func(void *udata, const char *name, const struct fbx
 	struct FbxFS *fs = lock->fs;
 	struct Library *SysBase = fs->sysbase;
 	struct FbxDirData *ed;
-	size_t len;
+	size_t namesize;
 
 	if (name == NULL) return 2;
 
 	if (!IsDotOrDotDot(name)) {
 		if (FbxCheckString(fs, name)) {
-			len = strlen(name) + 1;
-			ed = AllocFbxDirData(lock, len);
+			namesize = strlen(name) + 1;
+			ed = AllocFbxDirData(lock, namesize);
 			if (ed == NULL) return 1;
 
 			ed->fsname = (char *)(ed + 1);
@@ -57,7 +57,7 @@ static STDARGS int dir_fill_func(void *udata, const char *name, const struct fbx
 #endif
 			ed->comment = NULL;
 
-			FbxStrlcpy(fs, ed->fsname, name, len);
+			CopyMem(name, ed->fsname, namesize);
 			if (stat != NULL)
 			{
 				ed->stat = *stat;
