@@ -940,5 +940,10 @@ size_t strlcat(char *dst, const char *src, size_t size);
 void FbxSetupAVL(struct FbxFS *fs);
 #endif
 
+/* allocdosobjectpatch.c */
+#ifdef ENABLE_EXD_SUPPORT
+BOOL PatchAllocDosObject(struct FileSysBoxBase *fb);
+#endif
+
 #endif /* FILESYSBOX_INTERNAL_H */
 

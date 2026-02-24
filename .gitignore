@@ -1,5 +1,7 @@
 # Ignore object, dependency and archive files
 *.[oda]
+# Ignore generated binary files
+*.bin
 # Ignore generated exe files
 bin
 obj

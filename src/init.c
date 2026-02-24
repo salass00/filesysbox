@@ -65,6 +65,11 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 	UtilityBase = libBase->utilitybase;
 #endif
 
+#ifdef ENABLE_EXD_SUPPORT
+	if (PatchAllocDosObject(libBase) == FALSE)
+		goto error;
+#endif
+
 	InitSemaphore(&libBase->procsema);
 
 	return libBase;

@@ -48,6 +48,10 @@ ifeq ($(HOST),m68k-amigaos)
 	ARCH_000 = -mcpu=68000 -mtune=68000
 	ARCH_020 = -mcpu=68020 -mtune=68020-60
 	ARCH_060 = -mcpu=68060 -mtune=68060
+
+	DEFINES += -DENABLE_EXD_SUPPORT
+	OBJS = src/m68k/allocdosobject.o
+
 	CFLAGS  := -noixemul -fno-common -mregparm $(CFLAGS)
 	LDFLAGS := -noixemul $(LDFLAGS)
 endif
@@ -65,12 +69,12 @@ SRCS = $(addprefix src/, \
        fsrelabel.c fsremovenotify.c fsrename.c fssamelock.c fsseek.c fssetcomment.c \
        fssetdate.c fssetfilesize.c fssetownerinfo.c fssetprotection.c fsunlock.c \
        fswrite.c fswriteprotect.c volume.c xattrs.c utf8.c ucs4.c strlcpy.c debugf.c \
-       dofmt.c allocvecpooled.c codesets.c avl.c)
+       dofmt.c allocvecpooled.c codesets.c avl.c allocdosobjectpatch.c)
 
 ifeq ($(HOST),m68k-amigaos)
-	OBJS_000 = $(subst src/,$(OBJDIR)/68000/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
-	OBJS_020 = $(subst src/,$(OBJDIR)/68020/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
-	OBJS_060 = $(subst src/,$(OBJDIR)/68060/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+	OBJS_000 = $(subst src/,$(OBJDIR)/68000/,$(main_SRCS:.c=.o) $(SRCS:.c=.o)) $(OBJS)
+	OBJS_020 = $(subst src/,$(OBJDIR)/68020/,$(main_SRCS:.c=.o) $(SRCS:.c=.o)) $(OBJS)
+	OBJS_060 = $(subst src/,$(OBJDIR)/68060/,$(main_SRCS:.c=.o) $(SRCS:.c=.o)) $(OBJS)
 	DEPS_000 = $(OBJS_000:.o=.d)
 	DEPS_020 = $(OBJS_020:.o=.d)
 	DEPS_060 = $(OBJS_060:.o=.d)
@@ -141,6 +145,9 @@ $(BINDIR)/$(TARGET).060: $(OBJS_060)
 	@mkdir -p $(dir $@)
 	$(CC) $(ARCH_060) $(LDFLAGS) -o $@.debug $^ $(LIBS)
 	$(STRIP) $(STRIPFLAGS) -o $@ $@.debug
+
+src/m68k/allocdosobject.o: src/m68k/allocdosobject.s
+	$(MAKE) -C src/m68k
 endif
 
 .PHONY: build-dismount
