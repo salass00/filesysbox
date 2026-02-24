@@ -47,6 +47,7 @@
 #endif
 
 #ifdef ENABLE_DP64_SUPPORT
+
 struct DosPacket64
 {
 	struct Message *dp_Link;
@@ -82,6 +83,45 @@ STATIC_ASSERT(offsetof(struct DosPacket64, dp_Res2) == offsetof(struct DosPacket
 #define ACTION_GET_FILE_POSITION64    8002
 #define ACTION_CHANGE_FILE_SIZE64     8003
 #define ACTION_GET_FILE_SIZE64        8004
+
+#define DOS_EXAMINEDATA 11
+
+struct ExamineData
+{
+	struct MinNode   EXDnode;
+	ULONG            EXDinfo;
+	ULONG            EXDinfo2;
+
+	APTR             FSPrivate;
+	APTR             DOSPrivate;
+
+	ULONG            StructSize;
+	ULONG            Type;
+	QUAD             FileSize;
+	struct DateStamp Date;
+	ULONG            RefCount;
+	UQUAD            ObjectID;
+	STRPTR           Name;
+	ULONG            NameSize;
+	STRPTR           Comment;
+	ULONG            CommentSize;
+	STRPTR           Link;
+	ULONG            LinkSize;
+	ULONG            Protection;
+	ULONG            OwnerUID;
+	ULONG            OwnerGID;
+	ULONG            Reserved[3];
+};
+
+#define ADO_ExamineData_NameSize           (ADO_Dummy + 20)
+#define ADO_ExamineData_CommentSize        (ADO_Dummy + 21)
+#define ADO_ExamineData_LinkSize           (ADO_Dummy + 22)
+
+#define ACTION_EXAMINEDATA     3030
+#define ACTION_EXAMINEDATA_FH  3031
+#define ACTION_EXAMINEDATA_OBJ 3032
+#define ACTION_EXAMINEDATA_DIR 3040
+
 #endif /* ENABLE_DP64_SUPPORT */
 
 #define DOS_OWNER_ROOT 65535
