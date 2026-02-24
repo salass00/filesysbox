@@ -84,6 +84,10 @@ STATIC_ASSERT(offsetof(struct DosPacket64, dp_Res2) == offsetof(struct DosPacket
 #define ACTION_CHANGE_FILE_SIZE64     8003
 #define ACTION_GET_FILE_SIZE64        8004
 
+#endif /* ENABLE_DP64_SUPPORT */
+
+#ifdef ENABLE_EXD_SUPPORT
+
 #define DOS_EXAMINEDATA 11
 
 struct ExamineData
@@ -122,7 +126,7 @@ struct ExamineData
 #define ACTION_EXAMINEDATA_OBJ 3032
 #define ACTION_EXAMINEDATA_DIR 3040
 
-#endif /* ENABLE_DP64_SUPPORT */
+#endif /* ENABLE_EXD_SUPPORT */
 
 #define DOS_OWNER_ROOT 65535
 #define DOS_OWNER_NONE 0
