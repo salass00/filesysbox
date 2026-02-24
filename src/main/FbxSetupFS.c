@@ -151,7 +151,7 @@ struct FbxFS *FbxSetupFS(
 	struct TagItem *tstate;
 	const struct TagItem *tag;
 
-	ADEBUGF("FbxSetupFS(%#p, %#p, %#p, %ld, %#p)\n", msg, tags, ops, opssize, user_data);
+	ADEBUGF("FbxSetupFS(%#p, %#p, %#p, %ld, %#p)\n", msg, tags, ops, opssize, udata);
 
 	fs = AllocFbxFS();
 	if (fs == NULL) goto error;
