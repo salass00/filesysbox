@@ -90,6 +90,7 @@ int _start(void)
 	if (dn != NULL && dn->dn_Task != NULL)
 	{
 		pkt->dp_Type = ACTION_DIE;
+		pkt->dp_Arg1 = 0;
 		SendPkt(pkt, dn->dn_Task, &me->pr_MsgPort);
 		pktsent = TRUE;
 	}
