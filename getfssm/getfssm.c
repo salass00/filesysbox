@@ -1,0 +1,159 @@
+/*
+ * Dismount command for use with filesysbox clients.
+ *
+ * Copyright (c) 2013-2026 Fredrik Wikstrom
+ *
+ * This code is released under AROS PUBLIC LICENSE 1.1
+ * See the file LICENSE.APL
+ */
+
+#include <exec/alerts.h>
+#include <dos/filehandler.h>
+
+#include <proto/exec.h>
+#include <proto/dos.h>
+
+#include <string.h>
+
+#ifndef ACTION_GET_DISK_FSSM
+#define ACTION_GET_DISK_FSSM  4201
+#define ACTION_FREE_DISK_FSSM 4202
+#endif
+
+#ifndef __AROS__
+typedef ULONG IPTR;
+typedef LONG SIPTR;
+#endif
+
+#define TEMPLATE "DEVICE/A"
+enum {
+	ARG_DEVICE,
+	NUM_ARGS
+};
+
+static const TEXT dosName[];
+static const TEXT template[];
+static const TEXT progName[];
+static const TEXT unexpectedPktMsg[];
+
+#ifdef __AROS__
+__startup AROS_UFH3(int, _start,
+	AROS_UFHA(STRPTR, argstr, A0),
+	AROS_UFHA(ULONG, arglen, D0),
+	AROS_UFHA(struct Library *, SysBase, A6)
+)
+{
+	AROS_USERFUNC_INIT
+#else
+int _start(void)
+{
+	struct Library *SysBase = *(struct Library **)4;
+#endif
+	struct Process *me = (struct Process *)FindTask(NULL);
+	struct Library *DOSBase;
+	struct RDArgs *rda;
+	SIPTR args[NUM_ARGS];
+	TEXT devname[256];
+	struct DosPacket *pkt = NULL, *rp;
+	struct DosList *dol;
+	struct DeviceNode *dn;
+	BOOL pktsent = FALSE;
+	LONG error;
+	int rc = RETURN_ERROR;
+
+	DOSBase = OpenLibrary(dosName, 39);
+	if (DOSBase == NULL)
+	{
+		Alert(AG_OpenLib | AO_DOSLib);
+		return RETURN_FAIL;
+	}
+
+	bzero(args, sizeof(args));
+	rda = ReadArgs(template, (APTR)args, NULL);
+	if (rda == NULL)
+	{
+		PrintFault(error = IoErr(), progName);
+		goto cleanup;
+	}
+
+	SplitName((CONST_STRPTR)args[ARG_DEVICE], ':', devname, 0, sizeof(devname));
+
+	pkt = AllocDosObject(DOS_STDPKT, NULL);
+	if (pkt == NULL)
+	{
+		PrintFault(error = ERROR_NO_FREE_STORE, progName);
+		goto cleanup;
+	}
+
+	dol = LockDosList(LDF_DEVICES | LDF_READ);
+	dn = (struct DeviceNode *)FindDosEntry(dol, devname, LDF_DEVICES | LDF_READ);
+	if (dn != NULL && dn->dn_Task != NULL)
+	{
+		pkt->dp_Type = ACTION_GET_DISK_FSSM;
+		pkt->dp_Arg1 = 0;
+		SendPkt(pkt, dn->dn_Task, &me->pr_MsgPort);
+		pktsent = TRUE;
+	}
+	UnLockDosList(LDF_DEVICES | LDF_READ);
+
+	if (dn == NULL)
+	{
+		PrintFault(error = ERROR_OBJECT_NOT_FOUND, devname);
+		goto cleanup;
+	}
+
+	if (pktsent)
+	{
+		struct FileSysStartupMsg *fssm;
+
+		while ((rp = WaitPkt()) != pkt)
+		{
+			Printf(unexpectedPktMsg, (IPTR)rp, rp->dp_Type);
+		}
+		fssm = (struct FileSysStartupMsg *)rp->dp_Res1;
+		if (fssm == NULL)
+		{
+			PrintFault(error = rp->dp_Res2, devname);
+			goto cleanup;
+		}
+
+		/* FIXME: Dump FSSM info */
+
+		pkt->dp_Type = ACTION_FREE_DISK_FSSM;
+		pkt->dp_Arg1 = (SIPTR)fssm;
+		SendPkt(pkt, dn->dn_Task, &me->pr_MsgPort);
+
+		while ((rp = WaitPkt()) != pkt)
+		{
+			Printf(unexpectedPktMsg, (IPTR)rp, rp->dp_Type);
+		}
+		if (rp->dp_Res1 == DOSFALSE)
+		{
+			PrintFault(error = rp->dp_Res2, devname);
+			goto cleanup;
+		}
+	}
+
+cleanup:
+	if (pkt != NULL) FreeDosObject(DOS_STDPKT, pkt);
+	if (rda != NULL) FreeArgs(rda);
+
+	if (rc != RETURN_OK && error != 0)
+	{
+		SetIoErr(error);
+	}
+
+	CloseLibrary(DOSBase);
+
+	return rc;
+
+#ifdef __AROS__
+	AROS_USERFUNC_EXIT
+#endif
+}
+
+static const TEXT dosName[] = "dos.library";
+static const TEXT template[] = TEMPLATE;
+static const TEXT progName[] = "FbxGetFSSM";
+static const TEXT unexpectedPktMsg[] = "Received unexpected packet: 0x%lx (dp_Type: %ld)\n";
+
