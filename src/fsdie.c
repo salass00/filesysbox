@@ -15,9 +15,15 @@ int FbxDie(struct FbxFS *fs) {
 	struct MinNode *chain;
 	struct Message *msg;
 
-	/* check if shutdown is already in progress */
+	/* Check if shutdown is already in progress */
 	if (fs->shutdown) {
 		fs->r2 = ERROR_ACTION_NOT_KNOWN;
+		return DOSFALSE;
+	}
+
+	/* Check FSSM reference count */
+	if (fs->fssmcount != 0) {
+		fs->r2 = ERROR_OBJECT_IN_USE;
 		return DOSFALSE;
 	}
 

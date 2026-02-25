@@ -187,6 +187,12 @@ SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
 		r1 = DOSTRUE;
 		fs->r2 = 0;
 		break;
+	case ACTION_GET_DISK_FSSM:
+		r1 = (SIPTR)FbxObtainFSSM(fs);
+		break;
+	case ACTION_FREE_DISK_FSSM:
+		r1 = FbxReleaseFSSM(fs, (struct FileSysStartupMsg *)pkt->dp_Arg1);
+		break;
 	case ACTION_NIL:
 		r1 = DOSFALSE;
 		fs->r2 = 0;

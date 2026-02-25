@@ -41,6 +41,11 @@
 #define STATIC_ASSERT(cond,msg)
 #endif
 
+#ifndef ACTION_GET_DISK_FSSM
+#define ACTION_GET_DISK_FSSM  4201
+#define ACTION_FREE_DISK_FSSM 4202
+#endif
+
 #ifdef ENABLE_DP64_SUPPORT
 struct DosPacket64
 {
@@ -442,6 +447,7 @@ struct FbxFS {
 	APTR                         initret;
 	LONG                         shutdown; // read by FbxEventLoop()
 	LONG                         dosetup; // read by FbxEventLoop()
+	LONG                         fssmcount;
 	LONG                         inhibit;
 	ULONG                        aut; // active auto update timeout
 	ULONG                        iaut; // inactive auto update timeout
@@ -778,6 +784,10 @@ struct FbxLock *FbxInternalLocateObject(struct FbxFS *fs, struct FbxLock *lock,
 	const char *name, int lockmode);
 struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock,
 	const char *name, int lockmode);
+
+/* fsobtainfssm.c */
+struct FileSysStartupMsg *FbxObtainFSSM(struct FbxFS *fs);
+int FbxReleaseFSSM(struct FbxFS *fs, struct FileSysStartupMsg *fssm);
 
 /* fsopen.c */
 int FbxOpenFile(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock,

@@ -25,6 +25,10 @@ static void FbxFillInfoData(struct FbxFS *fs, struct InfoData *info) {
 
 	info->id_UnitNumber = fs->fssm ? fs->fssm->fssm_Unit : -1;
 
+	if (fs->fssmcount) {
+		info->id_InUse = DOSTRUE;
+	}
+
 	if (OKVOLUME(vol)) {
 		struct statvfs st;
 
@@ -62,16 +66,16 @@ static void FbxFillInfoData(struct FbxFS *fs, struct InfoData *info) {
 		if (BADVOLUME(vol))
 		{
 			//info->id_NumSoftErrors = -1;
-			info->id_DiskType       = ID_NOT_REALLY_DOS;
+			info->id_DiskType = ID_NOT_REALLY_DOS;
 		}
 		else if (fs->inhibit)
 		{
-			info->id_DiskType       = ID_BUSY_DISK;
-			info->id_InUse         = DOSTRUE;
+			info->id_DiskType = ID_BUSY_DISK;
+			info->id_InUse    = DOSTRUE;
 		}
 		else
 		{
-			info->id_DiskType       = ID_NO_DISK_PRESENT;
+			info->id_DiskType = ID_NO_DISK_PRESENT;
 		}
 	}
 }
