@@ -212,3 +212,6 @@ filesysbox.library 54.10 (d.m.2026)
   not set) as nothing was using it and it was just needlessly complicating
   things.
 
+- Added back support for the ACTION_GET_DISK_FSSM and ACTION_FREE_DISK_FSSM
+  packets as in the original version 0.730 filesysbox.library.
+
