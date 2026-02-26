@@ -112,7 +112,7 @@ struct ExamineData *FbxExamineData(struct FbxFS *fs, const char *fullpath,
 	if (fs->fsflags & FBXF_USE_INO)
 		exd->ObjectID = statbuf.st_ino;
 	else
-		exd->ObjectID = FbxHashPath(fs, fullpath); /* FIXME: Should be FbxHashPathIno() */
+		exd->ObjectID = FbxHashPathIno(fs, fullpath);
 
 	exd->OwnerUID = FbxUnix2AmigaOwner(statbuf.st_uid);
 	exd->OwnerGID = FbxUnix2AmigaOwner(statbuf.st_gid);
