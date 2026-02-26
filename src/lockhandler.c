@@ -8,7 +8,6 @@
 #include "filesysbox_internal.h"
 #include <dos/dostags.h>
 #include <string.h>
-#include <stdalign.h>
 
 #define ACTION_COLLECT 3001
 
@@ -17,6 +16,8 @@ enum {
 	/* ID_COLLECT_FH, */
 	ID_COLLECT_NOTIFYNODE
 };
+
+static const UBYTE volumename[] = "\6NULLED";
 
 #ifdef __AROS__
 static AROS_UFH3(int, FbxLockHandlerProc,
@@ -294,7 +295,7 @@ static int FbxLockHandlerProc(void) {
 		}
 	}
 
-	FreeStructure(libBase->lhvolume, DeviceList);
+	FreeMem(libBase->lhvolume, sizeof(struct DeviceList) + sizeof(volumename));
 
 	Forbid();
 	libBase->lhvolume = NULL;
@@ -314,11 +315,16 @@ struct DeviceList *StartLockHandlerProc(struct FileSysBoxBase *libBase) {
 #endif
 	struct DeviceList *volume;
 	struct Process *proc;
-	alignas(4) static const UBYTE volumename[] = {6,'N','U','L','L','E','D',0};
+	STRPTR vname;
 
-	volume = AllocStructure(DeviceList);
+	STATIC_ASSERT((sizeof(struct DeviceList) & 3) == 0, "Volume name not 32bit-aligned");
+
+	volume = AllocMem(sizeof(struct DeviceList) + sizeof(volumename), MEMF_PUBLIC|MEMF_CLEAR);
 	if (volume == NULL)
 		return NULL;
+
+	vname = (STRPTR)volume;
+	CopyMem(volumename, vname, sizeof(volumename));
 
 	proc = CreateNewProcTags(
 		NP_Entry,       (IPTR)FbxLockHandlerProc,
@@ -342,7 +348,7 @@ struct DeviceList *StartLockHandlerProc(struct FileSysBoxBase *libBase) {
 		NP_ConsoleTask, 0,
 		TAG_END);
 	if (proc == NULL) {
-		FreeStructure(volume, DeviceList);
+		FreeMem(volume, sizeof(struct DeviceList) + sizeof(volumename));
 		return NULL;
 	}
 
@@ -358,7 +364,7 @@ struct DeviceList *StartLockHandlerProc(struct FileSysBoxBase *libBase) {
 	volume->dl_Task = &proc->pr_MsgPort;
 	DateStamp(&volume->dl_VolumeDate);
 	volume->dl_DiskType = ID_NOT_REALLY_DOS;
-	volume->dl_Name = MKBADDR(volumename);
+	volume->dl_Name = MKBADDR(vname);
 
 	return volume;
 }
