@@ -107,10 +107,11 @@ size_t FbxStrlcat(struct FbxFS *fs, char *dst, const char *src, size_t dst_size)
 	return utf8_strlcat(dst, src, dst_size);
 }
 
-static unsigned int FbxHashPathCase(struct FbxFS *fs, const char *str) {
-	unsigned int i, v = 0, c;
+static IPTR FbxHashPathInoCase(struct FbxFS *fs, const char *str) {
+	IPTR v = 0;
+	ULONG c;
 
-	DEBUGF("FbxHashPathCase(%#p, '%s')\n", fs, str);
+	DEBUGF("FbxHashPathInoCase(%#p, '%s')\n", fs, str);
 
 	// get a small seed from number of characters
 	v = FbxStrlen(fs, str);
@@ -120,16 +121,14 @@ static unsigned int FbxHashPathCase(struct FbxFS *fs, const char *str) {
 		v = v * 13 + c;
 	}
 
-	// and mask away excess bits
-	i = v & ENTRYHASHMASK;
-
-	return i;
+	return v;
 }
 
-static unsigned int FbxHashPathNoCase(struct FbxFS *fs, const char *str) {
-	unsigned int i, v = 0, c;
+static IPTR FbxHashPathInoNoCase(struct FbxFS *fs, const char *str) {
+	IPTR v = 0;
+	ULONG c;
 
-	DEBUGF("FbxHashPathNoCase(%#x, '%s')\n", fs, str);
+	DEBUGF("FbxHashPathInoNoCase(%#x, '%s')\n", fs, str);
 
 	// get a small seed from number of characters
 	v = FbxStrlen(fs, str);
@@ -140,23 +139,25 @@ static unsigned int FbxHashPathNoCase(struct FbxFS *fs, const char *str) {
 		v = v * 13 + c;
 	}
 
-	// and mask away excess bits
-	i = v & ENTRYHASHMASK;
-
-	return i;
+	return v;
 }
 
-unsigned int FbxHashPath(struct FbxFS *fs, const char *str) {
-	DEBUGF("FbxHashPath(%#p, '%s')\n", fs, str);
+IPTR FbxHashPathIno(struct FbxFS *fs, const char *str) {
+	DEBUGF("FbxHashPathIno(%#p, '%s')\n", fs, str);
 
 	if (fs->currvol->vflags & FBXVF_CASE_SENSITIVE)
-		return FbxHashPathCase(fs, str);
+		return FbxHashPathInoCase(fs, str);
 	else
-		return FbxHashPathNoCase(fs, str);
+		return FbxHashPathInoNoCase(fs, str);
+}
+
+/* Same as FbxHashPathIno() but with excess bits masked out */
+static unsigned int FbxHashPath(struct FbxFS *fs, const char *str) {
+	return FbxHashPathIno(fs, str) & ENTRYHASHMASK;
 }
 
 struct FbxEntry *FbxFindEntry(struct FbxFS *fs, const char *path) {
-	ULONG i;
+	unsigned int i;
 	struct FbxEntry *e, *succ;
 
 	DEBUGF("FbxFindEntry(%#p, '%s')\n", fs, path);
@@ -256,7 +257,7 @@ void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock) {
 
 void FbxAddEntry(struct FbxFS *fs, struct FbxEntry *e) {
 	struct Library *SysBase = fs->sysbase;
-	ULONG i;
+	unsigned int i;
 
 	DEBUGF("FbxAddEntry(%#p, %#p)\n", fs, e);
 
@@ -387,7 +388,7 @@ struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int type, QUA
 	if (fs->fsflags & FBXF_USE_INO)
 		e->diskkey = id;
 	else
-		e->diskkey = FbxHashPath(fs, path);
+		e->diskkey = FbxHashPathIno(fs, path);
 
 	FbxAddEntry(fs, e); // add to hash
 

@@ -98,7 +98,7 @@ void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *st
 	if (fs->fsflags & FBXF_USE_INO)
 		fib->fib_DiskKey = (IPTR)stat->st_ino;
 	else
-		fib->fib_DiskKey = (IPTR)FbxHashPath(fs, fullpath);
+		fib->fib_DiskKey = (IPTR)FbxHashPathIno(fs, fullpath);
 
 	FbxTimeSpec2DS(fs, &stat->st_mtim, &fib->fib_Date);
 

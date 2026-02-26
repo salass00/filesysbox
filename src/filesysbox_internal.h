@@ -298,7 +298,7 @@ struct FbxEntry {
 	struct MinList notifylist; // list of notifys
 	BOOL           xlock; // true if exclusively locked
 	LONG           type; // ETYPE_XXX
-	QUAD           diskkey; // st_ino copy
+	UQUAD          diskkey; // st_ino copy
 };
 
 #define FSENTRYFROMHASHCHAIN(chain) container_of(chain, struct FbxEntry, hashchain)
@@ -642,7 +642,7 @@ int FbxStrcmp(struct FbxFS *fs, const char *s1, const char *s2);
 int FbxStrncmp(struct FbxFS *fs, const char *s1, const char *s2, size_t n);
 size_t FbxStrlcpy(struct FbxFS *fs, char *dst, const char *src, size_t dst_size);
 size_t FbxStrlcat(struct FbxFS *fs, char *dst, const char *src, size_t dst_size);
-unsigned int FbxHashPath(struct FbxFS *fs, const char *str);
+IPTR FbxHashPathIno(struct FbxFS *fs, const char *str);
 struct FbxEntry *FbxFindEntry(struct FbxFS *fs, const char *path);
 struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mode);
 void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock);

@@ -215,3 +215,5 @@ filesysbox.library 54.10 (d.m.2026)
 - Added back support for the ACTION_GET_DISK_FSSM and ACTION_FREE_DISK_FSSM
   packets as in the original version 0.730 filesysbox.library.
 
+- Don't mask with ENTRYHASHMASK when generating a hash for st_ino/fib_DiskKey.
+
