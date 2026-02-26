@@ -323,7 +323,7 @@ struct DeviceList *StartLockHandlerProc(struct FileSysBoxBase *libBase) {
 	if (volume == NULL)
 		return NULL;
 
-	vname = (STRPTR)volume;
+	vname = (STRPTR)(volume + 1);
 	CopyMem(volumename, vname, sizeof(volumename));
 
 	proc = CreateNewProcTags(
