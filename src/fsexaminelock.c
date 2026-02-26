@@ -47,7 +47,7 @@ UWORD FbxUnix2AmigaOwner(const uid_t owner) {
 	else return (UWORD)owner;
 }
 
-static const char *FbxFilePart(const char *path) {
+const char *FbxFilePart(const char *path) {
 	const char *name = strrchr(path, '/');
 	return name ? (name + 1) : path;
 }

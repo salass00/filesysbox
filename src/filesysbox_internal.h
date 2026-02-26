@@ -21,6 +21,7 @@
 #include <libraries/filesysbox.h>
 #include <exec/interrupts.h>
 #include <dos/filehandler.h>
+#include <dos/dostags.h>
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <proto/utility.h>
@@ -120,6 +121,16 @@ struct ExamineData
 #define ADO_ExamineData_NameSize           (ADO_Dummy + 20)
 #define ADO_ExamineData_CommentSize        (ADO_Dummy + 21)
 #define ADO_ExamineData_LinkSize           (ADO_Dummy + 22)
+
+enum {
+	FSO_TYPE_SOFTLINK = 0,
+	FSO_TYPE_FILE,
+	FSO_TYPE_DIRECTORY,
+	FSO_TYPE_PIPE,
+	FSO_TYPE_SOCKET,
+	FSO_TYPE_INVALID = 0xFE
+};
+#define FSOF_LINK (1<<8)
 
 #define ACTION_EXAMINEDATA     3030
 #define ACTION_EXAMINEDATA_FH  3031
@@ -799,6 +810,7 @@ int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR 
 LONG FbxMode2EntryType(const mode_t mode);
 ULONG FbxMode2Protection(const mode_t mode);
 UWORD FbxUnix2AmigaOwner(const uid_t owner);
+const char *FbxFilePart(const char *path);
 void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *stat,
 	struct FileInfoBlock *fib);
 int FbxExamineLock(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock *fib);
@@ -806,6 +818,11 @@ int FbxExamineLock(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 /* fsexaminenext.c */
 int FbxReadDir(struct FbxFS *fs, struct FbxLock *lock);
 int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock *fib);
+
+/* fsexaminedatalock.c */
+struct ExamineData *FbxExamineData(struct FbxFS *fs, const char *fullpath,
+	struct fuse_file_info *fi);
+struct ExamineData *FbxExamineDataLock(struct FbxFS *fs, struct FbxLock *lock);
 
 /* fsformat.c */
 int FbxFormat(struct FbxFS *fs, const char *volname, ULONG dostype);

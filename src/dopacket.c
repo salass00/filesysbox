@@ -193,6 +193,9 @@ SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
 	case ACTION_FREE_DISK_FSSM:
 		r1 = FbxReleaseFSSM(fs, (struct FileSysStartupMsg *)pkt->dp_Arg1);
 		break;
+	case ACTION_EXAMINEDATA:
+		r1 = (SIPTR)FbxExamineDataLock(fs, (struct FbxLock *)pkt->dp_Arg1);
+		break;
 	case ACTION_NIL:
 		r1 = DOSFALSE;
 		fs->r2 = 0;

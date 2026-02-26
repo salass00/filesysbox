@@ -12,13 +12,6 @@
 #include "fuse_stubs.h"
 #include <string.h>
 
-static int Fbx_readlink(struct FbxFS *fs, const char *path, char *buf, size_t buflen)
-{
-	ODEBUGF("Fbx_readlink(%#p, '%s', %#p, %lu)\n", fs, path, buf, buflen);
-
-	return FSOP readlink(path, buf, buflen, &fs->fcntx);
-}
-
 int FbxReadLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	char *buffer, int size)
 {
