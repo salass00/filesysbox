@@ -31,10 +31,35 @@ enum {
 	NUM_ARGS
 };
 
+#if !defined(__AROS__) || !defined(AROS_FAST_BSTR)
+static void CopyStringBSTRToC(BSTR bstr, STRPTR cstr, ULONG size);
+#endif
+
 static const TEXT dosName[];
 static const TEXT template[];
 static const TEXT progName[];
 static const TEXT unexpectedPktMsg[];
+
+static const TEXT deviceInfoMsg[];
+static const TEXT tableHeaderMsg[];
+static const TEXT tableSizeMsg[];
+static const TEXT secSizeMsg[];
+static const TEXT surfacesMsg[];
+static const TEXT secsPerBlkMsg[];
+static const TEXT blksPerTrackMsg[];
+static const TEXT reservedBlksMsg[];
+static const TEXT lowCylMsg[];
+static const TEXT highCylMsg[];
+static const TEXT numBuffsMsg[];
+static const TEXT memFlagsMsg[];
+static const TEXT maxXferMsg[];
+static const TEXT maskMsg[];
+static const TEXT bootPriMsg[];
+static const TEXT dosTypeMsg[];
+static const TEXT baudRateMsg[];
+static const TEXT ctrlMsg[];
+static const TEXT bootBlksMsg[];
+static const TEXT tableFooterMsg[];
 
 #ifdef __AROS__
 __startup AROS_UFH3(int, _start,
@@ -105,6 +130,13 @@ int _start(void)
 	if (pktsent)
 	{
 		struct FileSysStartupMsg *fssm;
+		struct DosEnvec *envtab;
+#if defined(__AROS__) && defined(AROS_FAST_BSTR)
+		#define BTOC(bstr) ((CONST_STRPTR)(bstr))
+#else
+		TEXT buffer[256];
+		#define BTOC(bstr) (CopyStringBSTRToC((bstr), buffer, sizeof(buffer)), buffer)
+#endif
 
 		while ((rp = WaitPkt()) != pkt)
 		{
@@ -117,7 +149,50 @@ int _start(void)
 			goto cleanup;
 		}
 
-		/* FIXME: Dump FSSM info */
+		Printf(deviceInfoMsg, (IPTR)BTOC(fssm->fssm_Device), fssm->fssm_Unit, fssm->fssm_Flags);
+
+		envtab = (struct DosEnvec *)BADDR(fssm->fssm_Environ);
+		PutStr(tableHeaderMsg);
+
+		Printf(tableSizeMsg, envtab->de_TableSize);
+		if (envtab->de_TableSize >= DE_SIZEBLOCK)
+			Printf(secSizeMsg, envtab->de_SizeBlock<<2);
+		if (envtab->de_TableSize >= DE_NUMHEADS)
+			Printf(surfacesMsg, envtab->de_Surfaces);
+#ifdef DE_SECSPERBLOCK
+		if (envtab->de_TableSize >= DE_SECSPERBLOCK)
+#else
+		if (envtab->de_TableSize >= DE_SECSPERBLK)
+#endif
+			Printf(secsPerBlkMsg, envtab->de_SectorPerBlock);
+		if (envtab->de_TableSize >= DE_BLKSPERTRACK)
+			Printf(blksPerTrackMsg, envtab->de_BlocksPerTrack);
+		if (envtab->de_TableSize >= DE_RESERVEDBLKS)
+			Printf(reservedBlksMsg, envtab->de_Reserved);
+		if (envtab->de_TableSize >= DE_LOWCYL)
+			Printf(lowCylMsg, envtab->de_LowCyl);
+		if (envtab->de_TableSize >= DE_UPPERCYL)
+			Printf(highCylMsg, envtab->de_HighCyl);
+		if (envtab->de_TableSize >= DE_NUMBUFFERS)
+			Printf(numBuffsMsg, envtab->de_NumBuffers);
+		if (envtab->de_TableSize >= DE_MEMBUFTYPE)
+			Printf(memFlagsMsg, envtab->de_BufMemType);
+		if (envtab->de_TableSize >= DE_MAXTRANSFER)
+			Printf(maxXferMsg, envtab->de_MaxTransfer);
+		if (envtab->de_TableSize >= DE_MASK)
+			Printf(maskMsg, envtab->de_Mask);
+		if (envtab->de_TableSize >= DE_BOOTPRI)
+			Printf(bootPriMsg, envtab->de_BootPri);
+		if (envtab->de_TableSize >= DE_DOSTYPE)
+			Printf(dosTypeMsg, envtab->de_DosType);
+		if (envtab->de_TableSize >= DE_BAUD)
+			Printf(baudRateMsg, envtab->de_Baud);
+		if (envtab->de_TableSize >= DE_CONTROL)
+			Printf(ctrlMsg, (IPTR)BTOC(envtab->de_Control));
+		if (envtab->de_TableSize >= DE_BOOTBLOCKS)
+			Printf(bootBlksMsg, envtab->de_BootBlocks);
+
+		PutStr(tableFooterMsg);
 
 		pkt->dp_Type = ACTION_FREE_DISK_FSSM;
 		pkt->dp_Arg1 = (SIPTR)fssm;
@@ -156,4 +231,62 @@ static const TEXT dosName[] = "dos.library";
 static const TEXT template[] = TEMPLATE;
 static const TEXT progName[] = "FbxGetFSSM";
 static const TEXT unexpectedPktMsg[] = "Received unexpected packet: 0x%lx (dp_Type: %ld)\n";
+
+static const TEXT deviceInfoMsg[] =
+	"Storage device driver\n"
+	"=====================\n"
+	"Device: %s\n"
+	"Unit:   %lu\n"
+	"Flags:  0x%08lx\n\n";
+
+static const TEXT tableHeaderMsg[] =
+	"Environment table\n"
+	"=================\n";
+static const TEXT tableSizeMsg[] =
+	"Table size:        %lu longwords\n";
+static const TEXT secSizeMsg[] =
+	"Sector size:       %lu bytes\n";
+static const TEXT surfacesMsg[] =
+	"Surfaces:          %lu\n";
+static const TEXT secsPerBlkMsg[] =
+	"Sectors per block: %lu\n";
+static const TEXT blksPerTrackMsg[] =
+	"Blocks per track:  %lu\n";
+static const TEXT reservedBlksMsg[] =
+	"Reserved blocks:   %lu\n";
+static const TEXT lowCylMsg[] =
+	"First cylinder:    %lu\n";
+static const TEXT highCylMsg[] =
+	"Last cylinder:     %lu\n";
+static const TEXT numBuffsMsg[] =
+	"Number of buffers: %lu\n";
+static const TEXT memFlagsMsg[] =
+	"Memory flags:      0x%08lx\n";
+static const TEXT maxXferMsg[] =
+	"Max transfer:      0x%08lx\n";
+static const TEXT maskMsg[] =
+	"Mask:              0x%08lx\n";
+static const TEXT bootPriMsg[] =
+	"Boot priority:     %ld\n";
+static const TEXT dosTypeMsg[] =
+	"DOS Type:          0x%08lx\n";
+static const TEXT baudRateMsg[] =
+	"Baud rate:         %lu\n";
+static const TEXT ctrlMsg[] =
+	"Control:           %s\n";
+static const TEXT bootBlksMsg[] =
+	"Boot blocks:       %lu\n";
+static const TEXT tableFooterMsg[] =
+	"\n";
+
+#if !defined(__AROS__) || !defined(AROS_FAST_BSTR)
+static void CopyStringBSTRToC(BSTR bstr, STRPTR cstr, ULONG size) {
+	struct Library *SysBase = *(struct Library **)4;
+	UBYTE *src = BADDR(bstr);
+	ULONG len = *src++;
+	if (len >= size) len = size - 1;
+	CopyMem(src, cstr, len);
+	cstr[len] = '\0';
+}
+#endif
 
