@@ -81,9 +81,9 @@ endif
 
 .PHONY: all
 ifeq ($(HOST),m68k-amigaos)
-all: $(BINDIR)/$(TARGET).000 $(BINDIR)/$(TARGET).020 $(BINDIR)/$(TARGET).060 build-dismount
+all: $(BINDIR)/$(TARGET).000 $(BINDIR)/$(TARGET).020 $(BINDIR)/$(TARGET).060 build-dismount build-getfssm
 else
-all: $(BINDIR)/$(TARGET).$(CPU) $(BINDIR)/$(TARGET).$(CPU).debug build-dismount
+all: $(BINDIR)/$(TARGET).$(CPU) $(BINDIR)/$(TARGET).$(CPU).debug build-dismount build-getfssm
 endif
 
 -include $(DEPS)
@@ -147,10 +147,15 @@ endif
 build-dismount:
 	$(MAKE) -C dismount $(MKFLAGS)
 
+.PHONY: build-getfssm
+build-getfssm:
+	$(MAKE) -C getfssm $(MKFLAGS)
+
 .PHONY: clean
 clean:
 	rm -rf bin obj
 	$(MAKE) -C dismount clean
+	$(MAKE) -C getfssm clean
 
 .PHONY: revision
 revision:
