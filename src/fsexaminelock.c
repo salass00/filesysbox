@@ -55,34 +55,47 @@ static const char *FbxFilePart(const char *path) {
 void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *stat,
 	struct FileInfoBlock *fib)
 {
+	size_t blen;
 	char comment[FBX_MAX_COMMENT];
 	LONG type;
 
+	/*
+	 * At the file system layer fib_FileName and fib_Comment are always set as BCPL strings
+	 * with the length in the first byte. These are then converted by dos.library into standard
+	 * C strings with no length byte and instead a NUL terminator at the end.
+	 *
+	 * NOTE: Because we are using size limited string functions here that write a NUL terminator
+	 * it means that any field after may have its first byte overwritten with a NUL character
+	 * but as these (fib_Protection and fib_OwnerUID) are only written to later in the function
+	 * it should not cause any problems.
+	 */
 	if (IsRoot(fullpath)) {
 #ifdef ENABLE_CHARSET_CONVERSION
-		strlcpy((char *)fib->fib_FileName + 1, fs->currvol->volname, sizeof(fib->fib_FileName));
+		blen = strlcpy((char *)&fib->fib_FileName[1], fs->currvol->volname, sizeof(fib->fib_FileName));
 #else
-		FbxStrlcpy(fs, (char *)fib->fib_FileName + 1, fs->currvol->volname, sizeof(fib->fib_FileName));
+		blen = FbxStrlcpy(fs, (char *)&fib->fib_FileName[1], fs->currvol->volname, sizeof(fib->fib_FileName));
 #endif
 		type = ST_ROOT;
 	} else {
 #ifdef ENABLE_CHARSET_CONVERSION
-		FbxUTF8ToLocal(fs, (char *)fib->fib_FileName + 1, FbxFilePart(fullpath), sizeof(fib->fib_FileName));
+		blen = FbxUTF8ToLocal(fs, (char *)&fib->fib_FileName[1], FbxFilePart(fullpath), sizeof(fib->fib_FileName));
 #else
-		FbxStrlcpy(fs, (char *)fib->fib_FileName + 1, FbxFilePart(fullpath), sizeof(fib->fib_FileName));
+		blen = FbxStrlcpy(fs, (char *)&fib->fib_FileName[1], FbxFilePart(fullpath), sizeof(fib->fib_FileName));
 #endif
 		type = FbxMode2EntryType(stat->st_mode);
 	}
-	fib->fib_FileName[0] = strlen((char *)fib->fib_FileName + 1);
+	if (blen >= sizeof(fib->fib_FileName)) blen = sizeof(fib->fib_FileName) - 1;
+	fib->fib_FileName[0] = blen;
 	fib->fib_DirEntryType = fib->fib_EntryType = type;
 
 	FbxGetComment(fs, fullpath, comment, FBX_MAX_COMMENT);
 #ifdef ENABLE_CHARSET_CONVERSION
-	FbxUTF8ToLocal(fs, (char *)fib->fib_Comment + 1, comment, sizeof(fib->fib_Comment));
+	blen = FbxUTF8ToLocal(fs, (char *)&fib->fib_Comment[1], comment, sizeof(fib->fib_Comment));
 #else
-	FbxStrlcpy(fs, (char *)fib->fib_Comment + 1, comment, sizeof(fib->fib_Comment));
+	blen = FbxStrlcpy(fs, (char *)&fib->fib_Comment[1], comment, sizeof(fib->fib_Comment));
 #endif
-	fib->fib_Comment[0] = strlen((char *)fib->fib_Comment + 1);
+	if (blen >= sizeof(fib->fib_Comment)) blen = sizeof(fib->fib_Comment) - 1;
+	fib->fib_Comment[0] = blen;
 
 	if (stat->st_size < 0)
 		fib->fib_Size = 0;
