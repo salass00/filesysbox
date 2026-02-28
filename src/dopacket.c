@@ -195,6 +195,7 @@ SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
 		break;
 #ifdef ENABLE_EXD_SUPPORT
 	case ACTION_EXAMINEDATA:
+	case ACTION_EXAMINEDATA_FH:
 		r1 = (SIPTR)FbxExamineDataLock(fs, (struct FbxLock *)pkt->dp_Arg1);
 		break;
 #endif
