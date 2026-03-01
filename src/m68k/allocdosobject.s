@@ -136,15 +136,12 @@ have_mem:
 	move.l  d0,exd_FileSize(a0)
 	move.l  d0,exd_FileSize+4(a0)
 	lea     exd_SIZEOF(a0),a1
-	move.b  #0,(a1)
 	move.l  a1,exd_Name(a0)
 	move.l  d2,exd_NameSize(a0)
 	add.l   d2,a1
-	move.b  #0,(a1)
 	move.l  a1,exd_Comment(a0)
 	move.l  d3,exd_CommentSize(a0)
 	add.l   d3,a1
-	move.b  #0,(a1)
 	move.l  a1,exd_Link(a0)
 	move.l  d4,exd_LinkSize(a0)
 	movem.l (a7)+,d2-d4/a6
