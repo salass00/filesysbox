@@ -136,6 +136,7 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 	vol->fs           = fs;
 	vol->writeprotect = FALSE;
 	vol->vflags       = 0;
+	vol->blocksize    = st.f_frsize;
 
 	NEWMINLIST(&vol->unres_notifys);
 	NEWMINLIST(&vol->locklist);

@@ -55,9 +55,11 @@ const char *FbxFilePart(const char *path) {
 void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *stat,
 	struct FileInfoBlock *fib)
 {
+	struct FbxVolume *vol = fs->currvol;
 	size_t blen;
 	char comment[FBX_MAX_COMMENT];
 	LONG type;
+	QUAD filesize;
 
 	/*
 	 * At the file system layer fib_FileName and fib_Comment are always set as BCPL strings
@@ -71,9 +73,9 @@ void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *st
 	 */
 	if (IsRoot(fullpath)) {
 #ifdef ENABLE_CHARSET_CONVERSION
-		blen = strlcpy((char *)&fib->fib_FileName[1], fs->currvol->volname, sizeof(fib->fib_FileName));
+		blen = strlcpy((char *)&fib->fib_FileName[1], vol->volname, sizeof(fib->fib_FileName));
 #else
-		blen = FbxStrlcpy(fs, (char *)&fib->fib_FileName[1], fs->currvol->volname, sizeof(fib->fib_FileName));
+		blen = FbxStrlcpy(fs, (char *)&fib->fib_FileName[1], vol->volname, sizeof(fib->fib_FileName));
 #endif
 		type = ST_ROOT;
 	} else {
@@ -97,16 +99,25 @@ void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *st
 	if (blen >= sizeof(fib->fib_Comment)) blen = sizeof(fib->fib_Comment) - 1;
 	fib->fib_Comment[0] = blen;
 
-	if (stat->st_size < 0)
-		fib->fib_Size = 0;
-	else if (sizeof(fib->fib_Size) == 4 && stat->st_size >= INT32_MAX)
-		fib->fib_Size = INT32_MAX-1;
+	filesize = 0;
+	if (type == ST_FILE && stat->st_size > 0)
+		filesize = stat->st_size;
+	if (sizeof(fib->fib_Size) == 4 && filesize >= INT32_MAX)
+		fib->fib_Size = INT32_MAX - 1;
 	else
-		fib->fib_Size = stat->st_size;
+		fib->fib_Size = filesize;
 
 	fib->fib_Protection = FbxMode2Protection(stat->st_mode);
 	fib->fib_Protection |= FbxGetAmigaProtectionFlags(fs, fullpath);
+
 	fib->fib_NumBlocks = stat->st_blocks;
+	if (fib->fib_NumBlocks == 0) {
+		ULONG blocksize = vol->blocksize;
+		if (S_ISREG(stat->st_mode))
+			fib->fib_NumBlocks = ((UQUAD)filesize + blocksize - 1) / blocksize;
+		if (fib->fib_NumBlocks == 0)
+			fib->fib_NumBlocks++;
+	}
 
 	if (fs->fsflags & FBXF_USE_INO)
 		fib->fib_DiskKey = (IPTR)stat->st_ino;

@@ -380,6 +380,7 @@ struct FbxVolume {
 	struct MinList locklist;
 	struct MinList notifylist;
 	struct MinList entrytab[ENTRYHASHSIZE]; // hashtable
+	ULONG          blocksize;
 	UBYTE          volnamelen;
 	char           volname[CONN_VOLUME_NAME_BYTES];
 };
