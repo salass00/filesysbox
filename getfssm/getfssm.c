@@ -2,7 +2,7 @@
  * GetFSSM command for testing ACTION_GET_DISK_FSSM/
  * ACTION_FREE_DISK_FSSM packet support.
  *
- * Copyright (c) 2013-2026 Fredrik Wikstrom
+ * Copyright (c) 2026 Fredrik Wikstrom
  *
  * This code is released under AROS PUBLIC LICENSE 1.1
  * See the file LICENSE.APL
