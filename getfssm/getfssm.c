@@ -1,5 +1,6 @@
 /*
- * Dismount command for use with filesysbox clients.
+ * GetFSSM command for testing ACTION_GET_DISK_FSSM/
+ * ACTION_FREE_DISK_FSSM packet support.
  *
  * Copyright (c) 2013-2026 Fredrik Wikstrom
  *
