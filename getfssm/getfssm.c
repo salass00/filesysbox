@@ -132,6 +132,7 @@ int _start(void)
 	{
 		struct FileSysStartupMsg *fssm;
 		struct DosEnvec *envtab;
+		static const TEXT emptystr[] = "";
 #if defined(__AROS__) && defined(AROS_FAST_BSTR)
 		#define BTOC(bstr) ((CONST_STRPTR)(bstr))
 #else
@@ -189,7 +190,7 @@ int _start(void)
 		if (envtab->de_TableSize >= DE_BAUD)
 			Printf(baudRateMsg, envtab->de_Baud);
 		if (envtab->de_TableSize >= DE_CONTROL)
-			Printf(ctrlMsg, (IPTR)BTOC(envtab->de_Control));
+			Printf(ctrlMsg, (IPTR)(envtab->de_Control ? BTOC(envtab->de_Control) : (STRPTR)emptystr));
 		if (envtab->de_TableSize >= DE_BOOTBLOCKS)
 			Printf(bootBlksMsg, envtab->de_BootBlocks);
 
