@@ -37,7 +37,11 @@ static const CONST_APTR LibVectors[] = {
 	LibReserved,
 	FbxQueryMountMsg,
 	FbxSetupFS,
+#ifdef ENABLE_STACKSWAP
+	FbxEventLoop_SS,
+#else
 	FbxEventLoop,
+#endif
 	FbxCleanupFS,
 	FbxReturnMountMsg,
 	FbxFuseVersion,

@@ -14,7 +14,7 @@
 // Internal structures constants and macros.
 
 // All structures are PRIVATE to Filesysbox framework. 
-// No peek/poke is allowed from outside. 
+// No peek/poke is allowed from outside.
 // Consider them black-box objects.
 // Etc.
 
@@ -414,6 +414,9 @@ struct FbxAVL {
 };
 
 struct FbxFS {
+#ifdef ENABLE_STACKSWAP
+	struct StackSwapStruct       stackswap;
+#endif
 	struct FileSysBoxBase       *libbase;
 	struct MsgPort              *dlproc_port;
 	BPTR                         lhproc_volumebptr;

@@ -220,3 +220,6 @@ filesysbox.library 54.10 (d.m.2026)
 - Now calculates the number of blocks for fib_NumBlocks from the file size if
   st_blocks was set to zero by the file system.
 
+- AmigaOS 3: Added minimum stack size check and stack swap on FbxEventLoop()
+  function entry (the minimum is currently set to 16KiB).
+

@@ -145,6 +145,12 @@ struct FbxFS *FbxSetupFS(
 	REG(a3, APTR udata),
 	REG(a6, struct FileSysBoxBase *libBase));
 
+#ifdef ENABLE_STACKSWAP
+LONG FbxEventLoop_SS(
+	REG(a0, struct FbxFS *fs),
+	REG(a6, struct FileSysBoxBase *libBase));
+#endif
+
 LONG FbxEventLoop(
 	REG(a0, struct FbxFS *fs),
 	REG(a6, struct FileSysBoxBase *libBase));

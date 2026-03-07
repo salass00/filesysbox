@@ -23,11 +23,13 @@ else
 endif
 
 DEFINES += -DENABLE_CHARSET_CONVERSION
+DEFINES += -DENABLE_STACKSWAP
 
 CFLAGS  = -O2 -g -fomit-frame-pointer -fno-strict-aliasing \
           $(INCLUDES) $(DEFINES) $(WARNINGS)
 LDFLAGS = -nostartfiles
 LIBS    = 
+
 STRIPFLAGS = -R.comment
 
 MKFLAGS = HOST=$(HOST)
@@ -44,7 +46,10 @@ ifneq (,$(findstring -aros,$(HOST)))
 endif
 
 ifeq ($(HOST),m68k-amigaos)
-	DEFINES += -DENABLE_DP64_SUPPORT
+	AS = vasmm68k_mot
+	NDK ?= $(HOME)/Development/NDK3.9
+	ASFLAGS = -Fhunk -I$(NDK)/include/include_i
+	DEFINES += -DENABLE_DP64_SUPPORT -DENABLE_STACKSWAP
 	ARCH_000 = -mcpu=68000 -mtune=68000
 	ARCH_020 = -mcpu=68020 -mtune=68020-60
 	ARCH_060 = -mcpu=68060 -mtune=68060
@@ -66,6 +71,10 @@ SRCS = $(addprefix src/, \
        fssetdate.c fssetfilesize.c fssetownerinfo.c fssetprotection.c fsunlock.c \
        fswrite.c fswriteprotect.c volume.c xattrs.c utf8.c ucs4.c strlcpy.c debugf.c \
        dofmt.c allocvecpooled.c codesets.c avl.c)
+
+ifeq ($(HOST),m68k-amigaos)
+	SRCS += src/m68k/stackswap.c
+endif
 
 ifeq ($(HOST),m68k-amigaos)
 	OBJS_000 = $(subst src/,$(OBJDIR)/68000/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
@@ -117,15 +126,27 @@ $(OBJDIR)/68000/%.o: src/%.c
 	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(ARCH_000) $(CFLAGS) $<
 	$(CC) $(ARCH_000) $(CFLAGS) -c -o $@ $<
 
+$(OBJDIR)/68000/%.o: src/%.s
+	@mkdir -p $(dir $@)
+	$(AS) -m68000 $(ASFLAGS) -o $@ $<
+
 $(OBJDIR)/68020/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(ARCH_020) $(CFLAGS) $<
 	$(CC) $(ARCH_020) $(CFLAGS) -c -o $@ $<
 
+$(OBJDIR)/68020/%.o: src/%.s
+	@mkdir -p $(dir $@)
+	$(AS) -m68020 $(ASFLAGS) -o $@ $<
+
 $(OBJDIR)/68060/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -MM -MP -MT $(@:.o=.d) -MT $@ -MF $(@:.o=.d) $(ARCH_060) $(CFLAGS) $<
 	$(CC) $(ARCH_060) $(CFLAGS) -c -o $@ $<
+
+$(OBJDIR)/68060/%.o: src/%.s
+	@mkdir -p $(dir $@)
+	$(AS) -m68060 $(ASFLAGS) -o $@ $<
 
 $(BINDIR)/$(TARGET).000: $(OBJS_000)
 	@mkdir -p $(dir $@)
