@@ -47,7 +47,7 @@ endif
 
 ifeq ($(HOST),m68k-amigaos)
 	AS = vasmm68k_mot
-	NDK ?= $(HOME)/Development/NDK3.9
+	NDK ?= $(HOME)/Development/NDK3.2R4
 	ASFLAGS = -Fhunk -I$(NDK)/include/include_i
 	DEFINES += -DENABLE_DP64_SUPPORT -DENABLE_STACKSWAP
 	ARCH_000 = -mcpu=68000 -mtune=68000
