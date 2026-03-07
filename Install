@@ -29,8 +29,8 @@
   (prompt "Copying FbxDismount command")
   (help @copylib-help)
   (source "C/FbxDismount")
-  (dest "SYS:C")
+  (dest "C:")
 )
-(protect "SYS:C/FbxDismount" "+p")
+(protect "C:FbxDismount" "+p")
 (exit)
 
