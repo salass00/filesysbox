@@ -286,7 +286,7 @@ struct FbxFS *FbxSetupFS(
 			break;
 		case FBXT_GET_CONTEXT:
 			if (tag->ti_Data != 0)
-				*(struct fuse_context **)tag->ti_Data = &fs->context;
+				*(struct fuse_context **)tag->ti_Data = &fs->fcntx;
 			break;
 		case FBXT_ACTIVE_UPDATE_TIMEOUT:
 			fs->aut = tag->ti_Data;
