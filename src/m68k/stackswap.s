@@ -62,7 +62,7 @@ _FbxEventLoop_SS:
 swapstack:
 	; allocate memory for replacement stack
 	move.l  #FBX_MIN_STACK,d0
-	moveq.l #MEMF_PUBLIC,d1
+	moveq.l #MEMF_ANY,d1
 	jsr     _LVOAllocMem(a6)
 
 	; initialize stackswap struct
