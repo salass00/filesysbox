@@ -24,7 +24,11 @@ static APTR Fbx_init(struct FbxFS *fs, struct fuse_conn_info *conn)
 	}
 	else
 	{
-		const char *devname = (const char *)BADDR(fs->devnode->dn_Name) + 1;
+		const char *devname;
+
+		if (fs->devnode == NULL) return NULL;
+
+		devname = (const char *)BADDR(fs->devnode->dn_Name) + 1;
 #ifdef ENABLE_CHARSET_CONVERSION
 		FbxLocalToUTF8(fs, conn->volume_name, devname, CONN_VOLUME_NAME_BYTES);
 #else
