@@ -23,7 +23,6 @@ else
 endif
 
 DEFINES += -DENABLE_CHARSET_CONVERSION
-DEFINES += -DENABLE_STACKSWAP
 
 CFLAGS  = -O2 -g -fomit-frame-pointer -fno-strict-aliasing \
           $(INCLUDES) $(DEFINES) $(WARNINGS)
