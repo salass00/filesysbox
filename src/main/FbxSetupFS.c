@@ -183,7 +183,7 @@ struct FbxFS *FbxSetupFS(
 
 		fs->devnode = BADDR(pkt->dp_Arg3);
 
-		fs->fssm = FbxGetFSSM(SysBase, fs->devnode);
+		fs->fssm = FbxGetFSSM(libBase, fs->devnode);
 		if (fs->fssm) {
 			struct DosEnvec *de = BADDR(fs->fssm->fssm_Environ);
 

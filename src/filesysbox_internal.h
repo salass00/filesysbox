@@ -638,7 +638,7 @@ void CopyStringBSTRToC(BSTR bstr, char *cstr, size_t size);
 void CopyStringCToBSTR(const char *cstr, BSTR bstr, size_t size);
 
 /* filesysbox.c */
-struct FileSysStartupMsg *FbxGetFSSM(struct Library *sysbase, struct DeviceNode *devnode);
+struct FileSysStartupMsg *FbxGetFSSM(struct FileSysBoxBase *fb, struct DeviceNode *devnode);
 BOOL FbxCheckString(struct FbxFS *fs, const char *str);
 size_t FbxStrlen(struct FbxFS *fs, const char *str);
 char *FbxStrskip(struct FbxFS *fs, const char *str, size_t n);

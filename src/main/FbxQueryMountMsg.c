@@ -88,7 +88,7 @@ APTR FbxQueryMountMsg(
 		return BADDR(devnode->dn_Name) + 1;
 #endif
 	case FBXQMM_MOUNT_CONTROL:
-		fssm = FbxGetFSSM(libBase->sysbase, devnode);
+		fssm = FbxGetFSSM(libBase, devnode);
 		if (fssm != NULL) {
 			de = BADDR(fssm->fssm_Environ);
 			if (IS_VALID_BPTR(de->de_Control) && de->de_Control > 4095)
@@ -100,10 +100,10 @@ APTR FbxQueryMountMsg(
 		}
 		return NULL;
 	case FBXQMM_FSSM:
-		fssm = FbxGetFSSM(libBase->sysbase, devnode);
+		fssm = FbxGetFSSM(libBase, devnode);
 		return fssm;
 	case FBXQMM_ENVIRON:
-		fssm = FbxGetFSSM(libBase->sysbase, devnode);
+		fssm = FbxGetFSSM(libBase, devnode);
 		if (fssm != NULL) {
 			return BADDR(fssm->fssm_Environ);
 		}

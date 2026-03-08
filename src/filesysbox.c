@@ -40,8 +40,8 @@
 #include <errno.h>
 #include <string.h>
 
-struct FileSysStartupMsg *FbxGetFSSM(struct Library *sysbase, struct DeviceNode *devnode) {
-	struct Library *SysBase = sysbase;
+struct FileSysStartupMsg *FbxGetFSSM(struct FileSysBoxBase *fb, struct DeviceNode *devnode) {
+	struct Library *SysBase = fb->sysbase;
 	if (devnode == NULL) return NULL;
 	if (IS_VALID_BPTR(devnode->dn_Startup)) {
 		struct FileSysStartupMsg *fssm = BADDR(devnode->dn_Startup);
