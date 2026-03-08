@@ -150,6 +150,7 @@ struct FbxFS *FbxSetupFS(
 	struct FbxFS *fs;
 	struct TagItem *tstate;
 	const struct TagItem *tag;
+	BOOL got_dostype = FALSE;
 
 	ADEBUGF("FbxSetupFS(%#p, %#p, %#p, %ld, %#p)\n", msg, tags, ops, opssize, udata);
 
@@ -282,6 +283,7 @@ struct FbxFS *FbxSetupFS(
 			break;
 		case FBXT_DOSTYPE:
 			fs->dostype = tag->ti_Data;
+			got_dostype = TRUE;
 			break;
 		case FBXT_GET_CONTEXT:
 			*(struct fuse_context **)tag->ti_Data = &fs->fcntx;
@@ -294,6 +296,8 @@ struct FbxFS *FbxSetupFS(
 			break;
 		}
 	}
+
+	if (msg == NULL && !got_dostype) goto error;
 
 #ifdef ENABLE_CHARSET_CONVERSION
 	FbxGetCharsetMapTable(fs);
