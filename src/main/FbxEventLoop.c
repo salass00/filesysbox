@@ -69,6 +69,7 @@ LONG FbxEventLoop(
 #ifndef NODEBUG
 	struct Library *DOSBase = fs->dosbase;
 	struct NotifyRequest nr;
+	BOOL dbgflagsnotify_started = FALSE;
 #endif
 	LONG run = TRUE;
 
@@ -96,7 +97,8 @@ LONG FbxEventLoop(
 	nr.nr_stuff.nr_Signal.nr_Task = FindTask(NULL);
 	nr.nr_stuff.nr_Signal.nr_SignalNum = fs->dbgflagssig;
 
-	StartNotify(&nr);
+	if (StartNotify(&nr))
+		dbgflagsnotify_started = TRUE;
 #endif
 
 	while (run) {
@@ -122,7 +124,8 @@ LONG FbxEventLoop(
 	}
 
 #ifndef NODEBUG
-	EndNotify(&nr);
+	if (dbgflagsnotify_started)
+		EndNotify(&nr);
 #endif
 
 	FbxStopTimer(fs);
