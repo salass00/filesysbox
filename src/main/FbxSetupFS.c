@@ -300,6 +300,7 @@ struct FbxFS *FbxSetupFS(
 #endif
 
 	if (fs->fsflags & FBXF_ENABLE_DISK_CHANGE_DETECTION) {
+		if (fs->fssm == NULL || fs->devnode == NULL) goto error;
 		if (FbxAddDiskChangeHandler(fs, FbxDiskChangeHandler) == NULL) goto error;
 	}
 
