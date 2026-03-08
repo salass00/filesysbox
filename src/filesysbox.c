@@ -42,6 +42,7 @@
 
 struct FileSysStartupMsg *FbxGetFSSM(struct Library *sysbase, struct DeviceNode *devnode) {
 	struct Library *SysBase = sysbase;
+	if (devnode == NULL) return NULL;
 	if (IS_VALID_BPTR(devnode->dn_Startup)) {
 		struct FileSysStartupMsg *fssm = BADDR(devnode->dn_Startup);
 
