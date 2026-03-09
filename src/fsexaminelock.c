@@ -86,7 +86,13 @@ void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *st
 #endif
 		type = FbxMode2EntryType(stat->st_mode);
 	}
-	if (blen >= sizeof(fib->fib_FileName)) blen = sizeof(fib->fib_FileName) - 1;
+	if (blen >= sizeof(fib->fib_FileName)) {
+#ifdef ENABLE_CHARSET_CONVERSION
+		blen = sizeof(fib->fib_FileName) - 1;
+#else
+		blen = strlen(fib->fib_FileName);
+#endif
+	}
 	fib->fib_FileName[0] = blen;
 	fib->fib_DirEntryType = fib->fib_EntryType = type;
 
@@ -96,7 +102,13 @@ void FbxPathStat2FIB(struct FbxFS *fs, const char *fullpath, struct fbx_stat *st
 #else
 	blen = FbxStrlcpy(fs, (char *)&fib->fib_Comment[1], comment, sizeof(fib->fib_Comment));
 #endif
-	if (blen >= sizeof(fib->fib_Comment)) blen = sizeof(fib->fib_Comment) - 1;
+	if (blen >= sizeof(fib->fib_Comment)) {
+#ifdef ENABLE_CHARSET_CONVERSION
+		blen = sizeof(fib->fib_Comment) - 1;
+#else
+		blen = strlen(fib->fib_Comment);
+#endif
+	}
 	fib->fib_Comment[0] = blen;
 
 	filesize = 0;
