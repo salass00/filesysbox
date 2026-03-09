@@ -65,7 +65,9 @@
 *
 *       FBXT_DOSTYPE (ULONG)
 *           Overrides the dostype from fssm->fssm_Environ.
-*           Must be given if there is no msg.
+*           If omitted, filesysbox falls back to ID_DOS_DISK.
+*           This tag should be provided when no startup msg is available
+*           and a specific dostype is required.
 *
 *       FBXT_GET_CONTEXT (struct fuse_context **)
 *           Puts the address of filesystem context in the pointer
