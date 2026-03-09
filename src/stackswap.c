@@ -12,6 +12,8 @@
 
 #define FBX_MIN_STACK 16384
 
+#define FBX_STACK_THRESHOLD (FBX_MIN_STACK-256)
+
 static inline IPTR FbxGetStackSize(struct Library *SysBase) {
 	struct Task *me = FindTask(NULL);
 	UBYTE *lower = me->tc_SPLower;
@@ -49,7 +51,7 @@ LONG FbxEventLoop_SS(
 	SysBase = fs->sysbase;
 	sss = &fs->stackswap;
 
-	if (FbxGetStackSize(SysBase) >= (FBX_MIN_STACK - 16)) {
+	if (FbxGetStackSize(SysBase) >= FBX_STACK_THRESHOLD) {
 		return FbxEventLoop(fs, libBase);
 	}
 

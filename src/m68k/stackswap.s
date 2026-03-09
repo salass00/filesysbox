@@ -7,6 +7,8 @@
 
 FBX_MIN_STACK EQU 16384
 
+FBX_STACK_THRESHOLD EQU (FBX_MIN_STACK-256)
+
  include <exec/memory.i>
  include <exec/libraries.i>
  include <exec/tasks.i>
@@ -50,7 +52,7 @@ _FbxEventLoop_SS:
 	bhi.s   swapstack
 	sub.l   TC_SPLOWER(a0),d0
 	blo.s   swapstack
-	cmpi.l  #FBX_MIN_STACK-12,d0
+	cmpi.l  #FBX_STACK_THRESHOLD,d0
 	blo.s   swapstack
 
 	; enough stack -> restore registers and call FbxEventLoop
