@@ -33,12 +33,6 @@ STRIPFLAGS = -R.comment
 
 MKFLAGS = HOST=$(HOST)
 
-ifneq (,$(SYSROOT))
-	CFLAGS  := --sysroot=$(SYSROOT) $(CFLAGS)
-	LDFLAGS := --sysroot=$(SYSROOT) $(LDFLAGS)
-	MKFLAGS += SYSROOT=$(SYSROOT)
-endif
-
 ifneq (,$(findstring -aros,$(HOST)))
 	CPU = $(patsubst %-aros,%,$(HOST))
 	LIBS += -lstdc.static
@@ -54,6 +48,14 @@ ifeq ($(HOST),m68k-amigaos)
 	ARCH_060 = -mcpu=68060 -mtune=68060
 	CFLAGS  := -noixemul -fno-common -mregparm $(CFLAGS)
 	LDFLAGS := -noixemul $(LDFLAGS)
+else
+	#DEFINES += -DENABLE_STACKSWAP -DENABLE_C_STACKSWAP
+endif
+
+ifneq (,$(SYSROOT))
+	CFLAGS  := --sysroot=$(SYSROOT) $(CFLAGS)
+	LDFLAGS := --sysroot=$(SYSROOT) $(LDFLAGS)
+	MKFLAGS += SYSROOT=$(SYSROOT)
 endif
 
 main_SRCS = $(wildcard src/main/*.c)
@@ -69,7 +71,7 @@ SRCS = $(addprefix src/, \
        fsrelabel.c fsremovenotify.c fsrename.c fssamelock.c fsseek.c fssetcomment.c \
        fssetdate.c fssetfilesize.c fssetownerinfo.c fssetprotection.c fsunlock.c \
        fswrite.c fswriteprotect.c volume.c xattrs.c utf8.c ucs4.c strlcpy.c debugf.c \
-       dofmt.c allocvecpooled.c codesets.c avl.c)
+       dofmt.c allocvecpooled.c codesets.c avl.c stackswap.c)
 
 ifeq ($(HOST),m68k-amigaos)
 	SRCS += src/m68k/stackswap.c

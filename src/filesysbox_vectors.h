@@ -48,9 +48,16 @@ AROS_LD5(struct FbxFS *, FbxSetupFS,
 	AROS_LDA(APTR, udata, A3),
 	struct FileSysBoxBase *, libBase, 6, FileSysBox);
 
+#ifdef ENABLE_STACKSWAP
+AROS_LD1(LONG, FbxEventLoop_SS,
+	AROS_LDA(struct FbxFS *, fs, A0),
+	struct FileSysBoxBase *, libBase, 7, FileSysBox);
+LONG FbxEventLoop(struct FbxFS *fs, struct FileSysBoxBase *libBase);
+#else
 AROS_LD1(LONG, FbxEventLoop,
 	AROS_LDA(struct FbxFS *, fs, A0),
 	struct FileSysBoxBase *, libBase, 7, FileSysBox);
+#endif
 
 AROS_LD1(void, FbxCleanupFS,
 	AROS_LDA(struct FbxFS *, fs, A0),
@@ -150,7 +157,6 @@ LONG FbxEventLoop_SS(
 	REG(a0, struct FbxFS *fs),
 	REG(a6, struct FileSysBoxBase *libBase));
 #endif
-
 LONG FbxEventLoop(
 	REG(a0, struct FbxFS *fs),
 	REG(a6, struct FileSysBoxBase *libBase));

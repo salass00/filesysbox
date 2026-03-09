@@ -14,7 +14,11 @@
 #define LibReserved AROS_SLIB_ENTRY(LibReserved,FileSysBox,4)
 #define FbxQueryMountMsg AROS_SLIB_ENTRY(FbxQueryMountMsg,FileSysBox,5)
 #define FbxSetupFS AROS_SLIB_ENTRY(FbxSetupFS,FileSysBox,6)
+#ifdef ENABLE_STACKSWAP
+#define FbxEventLoop_SS AROS_SLIB_ENTRY(FbxEventLoop_SS,FileSysBox,7)
+#else
 #define FbxEventLoop AROS_SLIB_ENTRY(FbxEventLoop,FileSysBox,7)
+#endif
 #define FbxCleanupFS AROS_SLIB_ENTRY(FbxCleanupFS,FileSysBox,8)
 #define FbxReturnMountMsg AROS_SLIB_ENTRY(FbxReturnMountMsg,FileSysBox,9)
 #define FbxFuseVersion AROS_SLIB_ENTRY(FbxFuseVersion,FileSysBox,10)

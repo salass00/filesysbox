@@ -54,11 +54,16 @@ static void FbxHandleUserEvent(struct FbxFS *fs, ULONG signals);
 */
 
 #ifdef __AROS__
+# ifdef ENABLE_STACKSWAP
+LONG FbxEventLoop(struct FbxFS *fs, struct FileSysBoxBase *libBase)
+{
+# else
 AROS_LH1(LONG, FbxEventLoop,
 	AROS_LHA(struct FbxFS *, fs, A0),
 	struct FileSysBoxBase *, libBase, 7, FileSysBox)
 {
 	AROS_LIBFUNC_INIT
+# endif /* ENABLE_STACKSWAP */
 #else
 LONG FbxEventLoop(
 	REG(a0, struct FbxFS *fs),
@@ -132,7 +137,7 @@ LONG FbxEventLoop(
 
 	return 0;
 
-#ifdef __AROS__
+#if defined(__AROS__) && !defined(ENABLE_STACKSWAP)
 	AROS_LIBFUNC_EXIT
 #endif
 }
