@@ -39,6 +39,9 @@ LONG FbxEventLoop_SS(
 	register struct Library *SysBase;
 	register struct StackSwapStruct *sss;
 	register LONG rc;
+#ifdef __AROS__
+	struct StackSwapArgs ssa;
+#endif
 
 	if (fs == NULL)
 		return -1;
@@ -64,7 +67,9 @@ LONG FbxEventLoop_SS(
 #endif
 
 #ifdef __AROS__
-	#error FIXME: Implement code using NewStackSwap()
+	ssa.Args[0] = (IPTR)fs;
+	ssa.Args[1] = (IPTR)libBase;
+	rc = (LONG)NewStackSwap(sss, FbxEventLoop, &ssa);
 #else
 	/* NOTE: This section can easily break if the compiler generates code
 	 * that accesses the stack. This is why there is a special assembler

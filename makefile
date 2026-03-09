@@ -49,7 +49,7 @@ ifeq ($(HOST),m68k-amigaos)
 	CFLAGS  := -noixemul -fno-common -mregparm $(CFLAGS)
 	LDFLAGS := -noixemul $(LDFLAGS)
 else
-	#DEFINES += -DENABLE_STACKSWAP -DENABLE_C_STACKSWAP
+	DEFINES += -DENABLE_STACKSWAP -DENABLE_C_STACKSWAP
 endif
 
 ifneq (,$(SYSROOT))
