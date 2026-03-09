@@ -158,16 +158,21 @@ static unsigned int FbxHashPath(struct FbxFS *fs, const char *str) {
 }
 
 struct FbxEntry *FbxFindEntry(struct FbxFS *fs, const char *path) {
+	struct MinNode *chain, *succ;
+	struct FbxEntry *e;
 	unsigned int i;
-	struct FbxEntry *e, *succ;
 
 	DEBUGF("FbxFindEntry(%#p, '%s')\n", fs, path);
 
 	i = FbxHashPath(fs, path);
-	e = (struct FbxEntry *)fs->currvol->entrytab[i].mlh_Head;
-	while ((succ = (struct FbxEntry *)e->hashchain.mln_Succ) != NULL) {
-		if (FbxStrcmp(fs, e->path, path) == 0) return e;
-		e = succ;
+	for (chain = fs->currvol->entrytab[i].mlh_Head;
+	     (succ = chain->mln_Succ) != NULL;
+	     chain = succ)
+	{
+		e = FSENTRYFROMHASHCHAIN(chain);
+		if (FbxStrcmp(fs, e->path, path) == 0) {
+			return e;
+		}
 	}
 
 	return NULL;
