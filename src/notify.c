@@ -33,7 +33,7 @@ void FbxDoNotifyRequest(struct FbxFS *fs, struct NotifyRequest *nr) {
 			NDEBUGF("DoNotifyRequest: sent message to port of nreq %#p '%s'\n", nr, nr->nr_FullName);
 		}
 	} else if (nr->nr_Flags & NRF_SEND_SIGNAL) {
-		Signal(nr->nr_stuff.nr_Signal.nr_Task, 1 << nr->nr_stuff.nr_Signal.nr_SignalNum);
+		Signal(nr->nr_stuff.nr_Signal.nr_Task, 1UL << nr->nr_stuff.nr_Signal.nr_SignalNum);
 		NDEBUGF("DoNotifyRequest: signaled task of nreq %#p '%s'\n", nr, nr->nr_FullName);
 	}
 }
