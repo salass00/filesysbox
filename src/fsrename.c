@@ -33,8 +33,10 @@ static void FbxUpdatePaths(struct FbxFS *fs, const char *oldpath, const char *ne
 	size_t n = IsRoot(oldpath) ? 0 : FbxCharCount(fs, oldpath);
 	int a;
 	for (a = 0; a < ENTRYHASHSIZE; a++) {
-		chain = fs->currvol->entrytab[a].mlh_Head;
-		while ((succ = chain->mln_Succ) != NULL) {
+		for (chain = fs->currvol->entrytab[a].mlh_Head;
+			(succ = chain->mln_Succ) != NULL;
+			chain = succ)
+		{
 			struct FbxEntry *e = FSENTRYFROMHASHCHAIN(chain);
 			char *subpath;
 			if (FbxStrncmp(fs, oldpath, e->path, n) == 0 &&
@@ -48,7 +50,6 @@ static void FbxUpdatePaths(struct FbxFS *fs, const char *oldpath, const char *ne
 				Remove((struct Node *)&e->hashchain);
 				FbxAddEntry(fs, e);
 			}
-			chain = succ;
 		}
 	}
 }
