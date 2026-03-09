@@ -17,6 +17,10 @@ Documentation only: no behavior is defined here; it captures what the current co
 1. **Setup**
    - Filesysbox is initialized and the filesystem instance state is created.
    - Callback table (FUSE-like ops) is registered.
+   - Some features depend on startup context (`msg`, `devnode`, `fssm`)
+     being present.
+   - If startup context is absent, code must rely only on explicitly
+     provided overrides or documented defaults.
 2. **Event loop**
    - Packets are processed, translated, and dispatched.
    - Notifications and timeouts are handled.
@@ -84,7 +88,26 @@ Invariant: lock ordering must be stable to avoid deadlocks, especially around no
 
 Invariant: operations that cannot locate the referenced internal object must not return success.
 
-## 7. Notes for filesystem implementers (callback contract)
+## 7. Startup-context and runtime assumptions
+
+- `FbxSetupFS()` may be called with or without a startup message.
+- When no startup message is available, any feature that depends on
+  startup context must either:
+  - be disabled,
+  - use explicitly provided replacement data,
+  - or rely on a documented fallback.
+- Disk change detection requires valid startup context (`devnode` and
+  `fssm`).
+- `fs->dostype` may come from startup data, from an explicit
+  `FBXT_DOSTYPE` tag, or from the default fallback (`ID_DOS_DISK`).
+- The default volume-name fallback must not assume that `fs->devnode`
+  is always available.
+
+Invariant: code must not dereference startup-context pointers unless
+their presence is guaranteed by the current call path or checked
+explicitly.
+
+## 8. Notes for filesystem implementers (callback contract)
 
 Filesysbox routes AmigaDOS actions into FUSE-like callbacks.
 
@@ -93,11 +116,10 @@ Filesysbox routes AmigaDOS actions into FUSE-like callbacks.
 
 Invariant: callbacks must not free or invalidate internal handles owned by filesysbox unless explicitly documented.
 
-## 8. Documentation scope
+## 9. Documentation scope
 
 This file documents existing assumptions. It should be updated when:
 - list management strategy changes
 - ownership of locks/notify nodes changes
 - new locking primitives are introduced
 - error model changes
-
