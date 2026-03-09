@@ -640,8 +640,8 @@ void CopyStringCToBSTR(const char *cstr, BSTR bstr, size_t size);
 /* filesysbox.c */
 struct FileSysStartupMsg *FbxGetFSSM(struct FileSysBoxBase *fb, struct DeviceNode *devnode);
 BOOL FbxCheckString(struct FbxFS *fs, const char *str);
-size_t FbxStrlen(struct FbxFS *fs, const char *str);
-char *FbxStrskip(struct FbxFS *fs, const char *str, size_t n);
+size_t FbxCharCount(struct FbxFS *fs, const char *str);
+char *FbxCharPtr(struct FbxFS *fs, const char *str, size_t n);
 int FbxStrcmp(struct FbxFS *fs, const char *s1, const char *s2);
 int FbxStrncmp(struct FbxFS *fs, const char *s1, const char *s2, size_t n);
 size_t FbxStrlcpy(struct FbxFS *fs, char *dst, const char *src, size_t dst_size);
@@ -868,8 +868,8 @@ void FbxGetComment(struct FbxFS *fs, const char *fullpath, char *comment, size_t
 /* utf8.c */
 LONG utf8_decode_slow(const char **strp);
 LONG utf8_decode_fast(const char **strp);
-size_t utf8_strlen(const char *str);
-char *utf8_strskip(const char *str, size_t n);
+size_t utf8_charcount(const char *str);
+char *utf8_charptr(const char *str, size_t n);
 int utf8_stricmp(const char *s1, const char *s2);
 int utf8_strncmp(const char *s1, const char *s2, size_t n);
 int utf8_strnicmp(const char *s1, const char *s2, size_t n);

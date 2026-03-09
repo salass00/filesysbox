@@ -93,17 +93,17 @@ inline LONG utf8_decode_fast(const char **strp) {
 	return unicode;
 }
 
-size_t utf8_strlen(const char *str) {
-	size_t len = 0;
+size_t utf8_charcount(const char *str) {
+	size_t count = 0;
 	int byte;
 	while ((byte = (unsigned char)*str) != '\0') {
 		str += 1 + utf8_trailing_bytes[byte];
-		len++;
+		count++;
 	}
-	return len;
+	return count;
 }
 
-char *utf8_strskip(const char *str, size_t n) {
+char *utf8_charptr(const char *str, size_t n) {
 	int byte;
 	if (n == 0) return (char *)str;
 	while ((byte = (unsigned char)*str) != '\0') {

@@ -76,12 +76,12 @@ BOOL FbxCheckString(struct FbxFS *fs, const char *str) {
 	return TRUE;
 }
 
-size_t FbxStrlen(struct FbxFS *fs, const char *str) {
-	return utf8_strlen(str);
+size_t FbxCharCount(struct FbxFS *fs, const char *str) {
+	return utf8_charcount(str);
 }
 
-char *FbxStrskip(struct FbxFS *fs, const char *str, size_t n) {
-	return utf8_strskip(str, n);
+char *FbxCharPtr(struct FbxFS *fs, const char *str, size_t n) {
+	return utf8_charptr(str, n);
 }
 
 int FbxStrcmp(struct FbxFS *fs, const char *s1, const char *s2) {
@@ -115,7 +115,7 @@ static IPTR FbxHashPathInoCase(struct FbxFS *fs, const char *str) {
 	DEBUGF("FbxHashPathInoCase(%#p, '%s')\n", fs, str);
 
 	// get a small seed from number of characters
-	v = FbxStrlen(fs, str);
+	v = FbxCharCount(fs, str);
 
 	// compute hash
 	while ((c = utf8_decode_fast(&str)) != '\0') {
@@ -132,7 +132,7 @@ static IPTR FbxHashPathInoNoCase(struct FbxFS *fs, const char *str) {
 	DEBUGF("FbxHashPathInoNoCase(%#x, '%s')\n", fs, str);
 
 	// get a small seed from number of characters
-	v = FbxStrlen(fs, str);
+	v = FbxCharCount(fs, str);
 
 	// compute hash
 	while ((c = utf8_decode_fast(&str)) != '\0') {
@@ -434,8 +434,8 @@ void FbxSetModifyState(struct FbxFS *fs, int state) {
 }
 
 BOOL FbxIsParent(struct FbxFS *fs, const char *parent, const char *child) {
-	int plen = IsRoot(parent) ? 0 : FbxStrlen(fs, parent);
-	if (FbxStrncmp(fs, parent, child, plen) == 0 && *FbxStrskip(fs, child, plen) == '/')
+	size_t n = IsRoot(parent) ? 0 : FbxCharCount(fs, parent);
+	if (FbxStrncmp(fs, parent, child, n) == 0 && *FbxCharPtr(fs, child, n) == '/')
 		return TRUE;
 	else
 		return FALSE;

@@ -30,15 +30,15 @@ static void FbxUpdatePaths(struct FbxFS *fs, const char *oldpath, const char *ne
 	// let's rename all subentries. subentries can be
 	// found by comparing common path. do this by traversing
 	// global hashtable and compare entry->path
-	int plen = IsRoot(oldpath) ? 0 : FbxStrlen(fs, oldpath);
+	size_t n = IsRoot(oldpath) ? 0 : FbxCharCount(fs, oldpath);
 	int a;
 	for (a = 0; a < ENTRYHASHSIZE; a++) {
 		chain = fs->currvol->entrytab[a].mlh_Head;
 		while ((succ = chain->mln_Succ) != NULL) {
 			struct FbxEntry *e = FSENTRYFROMHASHCHAIN(chain);
 			char *subpath;
-			if (FbxStrncmp(fs, oldpath, e->path, plen) == 0 &&
-			    *(subpath = FbxStrskip(fs, e->path, plen)) == '/')
+			if (FbxStrncmp(fs, oldpath, e->path, n) == 0 &&
+			    *(subpath = FbxCharPtr(fs, e->path, n)) == '/')
 			{
 				// match! let's update path
 				FbxStrlcpy(fs, tstr, newpath, FBX_MAX_PATH);
