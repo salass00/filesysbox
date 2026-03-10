@@ -78,7 +78,7 @@ LONG utf8_decode_slow(const char **strp) {
 }
 
 // faster decode function which assumes valid UTF-8
-inline LONG utf8_decode_fast(const char **strp) {
+LONG utf8_decode_fast(const char **strp) {
 	const unsigned char *str = (const unsigned char *)*strp;
 	unsigned char ntb = utf8_trailing_bytes[*str];
 	ULONG unicode = 0;
