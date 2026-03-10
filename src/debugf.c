@@ -7,9 +7,7 @@
 
 #ifndef NODEBUG
 #include "filesysbox_internal.h"
-//#include <clib/debug_protos.h>
-
-extern struct Library *SysBase;
+#include <clib/debug_protos.h>
 
 int debug_putc_cb(char ch, void *udata) {
 #ifdef __AROS__
@@ -19,7 +17,7 @@ int debug_putc_cb(char ch, void *udata) {
 	//KPutStr((CONST_STRPTR)tmp);
 	struct Library *SysBase = udata;
 	RawPutChar(ch);
-#else
+#elif defined(__GNUC__)
 	//KPutChar((unsigned char)ch);
 	register char _d0 __asm__("d0") = ch;
 	register struct Library *_a6 __asm__("a6") = udata;
@@ -28,6 +26,8 @@ int debug_putc_cb(char ch, void *udata) {
 		: "d" (_d0), "a" (_a6)
 		: "d0", "d1", "a0", "a1", "cc"
 	);
+#else
+	KPutChar((LONG)(UBYTE)ch);
 #endif
 	return 0;
 }
