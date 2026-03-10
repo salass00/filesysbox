@@ -38,7 +38,9 @@
 #ifdef __GNUC__
 #define STATIC_ASSERT(cond,msg) _Static_assert(cond, msg)
 #else
-#define STATIC_ASSERT(cond,msg)
+#define STATIC_ASSERT_GLUE(a,b) a##b
+#define STATIC_ASSERT_XGLUE(a,b) STATIC_ASSERT_GLUE(a,b)
+#define STATIC_ASSERT(cond,msg) typedef char STATIC_ASSERT_XGLUE(static_assertion_,__LINE__)[(cond) ? 1 : -1]
 #endif
 
 #ifndef ACTION_GET_DISK_FSSM
