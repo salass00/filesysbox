@@ -326,6 +326,7 @@ struct DeviceList *StartLockHandlerProc(struct FileSysBoxBase *libBase) {
 	vname = (STRPTR)(volume + 1);
 	CopyMem(volumename, vname, sizeof(volumename));
 
+#ifdef __GNUC__
 	proc = CreateNewProcTags(
 		NP_Entry,       (IPTR)FbxLockHandlerProc,
 #ifdef __AROS__
@@ -347,6 +348,32 @@ struct DeviceList *StartLockHandlerProc(struct FileSysBoxBase *libBase) {
 		NP_CloseOutput, FALSE,
 		NP_ConsoleTask, 0,
 		TAG_END);
+#else
+	{
+		const struct TagItem proc_tags[] = {
+			{ NP_Entry,       (IPTR)FbxLockHandlerProc },
+			{ NP_StackSize,   4096 },
+			{ NP_Name,        (IPTR)"FileSysBox lock handler" },
+			{ NP_Priority,    5 },
+			{ NP_Cli,         FALSE },
+			{ NP_WindowPtr,   -1 },
+			{ NP_CopyVars,    FALSE },
+			{ NP_CurrentDir,  0 },
+			{ NP_HomeDir,     0 },
+			{ NP_Error,       0 },
+			{ NP_CloseError,  FALSE },
+			{ NP_Input,       0 },
+			{ NP_CloseInput,  FALSE },
+			{ NP_Output,      0 },
+			{ NP_CloseOutput, FALSE },
+			{ NP_ConsoleTask, 0 },
+			{ TAG_END,        0 }
+		};
+
+		proc = CreateNewProcTagList(proc_tags);
+	}
+#endif
+
 	if (proc == NULL) {
 		FreeMem(volume, sizeof(struct DeviceList) + sizeof(volumename));
 		return NULL;
