@@ -13,10 +13,7 @@
 static const char USED_VAR verstag[] = VERSTAG;
 
 struct Library *SysBase;
-#ifdef libnix
-//struct Library *__UtilityBase;
-struct Library *UtilityBase;
-#endif
+
 static inline void SetGlobalSysBase(struct Library *sysbase) {
 	SysBase = sysbase;
 }
@@ -60,10 +57,6 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 	libBase->localebase = OpenLibrary((CONST_STRPTR)"locale.library", 38);
 
 	SetGlobalSysBase(SysBase);
-#ifdef libnix
-	//__UtilityBase = libBase->utilitybase;
-	UtilityBase = libBase->utilitybase;
-#endif
 
 	InitSemaphore(&libBase->procsema);
 
