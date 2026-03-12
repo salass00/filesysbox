@@ -34,6 +34,9 @@
 #define FbxGetUpTime AROS_SLIB_ENTRY(FbxGetUpTime,FileSysBox,20)
 #endif
 
+/* Library vector table used by the resident/autoinit setup.
+ * This follows the Exec library initialization model expected by this code.
+ */
 static const CONST_APTR LibVectors[] = {
 	LibOpen,
 	LibClose,
