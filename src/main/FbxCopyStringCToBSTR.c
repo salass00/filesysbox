@@ -14,6 +14,11 @@
 #include <string.h>
 
 #ifndef __AROS__
+/* Keep a local strnlen() fallback here for non-AROS builds.
+ * Availability of strnlen() depends on the C library/toolchain in use,
+ * so this helper is intentional and should not be treated as obviously
+ * redundant by cleanup work.
+ */
 static size_t strnlen(const char *str, size_t maxlen)
 {
 	const char *s = str;
