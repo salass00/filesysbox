@@ -8,60 +8,39 @@
 #include "filesysbox_vectors.h"
 
 #ifdef __AROS__
-#define LibOpen AROS_SLIB_ENTRY(LibOpen,FileSysBox,1)
-#define LibClose AROS_SLIB_ENTRY(LibClose,FileSysBox,2)
-#define LibExpunge AROS_SLIB_ENTRY(LibExpunge,FileSysBox,3)
-#define LibReserved AROS_SLIB_ENTRY(LibReserved,FileSysBox,4)
-#define FbxQueryMountMsg AROS_SLIB_ENTRY(FbxQueryMountMsg,FileSysBox,5)
-#define FbxSetupFS AROS_SLIB_ENTRY(FbxSetupFS,FileSysBox,6)
-#ifdef ENABLE_STACKSWAP
-#define FbxEventLoop_SS AROS_SLIB_ENTRY(FbxEventLoop_SS,FileSysBox,7)
+#define FBX_LIB_ENTRY(name,index) AROS_SLIB_ENTRY(name,FileSysBox,index)
 #else
-#define FbxEventLoop AROS_SLIB_ENTRY(FbxEventLoop,FileSysBox,7)
-#endif
-#define FbxCleanupFS AROS_SLIB_ENTRY(FbxCleanupFS,FileSysBox,8)
-#define FbxReturnMountMsg AROS_SLIB_ENTRY(FbxReturnMountMsg,FileSysBox,9)
-#define FbxFuseVersion AROS_SLIB_ENTRY(FbxFuseVersion,FileSysBox,10)
-#define FbxVersion AROS_SLIB_ENTRY(FbxVersion,FileSysBox,11)
-#define FbxSetSignalCallback AROS_SLIB_ENTRY(FbxSetSignalCallback,FileSysBox,12)
-#define FbxInstallTimerCallback AROS_SLIB_ENTRY(FbxInstallTimerCallback,FileSysBox,13)
-#define FbxUninstallTimerCallback AROS_SLIB_ENTRY(FbxUninstallTimerCallback,FileSysBox,14)
-#define FbxSignalDiskChange AROS_SLIB_ENTRY(FbxSignalDiskChange,FileSysBox,15)
-#define FbxCopyStringBSTRToC AROS_SLIB_ENTRY(FbxCopyStringBSTRToC,FileSysBox,16)
-#define FbxCopyStringCToBSTR AROS_SLIB_ENTRY(FbxCopyStringCToBSTR,FileSysBox,17)
-#define FbxQueryFS AROS_SLIB_ENTRY(FbxQueryFS,FileSysBox,18)
-#define FbxGetSysTime AROS_SLIB_ENTRY(FbxGetSysTime,FileSysBox,19)
-#define FbxGetUpTime AROS_SLIB_ENTRY(FbxGetUpTime,FileSysBox,20)
+#define FBX_LIB_ENTRY(name,index) name
 #endif
 
 /* Library vector table used by the resident/autoinit setup.
  * This follows the Exec library initialization model expected by this code.
  */
 static const CONST_APTR LibVectors[] = {
-	LibOpen,
-	LibClose,
-	LibExpunge,
-	LibReserved,
-	FbxQueryMountMsg,
-	FbxSetupFS,
+	FBX_LIB_ENTRY(LibOpen, 1),
+	FBX_LIB_ENTRY(LibClose, 2),
+	FBX_LIB_ENTRY(LibExpunge, 3),
+	FBX_LIB_ENTRY(LibReserved, 4),
+	FBX_LIB_ENTRY(FbxQueryMountMsg, 5),
+	FBX_LIB_ENTRY(FbxSetupFS, 6),
 #ifdef ENABLE_STACKSWAP
-	FbxEventLoop_SS,
+	FBX_LIB_ENTRY(FbxEventLoop_SS, 7),
 #else
-	FbxEventLoop,
+	FBX_LIB_ENTRY(FbxEventLoop, 7),
 #endif
-	FbxCleanupFS,
-	FbxReturnMountMsg,
-	FbxFuseVersion,
-	FbxVersion,
-	FbxSetSignalCallback,
-	FbxInstallTimerCallback,
-	FbxUninstallTimerCallback,
-	FbxSignalDiskChange,
-	FbxCopyStringBSTRToC,
-	FbxCopyStringCToBSTR,
-	FbxQueryFS,
-	FbxGetSysTime,
-	FbxGetUpTime,
+	FBX_LIB_ENTRY(FbxCleanupFS, 8),
+	FBX_LIB_ENTRY(FbxReturnMountMsg, 9),
+	FBX_LIB_ENTRY(FbxFuseVersion, 10),
+	FBX_LIB_ENTRY(FbxVersion, 11),
+	FBX_LIB_ENTRY(FbxSetSignalCallback, 12),
+	FBX_LIB_ENTRY(FbxInstallTimerCallback, 13),
+	FBX_LIB_ENTRY(FbxUninstallTimerCallback, 14),
+	FBX_LIB_ENTRY(FbxSignalDiskChange, 15),
+	FBX_LIB_ENTRY(FbxCopyStringBSTRToC, 16),
+	FBX_LIB_ENTRY(FbxCopyStringCToBSTR, 17),
+	FBX_LIB_ENTRY(FbxQueryFS, 18),
+	FBX_LIB_ENTRY(FbxGetSysTime, 19),
+	FBX_LIB_ENTRY(FbxGetUpTime, 20),
 	(APTR)-1
 };
 
