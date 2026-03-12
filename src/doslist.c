@@ -67,24 +67,24 @@ static int FbxDosListProc(void) {
 				int cmd = async_msg->cmd;
 				switch (cmd) {
 				case FBX_ASYNC_ADD:
-					AddDosEntry(&vol->dol);
+					AddDosEntry((struct DosList *)vol);
 					break;
 				case FBX_ASYNC_REMOVE:
-					RemDosEntry(&vol->dol);
+					RemDosEntry((struct DosList *)vol);
 					break;
 				case FBX_ASYNC_REMOVE_FREE:
-					if (RemDosEntry(&vol->dol))
+					if (RemDosEntry((struct DosList *)vol))
 						FreeFbxVolume(vol);
 					break;
 				case FBX_ASYNC_RENAME:
-					if (RemDosEntry(&vol->dol)) {
+					if (RemDosEntry((struct DosList *)vol)) {
 #ifdef ENABLE_CHARSET_CONVERSION
 						strlcpy(vol->volname, async_msg->name, CONN_VOLUME_NAME_BYTES);
 #else
 						FbxStrlcpy(async_msg->fs, vol->volname, async_msg->name, CONN_VOLUME_NAME_BYTES);
 #endif
 						vol->volnamelen = strlen(vol->volname);
-						AddDosEntry(&vol->dol);
+						AddDosEntry((struct DosList *)vol);
 					}
 					break;
 				}
@@ -177,20 +177,20 @@ static int FbxAsyncDosListCmd(struct FbxFS *fs, struct FbxVolume *vol, int cmd, 
 	if (dl != NULL) {
 		switch (cmd) {
 		case FBX_ASYNC_ADD:
-			res = AddDosEntry(&vol->dol);
+			res = AddDosEntry((struct DosList *)vol);
 			break;
 		case FBX_ASYNC_REMOVE:
-			res = RemDosEntry(&vol->dol);
+			res = RemDosEntry((struct DosList *)vol);
 			break;
 		case FBX_ASYNC_REMOVE_FREE:
-			if ((res = RemDosEntry(&vol->dol)))
+			if ((res = RemDosEntry((struct DosList *)vol)))
 				FreeFbxVolume(vol);
 			break;
 		case FBX_ASYNC_RENAME:
-			if ((res = RemDosEntry(&vol->dol))) {
+			if ((res = RemDosEntry((struct DosList *)vol))) {
 				FbxStrlcpy(fs, vol->volname, name, CONN_VOLUME_NAME_BYTES);
 				vol->volnamelen = strlen(vol->volname);
-				res = AddDosEntry(&vol->dol);
+				res = AddDosEntry((struct DosList *)vol);
 			}
 			break;
 		default:

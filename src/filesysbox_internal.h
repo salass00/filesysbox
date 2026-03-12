@@ -320,22 +320,19 @@ struct FbxEntry {
 #define NOVOLUME(vol)  ((vol) == NULL)
 
 struct FbxVolume {
-	union {
-		struct DeviceList dl;
-		struct DosList    dol;
-	};
-	struct MinNode fschain;
-	struct FbxFS  *fs;
-	IPTR           passkey;
-	ULONG          writeprotect; // FbxWriteProtect()
-	ULONG          vflags;
-	struct MinList unres_notifys;
-	struct MinList locklist;
-	struct MinList notifylist;
-	struct MinList entrytab[ENTRYHASHSIZE]; // hashtable
-	ULONG          blocksize;
-	UBYTE          volnamelen;
-	char           volname[CONN_VOLUME_NAME_BYTES];
+	struct DeviceList dl;
+	struct MinNode    fschain;
+	struct FbxFS     *fs;
+	IPTR              passkey;
+	ULONG             writeprotect; // FbxWriteProtect()
+	ULONG             vflags;
+	struct MinList    unres_notifys;
+	struct MinList    locklist;
+	struct MinList    notifylist;
+	struct MinList    entrytab[ENTRYHASHSIZE]; // hashtable
+	ULONG             blocksize;
+	UBYTE             volnamelen;
+	char              volname[CONN_VOLUME_NAME_BYTES];
 };
 
 #define FSVOLUMEFROMFSCHAIN(chain) container_of(chain, struct FbxVolume, fschain)
