@@ -38,6 +38,7 @@ mkdir -p ${DESTDIR}/filesysbox/Developer/include/include_h/sys
 cp -p README ${DESTDIR}/filesysbox
 cp -p LICENSE.APL ${DESTDIR}/filesysbox
 cp -p LICENSE.CDL ${DESTDIR}/filesysbox
+cp -p LICENSE.BSD ${DESTDIR}/filesysbox
 cp -p releasenotes ${DESTDIR}/filesysbox/filesysbox_lib_relnotes
 cp -p dismount/releasenotes ${DESTDIR}/filesysbox/FbxDismount_cmd_relnotes
 if [ "$HOST" = "m68k-amigaos" ]; then
@@ -65,6 +66,7 @@ cp -p icons/def_drawer.info ${DESTDIR}/filesysbox.info
 cp -p icons/def_doc.info ${DESTDIR}/filesysbox/README.info
 cp -p icons/def_doc.info ${DESTDIR}/filesysbox/LICENSE.APL.info
 cp -p icons/def_doc.info ${DESTDIR}/filesysbox/LICENSE.CDL.info
+cp -p icons/def_doc.info ${DESTDIR}/filesysbox/LICENSE.BSD.info
 cp -p icons/def_doc.info ${DESTDIR}/filesysbox/filesysbox_lib_relnotes.info
 cp -p icons/def_doc.info ${DESTDIR}/filesysbox/FbxDismount_cmd_relnotes.info
 cp -p icons/def_install.info ${DESTDIR}/filesysbox/Install.info

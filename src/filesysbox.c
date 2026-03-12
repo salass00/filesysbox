@@ -24,6 +24,10 @@
 *       This library is released under AROS PUBLIC LICENSE v.1.1.
 *       See the file LICENSE.APL.
 *
+*       The UCS4 toupper and strlcpy/strlcpy functions used in the library
+*       are based on code released under BSD 3-clause license. See the file
+*       LICENSE.BSD.
+*
 *   AUTODOC
 *       Copyright (c) 2011 Leif Salomonsson.
 *       Copyright (c) 2013-2026 Fredrik Wikstrom.
