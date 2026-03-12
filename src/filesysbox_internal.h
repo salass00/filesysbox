@@ -309,6 +309,12 @@ struct FbxEntry {
 #define ETYPE_FILE 1
 #define ETYPE_DIR  2
 
+/* fs->currvol uses sentinel values:
+ *   NULL      = no current volume (for example no disk, or inhibited access)
+ *   (APTR)-1  = backend layout is invalid or not formatted
+ *   (APTR)-2  = backend setup/resource failure
+ * Any other value below (APTR)-2 is a valid struct FbxVolume *.
+ */
 #define OKVOLUME(vol)  ((vol) != NULL && (IPTR)(vol) < (IPTR)-2)
 #define BADVOLUME(vol) ((IPTR)(vol) >= (IPTR)-2)
 #define NOVOLUME(vol)  ((vol) == NULL)
