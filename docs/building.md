@@ -26,3 +26,10 @@ The maintainer recommends bebbo's GCC 6.5.0b (this is what is used for releases)
 
 Building with vbcc is not officially supported at this time.
 A dedicated vbcc build setup (for example a makefile.vbcc) would be needed before it can be recommended.
+
+### Probe builds and compatibility investigation
+
+Compiler-compatibility or portability probe builds can still be useful, but their results should be interpreted against the actual project build assumptions first.
+
+In particular, contributors should start from the project makefiles and account for the active project defines before treating a probe-build warning or error as evidence of a real project issue.
+
