@@ -7,6 +7,11 @@
 
 #include <exec/alerts.h>
 #include <exec/resident.h>
+/* Include exec/initializers.h before filesysbox_vectors.c is pulled in below.
+ * This makes OFFSET come from exec/initializers.h first and avoids a later
+ * macro conflict with SDI_compiler.h without needing a local #undef.
+ */
+#include <exec/initializers.h>
 #include "filesysbox_internal.h"
 #include "filesysbox.library_rev.h"
 
