@@ -11,7 +11,8 @@
  * Placed in the public domain Autumn 2005.
  */
 
-#include "filesysbox_internal.h"
+#include "utf8.h"
+#include "ucs4.h"
 #include <stdint.h> /* For UINT16_MAX */
 
 static const unsigned char utf8_trailing_bytes[256] = {

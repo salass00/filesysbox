@@ -407,16 +407,7 @@ struct FbxDiskChangeHandler {
 	struct IOStdReq *io;
 };
 
-typedef UWORD FbxUCS;
-
-struct FbxAVL {
-	struct FbxAVL *left; /* nodes for lower unicodes */
-	struct FbxAVL *right; /* nodes for higher unicodes */
-	struct FbxAVL *parent;
-	FbxUCS         unicode;
-	UBYTE          local;
-	BYTE           balance; /* > 0 right heavy, < 0 left heavy */
-};
+#include "utf8.h"
 
 struct FbxFS {
 #ifdef ENABLE_STACKSWAP
@@ -869,24 +860,6 @@ void FbxCleanupVolume(struct FbxFS *fs);
 ULONG FbxGetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath);
 int FbxSetAmigaProtectionFlags(struct FbxFS *fs, const char *fullpath, ULONG prot);
 void FbxGetComment(struct FbxFS *fs, const char *fullpath, char *comment, size_t size);
-
-/* utf8.c */
-LONG utf8_decode_slow(const char **strp);
-LONG utf8_decode_fast(const char **strp);
-size_t utf8_charcount(const char *str);
-char *utf8_charptr(const char *str, size_t n);
-int utf8_stricmp(const char *s1, const char *s2);
-int utf8_strncmp(const char *s1, const char *s2, size_t n);
-int utf8_strnicmp(const char *s1, const char *s2, size_t n);
-size_t utf8_strlcpy(char *dst, const char *src, size_t dst_size);
-size_t utf8_strlcat(char *dst, const char *src, size_t dst_size);
-#ifdef ENABLE_CHARSET_CONVERSION
-size_t utf8_to_local(char *dst, const char *src, size_t dst_size, const struct FbxAVL *maptree);
-size_t local_to_utf8(char *dst, const char *src, size_t dst_size, const FbxUCS *maptable);
-#endif
-
-/* ucs4.c */
-ULONG ucs4_toupper(ULONG c);
 
 /* allocvecpooled.c */
 #ifndef __AROS__

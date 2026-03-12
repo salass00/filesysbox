@@ -35,6 +35,7 @@
 
 #include "filesysbox_internal.h"
 #include "fuse_stubs.h"
+#include "ucs4.h"
 #include <devices/input.h>
 #include <devices/inputevent.h>
 #include <errno.h>
