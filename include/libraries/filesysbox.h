@@ -47,6 +47,10 @@ typedef QUAD fbx_off_t;
 #undef st_ctime
 #endif
 
+/* The direct time fields (st_atime/st_mtime/st_ctime and the corresponding
+ * *timensec fields) are kept for compatibility with FUSE file system code
+ * that expects these names to exist.
+ */
 struct fbx_stat {
 	mode_t          st_mode;
 	UQUAD           st_ino;
