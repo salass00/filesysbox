@@ -24,8 +24,11 @@ The maintainer recommends bebbo's GCC 6.5.0b (this is what is used for releases)
 
 ### vbcc
 
-Building with vbcc is not officially supported at this time.
-A dedicated vbcc build setup (for example a makefile.vbcc) would be needed before it can be recommended.
+A dedicated vbcc build path is available through `Makefile.vbcc`.
+
+This build currently requires Frank Wille's `vbcc_PosixLib` from Aminet (`dev/c/vbcc_PosixLib`).
+
+Make sure that this library is installed and available in the include/library search paths expected by the vbcc build environment.
 
 ### Probe builds and compatibility investigation
 
