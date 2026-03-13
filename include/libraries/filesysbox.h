@@ -49,8 +49,8 @@ typedef QUAD fbx_off_t;
 #ifdef __VBCC__
 typedef unsigned int mode_t;
 typedef unsigned short nlink_t;
-typedef int uid_t;
-typedef int gid_t;
+typedef unsigned short uid_t;
+typedef unsigned short gid_t;
 typedef int pid_t;
 typedef unsigned long dev_t;
 
