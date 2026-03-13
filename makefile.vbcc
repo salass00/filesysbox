@@ -8,7 +8,7 @@ AS = vasmm68k_mot
 TARGET  = filesysbox.library
 VERSION = 54
 
-INCLUDES = -Iinclude -I -Isrc
+INCLUDES = -I./include -I. -I./src
 DEFINES  = -D__NOLIBBASE__ -DENABLE_DP64_SUPPORT -DENABLE_STACKSWAP
 WARNINGS = #-warnings-as-errors
 
