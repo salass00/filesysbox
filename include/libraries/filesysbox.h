@@ -91,7 +91,7 @@ struct utimbuf {
 	time_t actime;
 	time_t modtime;
 };
-#endif
+#endif /* __VBCC__ */
 
 struct fbx_stat {
 	mode_t          st_mode;
