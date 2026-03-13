@@ -78,14 +78,14 @@ ifeq ($(HOST),m68k-amigaos)
 endif
 
 ifeq ($(HOST),m68k-amigaos)
-	OBJS_000 = $(subst src/,$(OBJDIR)/68000/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
-	OBJS_020 = $(subst src/,$(OBJDIR)/68020/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
-	OBJS_060 = $(subst src/,$(OBJDIR)/68060/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+	OBJS_000 = $(subst src/,$(OBJDIR)/68000/,$(SRCS:.c=.o) $(main_SRCS:.c=.o))
+	OBJS_020 = $(subst src/,$(OBJDIR)/68020/,$(SRCS:.c=.o) $(main_SRCS:.c=.o))
+	OBJS_060 = $(subst src/,$(OBJDIR)/68060/,$(SRCS:.c=.o) $(main_SRCS:.c=.o))
 	DEPS_000 = $(OBJS_000:.o=.d)
 	DEPS_020 = $(OBJS_020:.o=.d)
 	DEPS_060 = $(OBJS_060:.o=.d)
 else
-	OBJS = $(subst src/,$(OBJDIR)/$(CPU)/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+	OBJS = $(subst src/,$(OBJDIR)/$(CPU)/,$(SRCS:.c=.o) $(main_SRCS:.c=.o))
 	DEPS = $(OBJS:.o=.d)
 endif
 

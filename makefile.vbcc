@@ -3,7 +3,6 @@ NDK ?= $(HOME)/Development/NDK3.2R4
 
 CC = vc +$(CFG)
 AS = vasmm68k_mot
-STRIP = m68k-amigaos-strip
 
 TARGET  = filesysbox.library
 VERSION = 54
@@ -24,13 +23,11 @@ endif
 
 DEFINES += -DENABLE_CHARSET_CONVERSION
 
-CFLAGS  = -c99 -O3 -g $(INCLUDES) $(DEFINES) $(WARNINGS)
-LDFLAGS = -final -nostdlib
+CFLAGS  = -c99 -O2 $(INCLUDES) $(DEFINES) $(WARNINGS)
+LDFLAGS = -nostdlib
 LIBS    = -lvc
 
 ASFLAGS = -quiet -Fhunk -I$(NDK)/include/include_i
-
-STRIPFLAGS = -R.comment
 
 ARCH_000 = -cpu=68000 -amiga-softfloat
 ARCH_020 = -cpu=68020 -amiga-softfloat
@@ -60,9 +57,9 @@ ifeq (,$(findstring -DENABLE_C_STACKSWAP,$(DEFINES)))
 	SRCS += src/m68k/stackswap.c
 endif
 
-OBJS_000 = $(subst src/,$(OBJDIR)/68000/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
-OBJS_020 = $(subst src/,$(OBJDIR)/68020/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
-OBJS_060 = $(subst src/,$(OBJDIR)/68060/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+OBJS_000 = $(subst src/,$(OBJDIR)/68000/,$(SRCS:.c=.o) $(main_SRCS:.c=.o))
+OBJS_020 = $(subst src/,$(OBJDIR)/68020/,$(SRCS:.c=.o) $(main_SRCS:.c=.o))
+OBJS_060 = $(subst src/,$(OBJDIR)/68060/,$(SRCS:.c=.o) $(main_SRCS:.c=.o))
 
 .PHONY: all
 all: $(BINDIR)/$(TARGET).000 $(BINDIR)/$(TARGET).020 $(BINDIR)/$(TARGET).060
@@ -91,26 +88,17 @@ $(OBJDIR)/68060/%.o: src/%.s
 	@mkdir -p $(dir $@)
 	$(AS) -m68060 $(ASFLAGS) -o $@ $<
 
-$(BINDIR)/$(TARGET).000.debug: $(OBJS_000)
+$(BINDIR)/$(TARGET).000: $(OBJS_000)
 	@mkdir -p $(dir $@)
-	$(CC) $(ARCH_000) -g $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(CC) $(ARCH_000) $(LDFLAGS) -o $@ $^ $(LIBS)
 
-$(BINDIR)/$(TARGET).020.debug: $(OBJS_020)
+$(BINDIR)/$(TARGET).020: $(OBJS_020)
 	@mkdir -p $(dir $@)
-	$(CC) $(ARCH_020) -g $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(CC) $(ARCH_020) $(LDFLAGS) -o $@ $^ $(LIBS)
 
-$(BINDIR)/$(TARGET).060.debug: $(OBJS_060)
+$(BINDIR)/$(TARGET).060: $(OBJS_060)
 	@mkdir -p $(dir $@)
-	$(CC) $(ARCH_060) -g $(LDFLAGS) -o $@ $^ $(LIBS)
-
-$(BINDIR)/$(TARGET).000: $(BINDIR)/$(TARGET).000.debug
-	$(STRIP) $(STRIPFLAGS) -o $@ $<
-
-$(BINDIR)/$(TARGET).020: $(BINDIR)/$(TARGET).020.debug
-	$(STRIP) $(STRIPFLAGS) -o $@ $<
-
-$(BINDIR)/$(TARGET).060: $(BINDIR)/$(TARGET).060.debug
-	$(STRIP) $(STRIPFLAGS) -o $@ $<
+	$(CC) $(ARCH_060) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 .PHONY: build-dismount
 build-dismount:

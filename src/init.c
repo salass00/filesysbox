@@ -15,6 +15,14 @@
 #include "filesysbox_internal.h"
 #include "filesysbox.library_rev.h"
 
+/* Dummy entry point so that the library doesn't crash if run as a CLI program */
+#ifdef __AROS__
+__startup
+#endif
+int startup(void) {
+	return -1;
+}
+
 static const char USED_VAR verstag[] = VERSTAG;
 
 struct Library *SysBase;
