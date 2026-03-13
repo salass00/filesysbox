@@ -98,12 +98,13 @@ AROS_LH1(struct FileSysBoxBase *, LibOpen,
 	AROS_LIBFUNC_INIT
 #else
 struct FileSysBoxBase *LibOpen(
-	REG(d0, ULONG version),
 	REG(a6, struct FileSysBoxBase *libBase))
 {
 #endif
 
+#ifdef __AROS__
 	if (version > VERSION) return NULL;
+#endif
 
 	/* Add any specific open code here
 	   Return 0 before incrementing OpenCnt to fail opening */
