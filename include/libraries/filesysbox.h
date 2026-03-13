@@ -57,22 +57,22 @@ struct fbx_stat {
 };
 
 #ifndef st_atime
-#define st_atim.tv_sec
+#define st_atime st_atim.tv_sec
 #endif
 #ifndef st_atimensec
-#define st_atim.tv_nsec
+#define st_atimensec st_atim.tv_nsec
 #endif
 #ifndef st_mtime
-#define st_mtim.tv_sec
+#define st_mtime st_mtim.tv_sec
 #endif
 #ifndef st_mtimensec
-#define st_mtim.tv_nsec
+#define st_mtimensec st_mtim.tv_nsec
 #endif
 #ifndef st_ctime
-#define st_ctim.tv_sec
+#define st_ctime st_ctim.tv_sec
 #endif
 #ifndef st_ctimensec
-#define st_ctim.tv_nsec
+#define st_ctimensec st_ctim.tv_nsec
 #endif
 
 #ifndef S_IREAD
