@@ -1,0 +1,127 @@
+CFG ?= aos68k
+NDK ?= $(HOME)/Development/NDK3.2R4
+
+CC = vc
+AS = vasmm68k_mot
+#STRIP = m68k-amigaos-strip
+
+TARGET  = filesysbox.library
+VERSION = 54
+
+INCLUDES = -Iinclude -I -Isrc
+DEFINES  = -D__NOLIBBASE__ -DENABLE_DP64_SUPPORT -DENABLE_STACKSWAP
+WARNINGS = #-warnings-as-errors
+
+ifneq (1,$(DEBUG))
+	DEFINES += -DNODEBUG
+	BINDIR = bin-vc
+	OBJDIR = obj-vc
+else
+	DEFINES += -DADEBUG
+	BINDIR = bin-vc/debug
+	OBJDIR = obj-vc/debug
+endif
+
+DEFINES += DENABLE_CHARSET_CONVERSION
+
+CFLAGS  = +$(CFG) -c99 -O2 -g $(INCLUDES) $(DEFINES) $(WARNINGS)
+LDFLAGS = -nostdlib
+LIBS    =
+
+ASFLAGS = -quiet -Fhunk -I$(NDK)/include/include_i
+
+#STRIPFLAGS = -R.comment
+
+ARCH_000 = -cpu=68000 -amiga-softfloat
+ARCH_020 = -cpu=68020 -amiga-softfloat
+ARCH_060 = -cpu=68060 -amiga-softfloat
+
+MKFLAGS =
+ifneq (aos68k,$(CFG))
+	MKFLAGS += CFG=$(CFG)
+endif
+
+main_SRCS = $(wildcard src/main/*.c)
+
+SRCS = $(addprefix src/, \
+       init.c filesysbox.c diskchange.c timer.c notify.c doslist.c lockhandler.c \
+       fuse_stubs.c dopacket.c dopacket64.c fsaddnotify.c fschangefileposition.c \
+       fschangefilesize.c fschangemode.c fsclose.c fscreatedir.c fscreatehardlink.c \
+       fscreatesoftlink.c fscurrentvolume.c fsdelete.c fsdie.c fsduplock.c \
+       fsexamineall.c fsexamineallend.c fsexaminelock.c fsexaminenext.c fsformat.c \
+       fsgetfileposition.c fsgetfilesize.c fsinfodata.c fsinhibit.c fslock.c \
+       fsobtainfssm.c fsopen.c fsopenfromlock.c fsparentdir.c fsread.c fsreadlink.c \
+       fsrelabel.c fsremovenotify.c fsrename.c fssamelock.c fsseek.c fssetcomment.c \
+       fssetdate.c fssetfilesize.c fssetownerinfo.c fssetprotection.c fsunlock.c \
+       fswrite.c fswriteprotect.c volume.c xattrs.c utf8.c ucs4.c strlcpy.c debugf.c \
+       dofmt.c allocvecpooled.c codesets.c avl.c stackswap.c)
+
+ifneq (,$(findstring -DENABLE_C_STACKSWAP,$(DEFINES)))
+	SRCS += src/m68k/stackswap.c
+endif
+
+OBJS_000 = $(subst src/,$(OBJDIR)/68000/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+OBJS_020 = $(subst src/,$(OBJDIR)/68020/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+OBJS_060 = $(subst src/,$(OBJDIR)/68060/,$(main_SRCS:.c=.o) $(SRCS:.c=.o))
+
+.PHONY: all
+all: $(BINDIR)/$(TARGET).000 $(BINDIR)/$(TARGET).020 $(BINDIR)/$(TARGET).060
+
+$(OBJDIR)/68000/%.o: src/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(ARCH_000) $(CFLAGS) -c -o $@ $<
+
+$(OBJDIR)/68020/%.o: src/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(ARCH_020) $(CFLAGS) -c -o $@ $<
+
+$(OBJDIR)/68060/%.o: src/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(ARCH_060) $(CFLAGS) -c -o $@ $<
+
+$(BINDIR)/$(TARGET).000.debug: $(OBJS_000)
+	@mkdir -p $(dir $@)
+	$(CC) -g $(ARCH_000) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+$(BINDIR)/$(TARGET).020.debug: $(OBJS_020)
+	@mkdir -p $(dir $@)
+	$(CC) -g $(ARCH_020) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+$(BINDIR)/$(TARGET).060.debug: $(OBJS_060)
+	@mkdir -p $(dir $@)
+	$(CC) -g $(ARCH_060) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+$(BINDIR)/$(TARGET).000: $(OBJS_000)
+	@mkdir -p $(dir $@)
+	$(CC) $(ARCH_000) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+$(BINDIR)/$(TARGET).020: $(OBJS_020)
+	@mkdir -p $(dir $@)
+	$(CC) $(ARCH_020) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+$(BINDIR)/$(TARGET).060: $(OBJS_060)
+	@mkdir -p $(dir $@)
+	$(CC) $(ARCH_060) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+.PHONY: build-dismount
+build-dismount:
+	$(MAKE) -C dismount -f makefile.vbcc $(MKFLAGS)
+
+.PHONY: build-getfssm
+build-getfssm:
+	$(MAKE) -C getfssm -f makefile.vbcc $(MKFLAGS)
+
+.PHONY: clean
+clean:
+	rm -rf bin obj
+	$(MAKE) -C dismount -f makefile.vbcc clean
+	$(MAKE) -C getfssm -f makefile.vbcc clean
+
+.PHONY: revision
+revision:
+	bumprev -e si $(VERSION) $(TARGET)
+
+.PHONY: autodoc
+autodoc:
+	autodoc -l100 src/filesysbox_internal.h $(SRCS) $(main_SRCS) >filesysbox.doc
+

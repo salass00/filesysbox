@@ -9,11 +9,16 @@
 #include <devices/timer.h>
 #endif
 
+#ifdef __VBCC__
+#include <stddef.h>
+#include <time.h>
+#else
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/statvfs.h>
 #include <utime.h>
 #include <fcntl.h>
+#endif
+#include <sys/statvfs.h>
 
 #ifndef UTILITY_TAGITEM_H
 #include <utility/tagitem.h>
@@ -40,6 +45,20 @@ typedef signed long long   QUAD;
 #endif
 
 typedef QUAD fbx_off_t;
+
+#ifdef __VBCC__
+typedef unsigned int mode_t;
+typedef unsigned short nlink_t;
+typedef int uid_t;
+typedef int gid_t;
+typedef int pid_t;
+typedef unsigned long dev_t;
+
+struct timespec {
+	time_t tv_sec;
+	long   tv_nsec;
+};
+#endif
 
 struct fbx_stat {
 	mode_t          st_mode;
