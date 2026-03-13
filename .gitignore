@@ -3,6 +3,8 @@
 # Ignore generated exe files
 bin
 obj
+bin-vc
+obj-vc
 # Ignore generated autodoc file
 filesysbox.doc
 # Ignore release archives

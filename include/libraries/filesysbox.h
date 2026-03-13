@@ -9,11 +9,16 @@
 #include <devices/timer.h>
 #endif
 
+#ifdef __VBCC__
+#include <stddef.h>
+#include <time.h>
+#else
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/statvfs.h>
 #include <utime.h>
 #include <fcntl.h>
+#endif
+#include <sys/statvfs.h>
 
 #ifndef UTILITY_TAGITEM_H
 #include <utility/tagitem.h>
@@ -40,6 +45,53 @@ typedef signed long long   QUAD;
 #endif
 
 typedef QUAD fbx_off_t;
+
+#ifdef __VBCC__
+typedef unsigned int mode_t;
+typedef unsigned short nlink_t;
+typedef int uid_t;
+typedef int gid_t;
+typedef int pid_t;
+typedef unsigned long dev_t;
+
+#define S_IFMT  0170000
+#define S_IFREG 0100000
+#define S_IFLNK 0120000
+#define S_IFDIR 0040000
+
+#define S_ISREG(mode) (((mode) & S_IFMT) == S_IFREG)
+#define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
+#define S_ISLNK(mode) (((mode) & S_IFMT) == S_IFLNK)
+
+#define S_IRUSR 0400
+#define S_IWUSR 0200
+#define S_IXUSR 0100
+#define S_IRGRP 0040
+#define S_IWGRP 0020
+#define S_IXGRP 0010
+#define S_IROTH 0004
+#define S_IWOTH 0002
+#define S_IXOTH 0001
+
+#define S_IRWXU (S_IRUSR|S_IWUSR|S_IXUSR)
+#define S_IRWXG (S_IRGRP|S_IWGRP|S_IXGRP)
+#define S_IRWXO (S_IROTH|S_IWOTH|S_IXOTH)
+
+struct timespec {
+	time_t tv_sec;
+	long   tv_nsec;
+};
+
+#define O_RDONLY  0x0000
+#define O_WRONLY  0x0001
+#define O_RDWR    0x0002
+#define O_ACCMODE 0x0003
+
+struct utimbuf {
+	time_t actime;
+	time_t modtime;
+};
+#endif
 
 struct fbx_stat {
 	mode_t          st_mode;

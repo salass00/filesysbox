@@ -10,7 +10,7 @@
 #ifdef __AROS__
 #define FBX_LIB_ENTRY(name,index) AROS_SLIB_ENTRY(name,FileSysBox,index)
 #else
-#define FBX_LIB_ENTRY(name,index) name
+#define FBX_LIB_ENTRY(name,index) (APTR)name
 #endif
 
 /* Library vector table used by the resident/autoinit setup.
