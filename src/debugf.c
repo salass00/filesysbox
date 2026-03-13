@@ -7,18 +7,20 @@
 
 #ifndef NODEBUG
 #include "filesysbox_internal.h"
+
+#ifdef __AROS__
 #include <clib/debug_protos.h>
+#elif defined(__VBCC__)
+void __KPutChar(__reg("d0") LONG, __reg("a6") struct Library *)="\tjsr\t-516(a6)";
+#elif !defined(__GNUC__)
+#include <clib/debug_protos.h>
+#endif
 
 int debug_putc_cb(char ch, void *udata) {
 #ifdef __AROS__
-	//char tmp[4];
-	//tmp[0] = ch;
-	//tmp[1] = '\0';
-	//KPutStr((CONST_STRPTR)tmp);
 	struct Library *SysBase = udata;
 	RawPutChar(ch);
 #elif defined(__GNUC__)
-	//KPutChar((unsigned char)ch);
 	register char _d0 __asm__("d0") = ch;
 	register struct Library *_a6 __asm__("a6") = udata;
 	__asm__("jsr -516(a6)"
@@ -26,13 +28,16 @@ int debug_putc_cb(char ch, void *udata) {
 		: "d" (_d0), "a" (_a6)
 		: "d0", "d1", "a0", "a1", "cc"
 	);
-#else
-	KPutChar((LONG)(UBYTE)ch);
+#elif defined(__VBCC__)
+	__KPutChar((UBYTE)ch, udata);
+#elif
+	KPutChar((UBYTE)ch);
 #endif
 	return 0;
 }
 
 int vdebugf(const char *fmt, va_list args) {
+	extern struct Library *SysBase;
 	return FbxDoFmt(debug_putc_cb, SysBase, fmt, args);
 }
 
