@@ -18,8 +18,10 @@ void FreeFbxDirData(struct FbxLock *lock, struct FbxDirData *dd) {
 	if (dd != NULL) {
 		APTR pool = lock->mempool;
 
+#ifdef ENABLE_CHARSET_CONVERSION
 		if (dd->name != NULL)
 			FreeVecPooled(pool, dd->name);
+#endif
 
 		if (dd->comment != NULL)
 			FreeVecPooled(pool, dd->comment);
