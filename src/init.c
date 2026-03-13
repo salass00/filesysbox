@@ -197,7 +197,7 @@ static const CONST_APTR LibInitTab[] = {
 	(APTR)sizeof(struct FileSysBoxBase),
 	LibVectors,
 	NULL,
-	LibInit
+	(APTR)LibInit
 };
 
 static const struct Resident USED_VAR lib_res = {
