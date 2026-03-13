@@ -41,16 +41,6 @@ typedef signed long long   QUAD;
 
 typedef QUAD fbx_off_t;
 
-#ifdef __AROS__
-#undef st_atime
-#undef st_mtime
-#undef st_ctime
-#endif
-
-/* The direct time fields (st_atime/st_mtime/st_ctime and the corresponding
- * *timensec fields) are kept for compatibility with FUSE file system code
- * that expects these names to exist.
- */
 struct fbx_stat {
 	mode_t          st_mode;
 	UQUAD           st_ino;
@@ -58,31 +48,32 @@ struct fbx_stat {
 	uid_t           st_uid;
 	gid_t           st_gid;
 	dev_t           st_rdev;
-	union {
-		struct {
-			time_t       st_atime;
-			unsigned int st_atimensec;
-		};
-		struct timespec  st_atim;
-	};
-	union {
-		struct {
-			time_t       st_mtime;
-			unsigned int st_mtimensec;
-		};
-		struct timespec  st_mtim;
-	};
-	union {
-		struct {
-			time_t       st_ctime;
-			unsigned int st_ctimensec;
-		};
-		struct timespec  st_ctim;
-	};
+	struct timespec st_atim;
+	struct timespec st_mtim;
+	struct timespec st_ctim;
 	fbx_off_t       st_size;
 	QUAD            st_blocks;
 	LONG            st_blksize;
 };
+
+#ifndef st_atime
+#define st_atim.tv_sec
+#endif
+#ifndef st_atimensec
+#define st_atim.tv_nsec
+#endif
+#ifndef st_mtime
+#define st_mtim.tv_sec
+#endif
+#ifndef st_mtimensec
+#define st_mtim.tv_nsec
+#endif
+#ifndef st_ctime
+#define st_ctim.tv_sec
+#endif
+#ifndef st_ctimensec
+#define st_ctim.tv_nsec
+#endif
 
 #ifndef S_IREAD
 #define S_IREAD  0400
