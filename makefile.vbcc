@@ -1,9 +1,9 @@
 CFG ?= aos68k
 NDK ?= $(HOME)/Development/NDK3.2R4
 
-CC = vc
+CC = vc +$(CFG)
 AS = vasmm68k_mot
-#STRIP = m68k-amigaos-strip
+STRIP = m68k-amigaos-strip
 
 TARGET  = filesysbox.library
 VERSION = 54
@@ -22,15 +22,15 @@ else
 	OBJDIR = obj-vc/debug
 endif
 
-DEFINES += DENABLE_CHARSET_CONVERSION
+DEFINES += -DENABLE_CHARSET_CONVERSION
 
-CFLAGS  = +$(CFG) -c99 -O2 -g $(INCLUDES) $(DEFINES) $(WARNINGS)
-LDFLAGS = -nostdlib
-LIBS    =
+CFLAGS  = -c99 -O3 -g $(INCLUDES) $(DEFINES) $(WARNINGS)
+LDFLAGS = -final -nostdlib
+LIBS    = -lvc
 
 ASFLAGS = -quiet -Fhunk -I$(NDK)/include/include_i
 
-#STRIPFLAGS = -R.comment
+STRIPFLAGS = -R.comment
 
 ARCH_000 = -cpu=68000 -amiga-softfloat
 ARCH_020 = -cpu=68020 -amiga-softfloat
@@ -56,7 +56,7 @@ SRCS = $(addprefix src/, \
        fswrite.c fswriteprotect.c volume.c xattrs.c utf8.c ucs4.c strlcpy.c debugf.c \
        dofmt.c allocvecpooled.c codesets.c avl.c stackswap.c)
 
-ifneq (,$(findstring -DENABLE_C_STACKSWAP,$(DEFINES)))
+ifeq (,$(findstring -DENABLE_C_STACKSWAP,$(DEFINES)))
 	SRCS += src/m68k/stackswap.c
 endif
 
@@ -71,37 +71,46 @@ $(OBJDIR)/68000/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(ARCH_000) $(CFLAGS) -c -o $@ $<
 
+$(OBJDIR)/68000/%.o: src/%.s
+	@mkdir -p $(dir $@)
+	$(AS) -m68000 $(ASFLAGS) -o $@ $<
+
 $(OBJDIR)/68020/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(ARCH_020) $(CFLAGS) -c -o $@ $<
+
+$(OBJDIR)/68020/%.o: src/%.s
+	@mkdir -p $(dir $@)
+	$(AS) -m68020 $(ASFLAGS) -o $@ $<
 
 $(OBJDIR)/68060/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(ARCH_060) $(CFLAGS) -c -o $@ $<
 
+$(OBJDIR)/68060/%.o: src/%.s
+	@mkdir -p $(dir $@)
+	$(AS) -m68060 $(ASFLAGS) -o $@ $<
+
 $(BINDIR)/$(TARGET).000.debug: $(OBJS_000)
 	@mkdir -p $(dir $@)
-	$(CC) -g $(ARCH_000) $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(CC) $(ARCH_000) -g $(LDFLAGS) -o $@ $^ $(LIBS)
 
 $(BINDIR)/$(TARGET).020.debug: $(OBJS_020)
 	@mkdir -p $(dir $@)
-	$(CC) -g $(ARCH_020) $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(CC) $(ARCH_020) -g $(LDFLAGS) -o $@ $^ $(LIBS)
 
 $(BINDIR)/$(TARGET).060.debug: $(OBJS_060)
 	@mkdir -p $(dir $@)
-	$(CC) -g $(ARCH_060) $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(CC) $(ARCH_060) -g $(LDFLAGS) -o $@ $^ $(LIBS)
 
-$(BINDIR)/$(TARGET).000: $(OBJS_000)
-	@mkdir -p $(dir $@)
-	$(CC) $(ARCH_000) $(LDFLAGS) -o $@ $^ $(LIBS)
+$(BINDIR)/$(TARGET).000: $(BINDIR)/$(TARGET).000.debug
+	$(STRIP) $(STRIPFLAGS) -o $@ $<
 
-$(BINDIR)/$(TARGET).020: $(OBJS_020)
-	@mkdir -p $(dir $@)
-	$(CC) $(ARCH_020) $(LDFLAGS) -o $@ $^ $(LIBS)
+$(BINDIR)/$(TARGET).020: $(BINDIR)/$(TARGET).020.debug
+	$(STRIP) $(STRIPFLAGS) -o $@ $<
 
-$(BINDIR)/$(TARGET).060: $(OBJS_060)
-	@mkdir -p $(dir $@)
-	$(CC) $(ARCH_060) $(LDFLAGS) -o $@ $^ $(LIBS)
+$(BINDIR)/$(TARGET).060: $(BINDIR)/$(TARGET).060.debug
+	$(STRIP) $(STRIPFLAGS) -o $@ $<
 
 .PHONY: build-dismount
 build-dismount:
@@ -113,9 +122,9 @@ build-getfssm:
 
 .PHONY: clean
 clean:
-	rm -rf bin obj
-	$(MAKE) -C dismount -f makefile.vbcc clean
-	$(MAKE) -C getfssm -f makefile.vbcc clean
+	rm -rf $(BINDIR) $(OBJDIR)
+#	$(MAKE) -C dismount -f makefile.vbcc clean
+#	$(MAKE) -C getfssm -f makefile.vbcc clean
 
 .PHONY: revision
 revision:
