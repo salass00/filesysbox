@@ -117,29 +117,31 @@ static int FbxDosListProc(void) {
 struct Process *StartDosListProc(struct FileSysBoxBase *libBase) {
 	struct Library *DOSBase = libBase->dosbase;
 	struct Process *proc;
-
-	proc = CreateNewProcTags(
-		NP_Entry,       (IPTR)FbxDosListProc,
+	static const TEXT proc_name[] = "FileSysBox DosList handler";
+	const struct TagItem proc_tags[] = {
+		{ NP_Entry,       (IPTR)FbxDosListProc },
 #ifdef __AROS__
-		NP_UserData,    (IPTR)libBase,
+		{ NP_UserData,    (IPTR)libBase        },
 #endif
-		NP_StackSize,   4096,
-		NP_Name,        (IPTR)"FileSysBox DosList handler",
-		NP_Priority,    15,
-		NP_Cli,         FALSE,
-		NP_WindowPtr,   -1,
-		NP_CopyVars,    FALSE,
-		NP_CurrentDir,  0,
-		NP_HomeDir,     0,
-		NP_Error,       0,
-		NP_CloseError,  FALSE,
-		NP_Input,       0,
-		NP_CloseInput,  FALSE,
-		NP_Output,      0,
-		NP_CloseOutput, FALSE,
-		NP_ConsoleTask, 0,
-		TAG_END);
+		{ NP_StackSize,   4096                 },
+		{ NP_Name,        (IPTR)proc_name      },
+		{ NP_Priority,    15                   },
+		{ NP_Cli,         FALSE                },
+		{ NP_WindowPtr,   -1                   },
+		{ NP_CopyVars,    FALSE                },
+		{ NP_CurrentDir,  0                    },
+		{ NP_HomeDir,     0                    },
+		{ NP_Error,       0                    },
+		{ NP_CloseError,  FALSE                },
+		{ NP_Input,       0                    },
+		{ NP_CloseInput,  FALSE                },
+		{ NP_Output,      0                    },
+		{ NP_CloseOutput, FALSE                },
+		{ NP_ConsoleTask, 0                    },
+		{ TAG_END,        0                    }
+	};
 
+	proc = CreateNewProc(proc_tags);
 #ifndef __AROS__
 	if (proc != NULL) {
 		struct Library *SysBase = libBase->sysbase;
