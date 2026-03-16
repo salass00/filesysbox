@@ -68,7 +68,7 @@ int _start(void)
 		return RETURN_FAIL;
 	}
 
-	bzero(args, sizeof(args));
+	memset(args, 0, sizeof(args));
 	rda = ReadArgs(template, (APTR)args, NULL);
 	if (rda == NULL)
 	{
