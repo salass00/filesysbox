@@ -1,12 +1,16 @@
 #ifndef _SYS_STATVFS_H
 #define _SYS_STATVFS_H
 
+#ifndef __VBCC__
+#include <sys/types.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #if !defined(__AROS__) && !defined(_FSBLKCNT_T_DECLARED)
-typedef unsigned long fsblkcnt_t;
+typedef unsigned long long fsblkcnt_t;
 typedef unsigned long fsfilcnt_t;
 #endif
 
