@@ -23,7 +23,7 @@ int startup(void) {
 #include "filesysbox_internal.h"
 #include "filesysbox.library_rev.h"
 
-static const char USED_VAR verstag[] = VERSTAG;
+const TEXT USED_VAR verstag[] = VERSTAG;
 
 struct Library *SysBase;
 
@@ -214,7 +214,7 @@ static const CONST_APTR LibInitTab[] = {
 	(APTR)LibInit
 };
 
-static const struct Resident USED_VAR lib_res = {
+const struct Resident USED_VAR lib_res = {
 	RTC_MATCHWORD,
 	(struct Resident *)&lib_res,
 	(APTR)(&lib_res + 1),
