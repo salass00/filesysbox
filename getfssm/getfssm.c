@@ -39,7 +39,6 @@ static void CopyStringBSTRToC(BSTR bstr, STRPTR cstr, ULONG size);
 static const TEXT dosName[];
 static const TEXT template[];
 static const TEXT progName[];
-static const TEXT unexpectedPktMsg[];
 
 static const TEXT deviceInfoMsg[];
 static const TEXT tableHeaderMsg[];
@@ -142,7 +141,7 @@ int _start(void)
 
 		while ((rp = WaitPkt()) != pkt)
 		{
-			Printf(unexpectedPktMsg, (IPTR)rp, rp->dp_Type);
+			Alert(AN_AsyncPkt);
 		}
 		fssm = (struct FileSysStartupMsg *)rp->dp_Res1;
 		if (fssm == NULL)
@@ -202,7 +201,7 @@ int _start(void)
 
 		while ((rp = WaitPkt()) != pkt)
 		{
-			Printf(unexpectedPktMsg, (IPTR)rp, rp->dp_Type);
+			Alert(AN_AsyncPkt);
 		}
 		if (rp->dp_Res1 == DOSFALSE)
 		{
@@ -232,7 +231,6 @@ cleanup:
 static const TEXT dosName[] = "dos.library";
 static const TEXT template[] = TEMPLATE;
 static const TEXT progName[] = "FbxGetFSSM";
-static const TEXT unexpectedPktMsg[] = "Received unexpected packet: 0x%lx (dp_Type: %ld)\n";
 
 static const TEXT deviceInfoMsg[] =
 	"Storage device driver\n"
