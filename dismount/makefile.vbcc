@@ -9,7 +9,7 @@ INCLUDES = -I.
 DEFINES  = -D__NOLIBBASE__ -D__NOINLINE__
 WARNINGS = -warnings-as-errors
 
-CFLAGS  = -cpu=68000 -O2 $(INCLUDES) $(DEFINES) $(WARNINGS)
+CFLAGS  = -cpu=68000 -O3 $(INCLUDES) $(DEFINES) $(WARNINGS)
 LDFLAGS = -cpu=68000 -nostdlib
 LIBS    = -lvc
 
