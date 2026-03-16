@@ -62,7 +62,7 @@ OBJS_020 = $(subst src/,$(OBJDIR)/68020/,$(SRCS:.c=.o) $(main_SRCS:.c=.o))
 OBJS_060 = $(subst src/,$(OBJDIR)/68060/,$(SRCS:.c=.o) $(main_SRCS:.c=.o))
 
 .PHONY: all
-all: $(BINDIR)/$(TARGET).000 $(BINDIR)/$(TARGET).020 $(BINDIR)/$(TARGET).060 build-getfssm
+all: $(BINDIR)/$(TARGET).000 $(BINDIR)/$(TARGET).020 $(BINDIR)/$(TARGET).060 build-dismount build-getfssm
 
 $(OBJDIR)/68000/%.o: src/%.c
 	@mkdir -p $(dir $@)
@@ -111,8 +111,8 @@ build-getfssm:
 .PHONY: clean
 clean:
 	rm -rf bin-vc obj-vc
+	$(MAKE) -C dismount -f makefile.vbcc clean
 	$(MAKE) -C getfssm -f makefile.vbcc clean
-#	$(MAKE) -C dismount -f makefile.vbcc clean
 
 .PHONY: revision
 revision:

@@ -1,0 +1,39 @@
+CFG ?= aos68k
+
+CC = vc +$(CFG)
+
+TARGET  = FbxDismount
+VERSION = 54
+
+INCLUDES = -I.
+DEFINES  = -D__NOLIBBASE__ -D__NOINLINE__
+WARNINGS = -warnings-as-errors
+
+CFLAGS  = -cpu=68000 -O2 $(INCLUDES) $(DEFINES) $(WARNINGS)
+LDFLAGS = -cpu=68000 -nostdlib
+LIBS    = -lvc
+
+SRCS = dismount.c
+
+OBJS = $(addprefix obj-vc/,$(SRCS:.c=.o))
+
+.PHONY: all
+
+all: bin-vc/$(TARGET)
+
+obj-vc/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+bin-vc/$(TARGET): $(OBJS)
+	@mkdir -p $(dir $@)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+.PHONY: clean
+clean:
+	rm -rf bin-vc obj-vc
+
+.PHONY: revision
+revision:
+	bumprev -e si $(VERSION) $(TARGET)
+
