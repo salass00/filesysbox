@@ -85,7 +85,7 @@ struct timespec {
 #define O_RDONLY  0x0000
 #define O_WRONLY  0x0001
 #define O_RDWR    0x0002
-#define O_ACCMODE 0x0003
+#define O_ACCMODE (O_RDONLY|O_WRONLY|O_RDWR)
 
 struct utimbuf {
 	time_t actime;
