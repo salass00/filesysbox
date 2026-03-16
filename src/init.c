@@ -5,6 +5,14 @@
  * See the file LICENSE.APL
  */
 
+/* Dummy entry point so that the library doesn't crash if run as a CLI program */
+#ifdef __AROS__
+__startup
+#endif
+int startup(void) {
+	return -1;
+}
+
 #include <exec/alerts.h>
 #include <exec/resident.h>
 /* Include exec/initializers.h before filesysbox_vectors.c is pulled in below.
@@ -15,14 +23,6 @@
 #include "filesysbox_internal.h"
 #include "filesysbox.library_rev.h"
 
-/* Dummy entry point so that the library doesn't crash if run as a CLI program */
-#ifdef __AROS__
-__startup
-#endif
-int startup(void) {
-	return -1;
-}
-
 static const char USED_VAR verstag[] = VERSTAG;
 
 struct Library *SysBase;
@@ -30,6 +30,11 @@ struct Library *SysBase;
 static inline void SetGlobalSysBase(struct Library *sysbase) {
 	SysBase = sysbase;
 }
+
+static const TEXT fbxName[] = "filesysbox.library";
+static const TEXT dosName[] = "dos.library";
+static const TEXT utilityName[] = "utility.library";
+static const TEXT localeName[] = "locale.library";
 
 #ifdef __AROS__
 static AROS_UFH3(struct FileSysBoxBase *, LibInit,
@@ -46,7 +51,7 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 
 	libBase->libnode.lib_Node.ln_Type = NT_LIBRARY;
 	libBase->libnode.lib_Node.ln_Pri  = 0;
-	libBase->libnode.lib_Node.ln_Name = (char *)"filesysbox.library";
+	libBase->libnode.lib_Node.ln_Name = (char *)fbxName;
 	libBase->libnode.lib_Flags        = LIBF_SUMUSED|LIBF_CHANGED;
 	libBase->libnode.lib_Version      = VERSION;
 	libBase->libnode.lib_Revision     = REVISION;
@@ -55,19 +60,19 @@ static struct FileSysBoxBase *LibInit (REG(d0, struct FileSysBoxBase *libBase),
 	libBase->seglist = seglist;
 	libBase->sysbase = SysBase;
 
-	libBase->dosbase = OpenLibrary((CONST_STRPTR)"dos.library", 39);
+	libBase->dosbase = OpenLibrary(dosName, 39);
 	if (libBase->dosbase == NULL) {
 		Alert(AG_OpenLib|AO_DOSLib);
 		goto error;
 	}
 
-	libBase->utilitybase = OpenLibrary((CONST_STRPTR)"utility.library", 39);
+	libBase->utilitybase = OpenLibrary(utilityName, 39);
 	if (libBase->utilitybase == NULL) {
 		Alert(AG_OpenLib|AO_UtilityLib);
 		goto error;
 	}
 
-	libBase->localebase = OpenLibrary((CONST_STRPTR)"locale.library", 38);
+	libBase->localebase = OpenLibrary(localeName, 38);
 
 	SetGlobalSysBase(SysBase);
 
@@ -217,7 +222,7 @@ static const struct Resident USED_VAR lib_res = {
 	VERSION,
 	NT_LIBRARY,
 	0,
-	(APTR)"filesysbox.library",
+	(APTR)fbxName,
 	(APTR)VSTRING,
 	(APTR)LibInitTab
 };
