@@ -52,7 +52,7 @@ typedef unsigned short nlink_t;
 typedef unsigned short uid_t;
 typedef unsigned short gid_t;
 typedef int pid_t;
-typedef unsigned long dev_t;
+typedef unsigned short dev_t;
 
 #define S_IFMT  0170000
 #define S_IFREG 0100000
