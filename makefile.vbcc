@@ -29,9 +29,9 @@ LIBS    = -lvc
 
 ASFLAGS = -quiet -Fhunk -I$(NDK)/include/include_i
 
-ARCH_000 = -cpu=68000 -amiga-softfloat
-ARCH_020 = -cpu=68020 -amiga-softfloat
-ARCH_060 = -cpu=68060 -amiga-softfloat
+ARCH_000 = -cpu=68000
+ARCH_020 = -cpu=68020
+ARCH_060 = -cpu=68060
 
 MKFLAGS =
 ifneq (aos68k,$(CFG))
