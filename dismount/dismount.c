@@ -17,12 +17,12 @@
 
 #include <string.h>
 
-#include <SDI/SDI_compiler.h>
-
 #ifndef __AROS__
 typedef ULONG IPTR;
 typedef LONG SIPTR;
 #endif
+
+#include <SDI/SDI_compiler.h>
 
 #define TEMPLATE "DEVICE/A"
 enum {
