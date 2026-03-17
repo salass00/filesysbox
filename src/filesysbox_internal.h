@@ -657,7 +657,6 @@ void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass);
 void FbxSetModifyState(struct FbxFS *fs, int state);
 BOOL FbxIsParent(struct FbxFS *fs, const char *parent, const char *child);
 void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStamp *ds);
-int FbxFlushAll(struct FbxFS *fs);
 
 /* diskchange.c */
 struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskChangeHandlerFunc func);
@@ -762,6 +761,9 @@ int FbxExamineLock(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 /* fsexaminenext.c */
 int FbxReadDir(struct FbxFS *fs, struct FbxLock *lock);
 int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock *fib);
+
+/* fsflush.c */
+int FbxFlushAll(struct FbxFS *fs);
 
 /* fsformat.c */
 int FbxFormat(struct FbxFS *fs, const char *volname, ULONG dostype);

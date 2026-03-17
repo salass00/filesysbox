@@ -32,13 +32,6 @@ int Fbx_release(struct FbxFS *fs, const char *path, struct fuse_file_info *fi)
 	return FSOP release(path, fi, &fs->fcntx);
 }
 
-int Fbx_fsync(struct FbxFS *fs, const char *path, int x, struct fuse_file_info *fi)
-{
-	ODEBUGF("Fbx_fsync(%#p, '%s', %d, %#p)\n", fs, path, x, fi);
-
-	return FSOP fsync(path, x, fi, &fs->fcntx);
-}
-
 int Fbx_fgetattr(struct FbxFS *fs, const char *path, struct fbx_stat *stat,
 	struct fuse_file_info *fi)
 {

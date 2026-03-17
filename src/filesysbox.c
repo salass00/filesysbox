@@ -474,20 +474,6 @@ void FbxTimeSpec2DS(struct FbxFS *fs, const struct timespec *ts, struct DateStam
 	ds->ds_Tick = (sec % 60) * TICKS_PER_SECOND + nsec / ((1000*1000*1000) / TICKS_PER_SECOND);
 }
 
-int FbxFlushAll(struct FbxFS *fs) {
-	PDEBUGF("FbxFlushAll(%#p)\n", fs);
-
-	if (OKVOLUME(fs->currvol)) {
-		Fbx_fsync(fs, "", 0, NULL);
-	}
-
-	// reset update timeouts
-	FbxSetModifyState(fs, 0);
-
-	fs->r2 = 0;
-	return DOSTRUE;
-}
-
 void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass) {
 	struct Library *SysBase = fs->sysbase;
 	struct MsgPort *inputmp;

@@ -164,6 +164,9 @@ SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
 	case ACTION_INFO:
 		r1 = FbxInfo(fs, (struct FbxLock *)BADDR(pkt->dp_Arg1), (struct InfoData *)BADDR(pkt->dp_Arg2));
 		break;
+	case ACTION_FLUSH:
+		r1 = FbxFlushAll(fs);
+		break;
 	case ACTION_INHIBIT:
 		r1 = FbxInhibit(fs, pkt->dp_Arg1);
 		break;
