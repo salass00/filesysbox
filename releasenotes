@@ -223,3 +223,7 @@ filesysbox.library 54.10 (d.m.2026)
 - Added minimum stack size check and stack swap on FbxEventLoop() function
   entry (the minimum is currently set to 16KiB).
 
+- Added back ACTION_FLUSH packet support which got lost in the conversion from
+  vector port back to the AmigaDOS packet based interface used in AmigaOS 3/
+  AROS.
+
