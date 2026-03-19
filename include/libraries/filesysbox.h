@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 #ifndef STDARGS
-#if !defined(__AROS__) && defined(__GNUC__)
+#if !defined(__AROS__) && (defined(__GNUC__) || defined(__VBCC__))
 #define STDARGS __stdargs
 #else
 #define STDARGS
