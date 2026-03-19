@@ -24,8 +24,11 @@ The maintainer recommends bebbo's GCC 6.5.0b (this is what is used for releases)
 
 ### vbcc
 
-Building with vbcc is not officially supported at this time.
-A dedicated vbcc build setup (for example a makefile.vbcc) would be needed before it can be recommended.
+A dedicated vbcc build path is available through `Makefile.vbcc`.
+
+The current vbcc build support does not require `vbcc_PosixLib`.
+
+Instead, the missing POSIX types, constants, and macros needed for building filesysbox with vbcc are currently provided in `include/libraries/filesysbox.h` under `__VBCC__`.
 
 ### Probe builds and compatibility investigation
 
