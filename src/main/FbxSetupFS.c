@@ -299,7 +299,7 @@ struct FbxFS *FbxSetupFS(
 		}
 	}
 
-	if ((fs->flags & FBXF_ENABLE_UTF8_NAMES) == 0) {
+	if ((fs->fsflags & FBXF_ENABLE_UTF8_NAMES) == 0) {
 		/* Non-UTF8 file systems are no longer supported */
 		goto error;
 	}
