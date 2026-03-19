@@ -10,7 +10,7 @@
 
 #include "filesysbox_internal.h"
 #include <devices/trackdisk.h>
-#include <SDI/SDI_interrupt.h>
+#include <SDI/SDI_compiler.h>
 #include <string.h>
 
 #ifdef __AROS__
@@ -23,7 +23,7 @@ AROS_UFH5(int, FbxDiskChangeInterrupt,
 {
 	AROS_USERFUNC_INIT
 #else
-INTERRUPTPROTO(FbxDiskChangeInterrupt, int, APTR custom, APTR data) {
+int FbxDiskChangeInterrupt(REG(a0, APTR custom), REG(a1, APTR data)) {
 #endif
 	struct FbxFS *fs = data;
 	struct FbxDiskChangeHandler *dch = fs->diskchangehandler;
@@ -84,11 +84,7 @@ struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskCh
 		goto cleanup;
 	memcpy(interrupt->is_Node.ln_Name, namebuffer, namesize + 1);
 
-#ifdef __AROS__
 	interrupt->is_Code = (void (*)())FbxDiskChangeInterrupt;
-#else
-	interrupt->is_Code = (void (*)())ENTRY(FbxDiskChangeInterrupt);
-#endif
 	interrupt->is_Data = fs;
 
 	io->io_Command = TD_ADDCHANGEINT;

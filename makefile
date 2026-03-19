@@ -10,7 +10,7 @@ VERSION = 54
 
 INCLUDES = -I./include -I. -I./src
 DEFINES  = -D__NOLIBBASE__
-WARNINGS = -Werror -Wall -Wwrite-strings -Wno-attributes
+WARNINGS = -Werror -Wall -Wwrite-strings
 
 ifneq (1,$(DEBUG))
 	DEFINES += -DNODEBUG
