@@ -82,21 +82,13 @@ APTR FbxQueryMountMsg(
 
 	switch (attr) {
 	case FBXQMM_MOUNT_NAME:
-#ifdef __AROS__
-		return AROS_BSTR_ADDR(devnode->dn_Name);
-#else
-		return (UBYTE *)BADDR(devnode->dn_Name) + 1;
-#endif
+		return FBX_BSTR_ADDR(devnode->dn_Name);
 	case FBXQMM_MOUNT_CONTROL:
 		fssm = FbxGetFSSM(libBase, devnode);
 		if (fssm != NULL) {
 			de = BADDR(fssm->fssm_Environ);
 			if (IS_VALID_BPTR(de->de_Control) && de->de_Control > 4095)
-#ifdef __AROS__
-				return AROS_BSTR_ADDR(de->de_Control);
-#else
-				return (UBYTE *)BADDR(de->de_Control) + 1;
-#endif
+				return FBX_BSTR_ADDR(de->de_Control);
 		}
 		return NULL;
 	case FBXQMM_FSSM:

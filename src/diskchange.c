@@ -71,11 +71,7 @@ struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskCh
 	interrupt->is_Node.ln_Type = NT_INTERRUPT;
 
 	if (fs->devnode != NULL) {
-#ifdef __AROS__
-		strlcpy(namebuffer, (const char *)AROS_BSTR_ADDR(fs->devnode->dn_Name), sizeof(namebuffer));
-#else
-		strlcpy(namebuffer, (const char *)BADDR(fs->devnode->dn_Name) + 1, sizeof(namebuffer));
-#endif
+		strlcpy(namebuffer, (const char *)FBX_BSTR_ADDR(fs->devnode->dn_Name), sizeof(namebuffer));
 	} else {
 		strlcpy(namebuffer, "Fbx", sizeof(namebuffer));
 	}

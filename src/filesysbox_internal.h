@@ -95,6 +95,12 @@ STATIC_ASSERT(offsetof(struct DosPacket64, dp_Res2) == offsetof(struct DosPacket
 #define IS_VALID_BPTR(bptr) (((bptr) & 0xC0000000) == 0 && (bptr) >= 1024)
 #endif
 
+#ifdef __AROS__
+#define FBX_BSTR_ADDR(bstr) AROS_BSTR_ADDR(bstr)
+#else
+#define FBX_BSTR_ADDR(bstr) ((STRPTR)BADDR(bstr) + 1)
+#endif
+
 #ifndef NEWLIST
 #define NEWLIST(list) \
 	do { \
