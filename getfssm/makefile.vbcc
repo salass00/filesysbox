@@ -16,14 +16,17 @@ LIBS    = -lvc
 SRCS = getfssm.c
 
 OBJS = $(addprefix obj-vc/,$(SRCS:.c=.o))
+DEPS = $(OBJS:.o=.d)
 
 .PHONY: all
 
 all: bin-vc/$(TARGET)
 
+-include $(DEPS)
+
 obj-vc/%.o: %.c
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $< -deps -depfile=$(@:.o=.d)
 
 bin-vc/$(TARGET): $(OBJS)
 	@mkdir -p $(dir $@)

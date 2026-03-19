@@ -61,12 +61,20 @@ OBJS_000 = $(subst src/,$(OBJDIR)/68000/,$(SRCS:.c=.o) $(main_SRCS:.c=.o))
 OBJS_020 = $(subst src/,$(OBJDIR)/68020/,$(SRCS:.c=.o) $(main_SRCS:.c=.o))
 OBJS_060 = $(subst src/,$(OBJDIR)/68060/,$(SRCS:.c=.o) $(main_SRCS:.c=.o))
 
+DEPS_000 = $(OBJS_000:.o=.d)
+DEPS_020 = $(OBJS_020:.o=.d)
+DEPS_060 = $(OBJS_060:.o=.d)
+
 .PHONY: all
 all: $(BINDIR)/$(TARGET).000 $(BINDIR)/$(TARGET).020 $(BINDIR)/$(TARGET).060 build-dismount build-getfssm
 
+-include $(DEPS_000)
+-include $(DEPS_020)
+-include $(DEPS_060)
+
 $(OBJDIR)/68000/%.o: src/%.c
 	@mkdir -p $(dir $@)
-	$(CC) $(ARCH_000) $(CFLAGS) -c -o $@ $<
+	$(CC) $(ARCH_000) $(CFLAGS) -c -o $@ $< -deps -depfile=$(@:.o=.d)
 
 $(OBJDIR)/68000/%.o: src/%.s
 	@mkdir -p $(dir $@)
@@ -74,7 +82,7 @@ $(OBJDIR)/68000/%.o: src/%.s
 
 $(OBJDIR)/68020/%.o: src/%.c
 	@mkdir -p $(dir $@)
-	$(CC) $(ARCH_020) $(CFLAGS) -c -o $@ $<
+	$(CC) $(ARCH_020) $(CFLAGS) -c -o $@ $< -deps -depfile=$(@:.o=.d)
 
 $(OBJDIR)/68020/%.o: src/%.s
 	@mkdir -p $(dir $@)
@@ -82,7 +90,7 @@ $(OBJDIR)/68020/%.o: src/%.s
 
 $(OBJDIR)/68060/%.o: src/%.c
 	@mkdir -p $(dir $@)
-	$(CC) $(ARCH_060) $(CFLAGS) -c -o $@ $<
+	$(CC) $(ARCH_060) $(CFLAGS) -c -o $@ $< -deps -depfile=$(@:.o=.d)
 
 $(OBJDIR)/68060/%.o: src/%.s
 	@mkdir -p $(dir $@)
