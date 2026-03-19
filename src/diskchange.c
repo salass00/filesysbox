@@ -46,7 +46,8 @@ struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskCh
 	struct MsgPort *mp = NULL;
 	struct IOStdReq *io = NULL;
 	struct Interrupt *interrupt = NULL;
-	char devname[256];
+	char namebuffer[256];
+	size_t namesize;
 
 	dch = AllocPooled(fs->mempool, sizeof(*dch));
 	if (dch == NULL) goto cleanup;
@@ -57,8 +58,8 @@ struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskCh
 	io = (struct IOStdReq *)CreateIORequest(mp, sizeof(*io));
 	if (io == NULL) goto cleanup;
 
-	CopyStringBSTRToC(fssm->fssm_Device, devname, sizeof(devname));
-	if (OpenDevice((CONST_STRPTR)devname, fssm->fssm_Unit, (struct IORequest *)io, fssm->fssm_Flags) != 0) {
+	CopyStringBSTRToC(fssm->fssm_Device, namebuffer, sizeof(namebuffer));
+	if (OpenDevice((CONST_STRPTR)namebuffer, fssm->fssm_Unit, (struct IORequest *)io, fssm->fssm_Flags) != 0) {
 		io->io_Device = NULL;
 		goto cleanup;
 	}
@@ -68,12 +69,29 @@ struct FbxDiskChangeHandler *FbxAddDiskChangeHandler(struct FbxFS *fs, FbxDiskCh
 
 	memset(interrupt, 0, sizeof(*interrupt));
 	interrupt->is_Node.ln_Type = NT_INTERRUPT;
+
+	if (fs->devnode != NULL) {
 #ifdef __AROS__
-	interrupt->is_Node.ln_Name = (char *)AROS_BSTR_ADDR(fs->devnode->dn_Name);
-	interrupt->is_Code         = (void (*)())FbxDiskChangeInterrupt;
+		strlcpy(namebuffer, (const char *)AROS_BSTR_ADDR(fs->devnode->dn_Name), sizeof(namebuffer));
 #else
-	interrupt->is_Node.ln_Name = (char *)BADDR(fs->devnode->dn_Name) + 1;
-	interrupt->is_Code         = (void (*)())ENTRY(FbxDiskChangeInterrupt);
+		strlcpy(namebuffer, (const char *)BADDR(fs->devnode->dn_Name) + 1, sizeof(namebuffer));
+#endif
+	} else {
+		strlcpy(namebuffer, "Fbx", sizeof(namebuffer));
+	}
+	namesize = strlcat(namebuffer, ": Diskchange Interrupt", sizeof(namebuffer));
+	if (namesize >= sizeof(namebuffer))
+		namesize = sizeof(namebuffer) - 1;
+
+	interrupt->is_Node.ln_Name = AllocVecPooled(fs->mempool, namesize + 1);
+	if (interrupt->is_Node.ln_Name == NULL)
+		goto cleanup;
+	memcpy(interrupt->is_Node.ln_Name, namebuffer, namesize + 1);
+
+#ifdef __AROS__
+	interrupt->is_Code = (void (*)())FbxDiskChangeInterrupt;
+#else
+	interrupt->is_Code = (void (*)())ENTRY(FbxDiskChangeInterrupt);
 #endif
 	interrupt->is_Data = fs;
 
@@ -118,6 +136,7 @@ void FbxRemDiskChangeHandler(struct FbxFS *fs) {
 		CloseDevice((struct IORequest *)io);
 		DeleteIORequest((struct IORequest *)io);
 		DeleteMsgPort(mp);
+		FreeVecPooled(fs->mempool, interrupt->is_Node.ln_Name);
 		FreePooled(fs->mempool, interrupt, sizeof(*interrupt));
 		FreePooled(fs->mempool, dch, sizeof(*dch));
 	}

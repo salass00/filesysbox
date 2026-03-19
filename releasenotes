@@ -227,3 +227,5 @@ filesysbox.library 54.10 (d.m.2026)
   vector port back to the AmigaDOS packet based interface used in AmigaOS 3/
   AROS.
 
+- Added fallback for diskchange interrupt name if DeviceNode is not available.
+

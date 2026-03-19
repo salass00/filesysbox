@@ -96,8 +96,7 @@ Invariant: operations that cannot locate the referenced internal object must not
   - be disabled,
   - use explicitly provided replacement data,
   - or rely on a documented fallback.
-- Disk change detection requires valid startup context (`devnode` and
-  `fssm`).
+- Disk change detection requires valid startup context (`fssm`).
 - `fs->dostype` may come from startup data, from an explicit
   `FBXT_DOSTYPE` tag, or from the default fallback (`ID_DOS_DISK`).
 - The default volume-name fallback must not assume that `fs->devnode`
