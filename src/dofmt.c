@@ -139,6 +139,7 @@ static size_t lltoa(unsigned long long num, char *dst, unsigned base,
 #define FBXF_DOFMT_LONG        0x08
 #define FBXF_DOFMT_LONGLONG    0x10
 #define FBXF_DOFMT_SHORT       0x20
+#define FBXF_DOFMT_CHAR        0x40
 
 size_t FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 	size_t count = 0;
@@ -201,17 +202,23 @@ size_t FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 			} else if (ch == 'h') {
 				if ((ch = *fmt++) == '\0')
 					return count;
-				flags |= FBXF_DOFMT_SHORT;
+				if (ch == 'h') {
+					if ((ch = *fmt++) == '\0')
+						return count;
+					flags |= FBXF_DOFMT_CHAR;
+				} else {
+					flags |= FBXF_DOFMT_SHORT;
+				}
 			} else if (ch == 'l') {
 				if ((ch = *fmt++) == '\0')
 					return count;
 				if (ch == 'l') {
+					if ((ch = *fmt++) == '\0')
+						return count;
 					if (sizeof(long long) > sizeof(long))
 						flags |= FBXF_DOFMT_LONGLONG;
 					else
 						flags |= FBXF_DOFMT_LONG;
-					if ((ch = *fmt++) == '\0')
-						return count;
 				} else if (sizeof(long) > sizeof(int)) {
 					flags |= FBXF_DOFMT_LONG;
 				}
