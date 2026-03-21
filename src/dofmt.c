@@ -249,13 +249,13 @@ int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 			case 'P':
 			case 'p':
 				uppercase = (ch == 'P') ? TRUE : FALSE;
-				if (longlong)
+				if (sizeof(void *) == sizeof(long long))
 					len = lltoa(va_arg(arg, long long), tmp, 16, FALSE, FALSE, uppercase);
 				else
 					len = itoa(va_arg(arg, int), tmp, 16, FALSE, FALSE, uppercase);
 
 				src = tmp;
-				width = 8;
+				width = 2*sizeof(void *);
 				lead = '0';
 				if (width > len)
 					width -= len;
