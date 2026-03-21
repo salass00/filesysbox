@@ -10,11 +10,10 @@
 
 #include "filesysbox_internal.h"
 
-#ifdef __AROS__
-extern struct Library *SysBase;
-#endif
-
 void FreeFbxDirData(struct FbxLock *lock, struct FbxDirData *dd) {
+#ifdef __AROS__
+	extern struct Library *SysBase;
+#endif
 	if (dd != NULL) {
 		APTR pool = lock->mempool;
 

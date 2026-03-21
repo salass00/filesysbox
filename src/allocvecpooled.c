@@ -5,9 +5,9 @@
  * See the file LICENSE.APL
  */
 
+#ifndef __AROS__
 #include "filesysbox_internal.h"
 
-#ifndef __AROS__
 extern struct Library *SysBase;
 
 APTR AllocVecPooled(APTR mempool, ULONG size) {
@@ -30,5 +30,6 @@ void FreeVecPooled(APTR mempool, APTR ptr) {
 		FreePooled(mempool, pmem, sizeof(ULONG) + size);
 	}
 }
-#endif
+
+#endif /* __AROS__ */
 
