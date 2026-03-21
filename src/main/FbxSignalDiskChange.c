@@ -57,7 +57,7 @@ void FbxSignalDiskChange(
 #endif
 	struct Library *SysBase = fs->sysbase;
 
-	ADEBUGF("FbxSignalDiskChange(%#p)\n", fs);
+	ADEBUGF("FbxSignalDiskChange(%p)\n", fs);
 
 	fs->dosetup = TRUE;
 	Signal(&fs->thisproc->pr_Task, 1UL << fs->diskchangesig);

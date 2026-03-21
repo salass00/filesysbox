@@ -153,7 +153,7 @@ struct FbxFS *FbxSetupFS(
 	struct TagItem *tstate;
 	const struct TagItem *tag;
 
-	ADEBUGF("FbxSetupFS(%#p, %#p, %#p, %ld, %#p)\n", msg, tags, ops, opssize, udata);
+	ADEBUGF("FbxSetupFS(%p, %p, %p, %d, %p)\n", msg, tags, ops, opssize, udata);
 
 	fs = AllocFbxFS();
 	if (fs == NULL) goto error;
@@ -340,7 +340,7 @@ struct FbxFS *FbxSetupFS(
 	// reply startup packet with success
 	if (msg != NULL) FbxReturnMountMsg(msg, DOSTRUE, 0);
 
-	ADEBUGF("FbxSetupFS: DONE => %#p\n", fs);
+	ADEBUGF("FbxSetupFS: DONE => %p\n", fs);
 
 	return fs;
 

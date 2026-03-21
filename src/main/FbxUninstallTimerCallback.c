@@ -59,7 +59,7 @@ void FbxUninstallTimerCallback(
 	REG(a6, struct FileSysBoxBase *libBase))
 {
 #endif
-	ADEBUGF("FbxUninstallTimerCallback(%#p, %#p)\n", fs, cb);
+	ADEBUGF("FbxUninstallTimerCallback(%p, %p)\n", fs, cb);
 
 	if (fs != NULL && cb != NULL) {
 		struct Library *SysBase = fs->sysbase;

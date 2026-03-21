@@ -67,7 +67,7 @@ struct FbxTimerCallbackData *FbxInstallTimerCallback(
 #endif
 	struct FbxTimerCallbackData *cb = NULL;
 
-	ADEBUGF("FbxInstallTimerCallback(%#p, %#p, %lu)\n", fs, func, period);
+	ADEBUGF("FbxInstallTimerCallback(%p, %p, %u)\n", fs, func, period);
 
 	if (fs != NULL && func != NULL && period != 0) {
 		struct Library *SysBase = fs->sysbase;

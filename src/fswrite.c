@@ -13,7 +13,7 @@
 static int Fbx_write(struct FbxFS *fs, const char *path, const char *buf, size_t len,
 	QUAD offset, struct fuse_file_info *fi)
 {
-	ODEBUGF("Fbx_write(%p, '%s', %p, %lu, %lld, %p)\n", fs, path, buf, len, offset, fi);
+	ODEBUGF("Fbx_write(%p, '%s', %p, %zu, %lld, %p)\n", fs, path, buf, len, (long long)offset, fi);
 
 	return FSOP write(path, buf, len, offset, fi, &fs->fcntx);
 }

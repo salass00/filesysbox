@@ -78,7 +78,7 @@ LONG FbxEventLoop(
 #endif
 	LONG run = TRUE;
 
-	ADEBUGF("FbxEventLoop(%#p)\n", fs);
+	ADEBUGF("FbxEventLoop(%p)\n", fs);
 
 	fs->dosetup = TRUE;
 
@@ -191,7 +191,7 @@ static void FbxHandlePackets(struct FbxFS *fs) {
 	struct Message *msg;
 	struct DosPacket *pkt;
 
-	DEBUGF("FbxHandlePackets(%#p)\n", fs);
+	DEBUGF("FbxHandlePackets(%p)\n", fs);
 
 	while ((msg = GetMsg(fs->fsport)) != NULL) {
 		pkt = (struct DosPacket *)msg->mn_Node.ln_Name;
@@ -216,7 +216,7 @@ static void FbxHandleNotifyReplies(struct FbxFS *fs) {
 	struct NotifyMessage *nm;
 	struct NotifyRequest *nr;
 
-	NDEBUGF("FbxHandleNotifyReplies(%#p)\n", fs);
+	NDEBUGF("FbxHandleNotifyReplies(%p)\n", fs);
 
 	while ((nm = (struct NotifyMessage *)GetMsg(fs->notifyreplyport)) != NULL) {
 		nr = nm->nm_NReq;

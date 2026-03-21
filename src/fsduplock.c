@@ -11,7 +11,7 @@
 #include "filesysbox_internal.h"
 
 struct FbxLock *FbxDupLock(struct FbxFS *fs, struct FbxLock *lock) {
-	PDEBUGF("FbxDupLock(%#x)\n", lock);
+	PDEBUGF("FbxDupLock(%p, %p)\n", fs, lock);
 
 	CHECKVOLUME(NULL);
 

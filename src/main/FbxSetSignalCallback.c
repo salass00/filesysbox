@@ -62,7 +62,7 @@ void FbxSetSignalCallback(
 	REG(a6, struct FileSysBoxBase *libBase))
 {
 #endif
-	ADEBUGF("FbxSetSignalCallback(%#p, %#p, 0x%lx)\n", fs, func, signals);
+	ADEBUGF("FbxSetSignalCallback(%p, %p, %#x)\n", fs, func, signals);
 
 	if (fs != NULL) {
 		struct Library *SysBase = fs->sysbase;

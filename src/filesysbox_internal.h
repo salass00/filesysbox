@@ -179,6 +179,9 @@ typedef int (*fbx_putc_cb)(char ch, void *udata);
 
 int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg);
 
+#ifdef __GNUC__
+__attribute__((format(printf, 1, 2)))
+#endif
 int debugf(const char *fmt, ...);
 int vdebugf(const char *fmt, va_list args);
 

@@ -73,7 +73,7 @@ APTR FbxQueryMountMsg(
 	REG(a6, struct FileSysBoxBase *libBase))
 {
 #endif
-	ADEBUGF("FbxQueryMountMsg(%#p, %ld)\n", msg, attr);
+	ADEBUGF("FbxQueryMountMsg(%p, %d)\n", msg, attr);
 
 	struct DosPacket *pkt = (struct DosPacket *)msg->mn_Node.ln_Name;
 	struct DeviceNode *devnode = BADDR(pkt->dp_Arg3);

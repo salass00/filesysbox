@@ -134,7 +134,7 @@ static IPTR FbxHashPathInoNoCase(struct FbxFS *fs, const char *str) {
 	IPTR v = 0;
 	ULONG c;
 
-	DEBUGF("FbxHashPathInoNoCase(%#x, '%s')\n", fs, str);
+	DEBUGF("FbxHashPathInoNoCase(%p, '%s')\n", fs, str);
 
 	// get a small seed from number of characters
 	v = FbxCharCount(fs, str);
@@ -369,7 +369,7 @@ int FbxFuseErrno2Error(int error) {
 	case ENOTEMPTY: /* Directory not empty */       return ERROR_DIRECTORY_NOT_EMPTY;
 	case EOPNOTSUPP: /* Operation not supported on socket */ return ERROR_ACTION_NOT_KNOWN;
 	default:     
-		debugf("FbxFuseErrno2Error: unknown fuse error %ld\n", error);
+		debugf("FbxFuseErrno2Error: unknown fuse error %d\n", error);
 		return -1;
 	}
 }
@@ -382,7 +382,7 @@ struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int type, QUA
 	struct Library *SysBase = fs->sysbase;
 	struct FbxEntry *e;
 
-	DEBUGF("FbxSetupEntry(%p, '%s', %d, 0x%llx)\n", fs, path, type, id);
+	DEBUGF("FbxSetupEntry(%p, '%s', %d, 0x%llx)\n", fs, path, type, (long long)id);
 
 	e = AllocFbxEntry(fs);
 	if (e == NULL) {

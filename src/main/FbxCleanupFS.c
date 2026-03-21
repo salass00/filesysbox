@@ -57,7 +57,7 @@ void FbxCleanupFS(
 	REG(a6, struct FileSysBoxBase *libBase))
 {
 #endif
-	ADEBUGF("FbxCleanupFS(%#p)\n", fs);
+	ADEBUGF("FbxCleanupFS(%p)\n", fs);
 
 	if (fs != NULL) {
 		struct Library *SysBase = fs->sysbase;

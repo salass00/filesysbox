@@ -42,7 +42,7 @@ int FbxSetProtection(struct FbxFS *fs, struct FbxLock *lock, const char *name, U
 	char fsname[FBX_MAX_NAME];
 #endif
 
-	PDEBUGF("FbxSetProtection(%p, %p, '%s', %#lx)\n", fs, lock, name, prot);
+	PDEBUGF("FbxSetProtection(%p, %p, '%s', %#x)\n", fs, lock, name, prot);
 
 	CHECKVOLUME(DOSFALSE);
 	CHECKWRITABLE(DOSFALSE);

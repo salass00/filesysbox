@@ -19,7 +19,7 @@ QUAD FbxDoPacket64(struct FbxFS *fs, struct DosPacket64 *pkt) {
 
 #ifndef NODEBUG
 	struct Task *callertask = pkt->dp_Port->mp_SigTask;
-	PDEBUGF("action %ld task %p '%s'\n", pkt->dp_Type, callertask, callertask->tc_Node.ln_Name);
+	PDEBUGF("action %d task %p '%s'\n", pkt->dp_Type, callertask, callertask->tc_Node.ln_Name);
 #endif
 
 	type = pkt->dp_Type;

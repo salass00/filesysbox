@@ -46,7 +46,7 @@ int FbxExamineAllEnd(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR 
 	struct Library *SysBase = fs->sysbase;
 	struct FbxExAllState *exallstate;
 
-	PDEBUGF("FbxExamineAllEnd(%p, %p, %p, %d, %d, %p)\n", fs, lock, buffer, len, type, ctrl);
+	PDEBUGF("FbxExamineAllEnd(%p, %p, %p, %zd, %d, %p)\n", fs, lock, buffer, len, type, ctrl);
 
 	if (ctrl != NULL) {
 		exallstate = (struct FbxExAllState *)ctrl->eac_LastKey;

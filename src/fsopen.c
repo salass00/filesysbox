@@ -22,14 +22,14 @@ static int Fbx_create(struct FbxFS *fs, const char *path, mode_t mode, struct fu
 
 static int Fbx_mknod(struct FbxFS *fs, const char *path, mode_t mode, dev_t dev)
 {
-	ODEBUGF("Fbx_mknod(%p, '%s', 0%o, %#x)\n", fs, path, mode, dev);
+	ODEBUGF("Fbx_mknod(%p, '%s', 0%o, %#lx)\n", fs, path, mode, (unsigned long)dev);
 
 	return FSOP mknod(path, mode, dev, &fs->fcntx);
 }
 
 static int Fbx_truncate(struct FbxFS *fs, const char *path, QUAD size)
 {
-	ODEBUGF("Fbx_truncate(%p, '%s', %lld)\n", fs, path, size);
+	ODEBUGF("Fbx_truncate(%p, '%s', %lld)\n", fs, path, (long long)size);
 
 	return FSOP truncate(path, size, &fs->fcntx);
 }

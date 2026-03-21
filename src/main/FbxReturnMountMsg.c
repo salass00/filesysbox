@@ -63,7 +63,7 @@ void FbxReturnMountMsg(
 #endif
 	struct Library   *DOSBase   = libBase->dosbase;
 
-	ADEBUGF("FbxReturnMountMsg(%#p, %#p, %#p)\n", msg, (APTR)r1, (APTR)r2);
+	ADEBUGF("FbxReturnMountMsg(%p, %p, %p)\n", msg, (APTR)r1, (APTR)r2);
 
 	if (msg != NULL)
 	{

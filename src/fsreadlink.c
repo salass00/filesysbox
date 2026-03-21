@@ -14,7 +14,7 @@
 
 static int Fbx_readlink(struct FbxFS *fs, const char *path, char *buf, size_t buflen)
 {
-	ODEBUGF("Fbx_readlink(%p, '%s', %p, %lu)\n", fs, path, buf, buflen);
+	ODEBUGF("Fbx_readlink(%p, '%s', %p, %zu)\n", fs, path, buf, buflen);
 
 	return FSOP readlink(path, buf, buflen, &fs->fcntx);
 }
