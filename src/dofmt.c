@@ -194,7 +194,7 @@ int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 					return count;
 				if (sizeof(size_t) == sizeof(long long))
 					longlong = TRUE;
-				else if (sizeof(size_t) > sizeof(int))
+				else if (sizeof(size_t) == sizeof(long) && sizeof(long) > sizeof(int))
 					longint = TRUE;
 			} else if (ch == 'l' || ch == 'h') {
 				if ((ch = *fmt++) == '\0')
@@ -305,7 +305,7 @@ int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 				uppercase = (ch == 'P') ? TRUE : FALSE;
 				if (sizeof(void *) == sizeof(long long))
 					len = lltoa(va_arg(arg, long long), tmp, 16, FALSE, FALSE, uppercase);
-				else if (sizeof(void *) == sizeof(long))
+				else if (sizeof(void *) == sizeof(long) && sizeof(long) > sizeof(int))
 					len = ltoa(va_arg(arg, long), tmp, 16, FALSE, FALSE, uppercase);
 				else
 					len = itoa(va_arg(arg, int), tmp, 16, FALSE, FALSE, uppercase);
