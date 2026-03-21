@@ -16,7 +16,7 @@ void __KPutChar(__reg("d0") LONG, __reg("a6") struct Library *)="\tjsr\t-516(a6)
 #include <clib/debug_protos.h>
 #endif
 
-int debug_putc_cb(char ch, void *udata) {
+static int debug_putc_cb(char ch, void *udata) {
 #ifdef __AROS__
 	struct Library *SysBase = udata;
 	RawPutChar(ch);

@@ -172,9 +172,9 @@ struct FileSysBoxBase {
 
 #else
 
-typedef int (*fbx_putc_cb)(char ch, void *udata);
+typedef int (*FbxPutCFunc)(char ch, void *udata);
 
-size_t FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg);
+size_t FbxDoFmt(FbxPutCFunc cb, void *cb_data, const char *fmt, va_list arg);
 
 #ifdef __GNUC__
 __attribute__((format(printf, 1, 2)))

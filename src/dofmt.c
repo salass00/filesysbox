@@ -141,7 +141,7 @@ static size_t lltoa(unsigned long long num, char *dst, unsigned base,
 #define FBXF_DOFMT_SHORT       0x20
 #define FBXF_DOFMT_CHAR        0x40
 
-size_t FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
+size_t FbxDoFmt(FbxPutCFunc cb, void *cb_data, const char *fmt, va_list arg) {
 	size_t count = 0;
 	char ch;
 
