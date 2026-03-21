@@ -263,14 +263,13 @@ size_t FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 				case 'U':
 				case 'u':
 				{
-					BOOL addplus = (flags & FBXF_DOFMT_ADDPLUS) ? TRUE : FALSE;
 					BOOL uppercase = (ch == 'X') ? TRUE : FALSE;
 					if (flags & FBXF_DOFMT_LONGLONG)
-						len = lltoa(va_arg(arg, long long), tmp, 10, FALSE, addplus, uppercase);
+						len = lltoa(va_arg(arg, long long), tmp, 10, FALSE, FALSE, uppercase);
 					else if (flags & FBXF_DOFMT_LONG)
-						len = ltoa(va_arg(arg, long), tmp, 10, FALSE, addplus, uppercase);
+						len = ltoa(va_arg(arg, long), tmp, 10, FALSE, FALSE, uppercase);
 					else
-						len = itoa(va_arg(arg, int), tmp, 10, FALSE, addplus, uppercase);
+						len = itoa(va_arg(arg, int), tmp, 10, FALSE, FALSE, uppercase);
 
 					src = tmp;
 					if (width > len)
@@ -293,14 +292,13 @@ size_t FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 				case 'O':
 				case 'o':
 				{
-					BOOL addplus = (flags & FBXF_DOFMT_ADDPLUS) ? TRUE : FALSE;
 					BOOL uppercase = (ch == 'O') ? TRUE : FALSE;
 					if (flags & FBXF_DOFMT_LONGLONG)
-						len = lltoa(va_arg(arg, long long), tmp, 8, FALSE, addplus, uppercase);
+						len = lltoa(va_arg(arg, long long), tmp, 8, FALSE, FALSE, uppercase);
 					else if (flags & FBXF_DOFMT_LONG)
-						len = ltoa(va_arg(arg, long), tmp, 8, FALSE, addplus, uppercase);
+						len = ltoa(va_arg(arg, long), tmp, 8, FALSE, FALSE, uppercase);
 					else
-						len = itoa(va_arg(arg, int), tmp, 8, FALSE, addplus, uppercase);
+						len = itoa(va_arg(arg, int), tmp, 8, FALSE, FALSE, uppercase);
 
 					src = tmp;
 					if (width > len)
@@ -327,14 +325,13 @@ size_t FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 				case 'X':
 				case 'x':
 				{
-					BOOL addplus = (flags & FBXF_DOFMT_ADDPLUS) ? TRUE : FALSE;
 					BOOL uppercase = (ch == 'X') ? TRUE : FALSE;
 					if (flags & FBXF_DOFMT_LONGLONG)
-						len = lltoa(va_arg(arg, long long), tmp, 16, FALSE, addplus, uppercase);
+						len = lltoa(va_arg(arg, long long), tmp, 16, FALSE, FALSE, uppercase);
 					else if (flags & FBXF_DOFMT_LONG)
-						len = ltoa(va_arg(arg, long), tmp, 16, FALSE, addplus, uppercase);
+						len = ltoa(va_arg(arg, long), tmp, 16, FALSE, FALSE, uppercase);
 					else
-						len = itoa(va_arg(arg, int), tmp, 16, FALSE, addplus, uppercase);
+						len = itoa(va_arg(arg, int), tmp, 16, FALSE, FALSE, uppercase);
 
 					src = tmp;
 					if (width > len)
