@@ -23,7 +23,6 @@ static void reverse(char *str, size_t len) {
 	}
 }
 
-
 static size_t itoa(unsigned num, char *dst, unsigned base,
 	char issigned, char addplus, char uppercase)
 {
@@ -38,6 +37,40 @@ static size_t itoa(unsigned num, char *dst, unsigned base,
 	}
 
 	if (issigned && (int)num < 0 && base == 10) {
+		negative = TRUE;
+		num = -num;
+	}
+
+	while (num != 0) {
+		unsigned rem = num % base;
+		num /= base;
+		*d++ = (rem > 9) ? (rem - 10 + a) : (rem + '0');
+	}
+
+	if (negative)
+		*d++ = '-';
+	else if (addplus)
+		*d++ = '+';
+
+	len = d - dst;
+	reverse(dst, len);
+	return len;
+}
+
+static size_t ltoa(unsigned long num, char *dst, unsigned base,
+	char issigned, char addplus, char uppercase)
+{
+	char a = uppercase ? 'A' : 'a';
+	char negative = FALSE;
+	char *d = dst;
+	size_t len;
+
+	if (num == 0) {
+		*d++ = '0';
+		return d - dst;
+	}
+
+	if (issigned && (long)num < 0 && base == 10) {
 		negative = TRUE;
 		num = -num;
 	}
@@ -114,6 +147,7 @@ int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 			char lead = ' ';
 			size_t width = 0;
 			size_t limit = 0;
+			char longint = FALSE;
 			char longlong = FALSE;
 			char uppercase;
 			char tmp[128];
@@ -160,6 +194,8 @@ int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 					return count;
 				if (sizeof(size_t) == sizeof(long long))
 					longlong = TRUE;
+				else if (sizeof(size_t) > sizeof(int))
+					longint = TRUE;
 			} else if (ch == 'l' || ch == 'h') {
 				if ((ch = *fmt++) == '\0')
 					return count;
@@ -167,6 +203,8 @@ int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 					longlong = TRUE;
 					if ((ch = *fmt++) == '\0')
 						return count;
+				} else if (sizeof(long) > sizeof(int)) {
+					longint = TRUE;
 				}
 			}
 
@@ -181,6 +219,8 @@ int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 				uppercase = (ch == 'D' || ch == 'I') ? TRUE : FALSE;
 				if (longlong)
 					len = lltoa(va_arg(arg, long long), tmp, 10, TRUE, addplus, uppercase);
+				else if (longint)
+					len = ltoa(va_arg(arg, long), tmp, 10, TRUE, addplus, uppercase);
 				else
 					len = itoa(va_arg(arg, int), tmp, 10, TRUE, addplus, uppercase);
 
@@ -206,6 +246,8 @@ int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 				uppercase = (ch == 'X') ? TRUE : FALSE;
 				if (longlong)
 					len = lltoa(va_arg(arg, long long), tmp, 10, FALSE, addplus, uppercase);
+				else if (longint)
+					len = ltoa(va_arg(arg, long), tmp, 10, FALSE, addplus, uppercase);
 				else
 					len = itoa(va_arg(arg, int), tmp, 10, FALSE, addplus, uppercase);
 
@@ -231,6 +273,8 @@ int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 				uppercase = (ch == 'X') ? TRUE : FALSE;
 				if (longlong)
 					len = lltoa(va_arg(arg, long long), tmp, 16, FALSE, addplus, uppercase);
+				else if (longint)
+					len = ltoa(va_arg(arg, long), tmp, 16, FALSE, addplus, uppercase);
 				else
 					len = itoa(va_arg(arg, int), tmp, 16, FALSE, addplus, uppercase);
 
@@ -261,6 +305,8 @@ int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 				uppercase = (ch == 'P') ? TRUE : FALSE;
 				if (sizeof(void *) == sizeof(long long))
 					len = lltoa(va_arg(arg, long long), tmp, 16, FALSE, FALSE, uppercase);
+				else if (sizeof(void *) == sizeof(long))
+					len = ltoa(va_arg(arg, long), tmp, 16, FALSE, FALSE, uppercase);
 				else
 					len = itoa(va_arg(arg, int), tmp, 16, FALSE, FALSE, uppercase);
 
