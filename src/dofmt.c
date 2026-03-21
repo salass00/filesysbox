@@ -155,7 +155,12 @@ int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 				}
 			}
 
-			if (ch == 'l' || ch == 'h') {
+			if (ch == 'z') {
+				if ((ch = *fmt++) == '\0')
+					return count;
+				if (sizeof(size_t) == sizeof(long long))
+					longlong = TRUE;
+			} else if (ch == 'l' || ch == 'h') {
 				if ((ch = *fmt++) == '\0')
 					return count;
 				if (ch == 'l') {
