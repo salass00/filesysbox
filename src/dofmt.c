@@ -271,6 +271,37 @@ size_t FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 					while (width--)
 						PUTC(' ');
 				break;
+			case 'O':
+			case 'o':
+				uppercase = (ch == 'O') ? TRUE : FALSE;
+				if (longlong)
+					len = lltoa(va_arg(arg, long long), tmp, 8, FALSE, addplus, uppercase);
+				else if (longint)
+					len = ltoa(va_arg(arg, long), tmp, 8, FALSE, addplus, uppercase);
+				else
+					len = itoa(va_arg(arg, int), tmp, 8, FALSE, addplus, uppercase);
+
+				src = tmp;
+				if (width > len)
+					width -= len;
+				else
+					width = 0;
+
+				if (alternate && tmp[0] != '0') {
+					PUTC('0');
+				}
+
+				if (!left)
+					while (width--)
+						PUTC(lead);
+
+				while (len--)
+					PUTC(*src++);
+
+				if (left)
+					while (width--)
+						PUTC(' ');
+				break;
 			case 'X':
 			case 'x':
 				uppercase = (ch == 'X') ? TRUE : FALSE;
