@@ -262,10 +262,8 @@ int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 				else
 					width = 0;
 
-				if (alternate && tmp[0] != '0') {
-					PUTC('0');
-					PUTC('x');
-				}
+				PUTC('0');
+				PUTC('x');
 
 				while (width--)
 					PUTC(lead);
