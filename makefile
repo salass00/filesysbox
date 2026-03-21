@@ -71,7 +71,7 @@ SRCS = $(addprefix src/, \
        fsreadlink.c fsrelabel.c fsremovenotify.c fsrename.c fssamelock.c fsseek.c \
        fssetcomment.c fssetdate.c fssetfilesize.c fssetownerinfo.c fssetprotection.c \
        fsunlock.c fswrite.c fswriteprotect.c volume.c xattrs.c utf8.c ucs4.c \
-       strlcpy.c debugf.c dofmt.c allocvecpooled.c codesets.c avl.c stackswap.c)
+       strlcpy.c debugprintf.c dofmt.c allocvecpooled.c codesets.c avl.c stackswap.c)
 
 ifeq ($(HOST),m68k-amigaos)
 	SRCS += src/m68k/stackswap.c

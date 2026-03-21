@@ -133,9 +133,9 @@ static size_t lltoa(unsigned long long num, char *dst, unsigned base,
 			return -1; \
 	} while (0)
 
-int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
+size_t FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
+	size_t count = 0;
 	char ch;
-	int count = 0;
 
 	while ((ch = *fmt++) != '\0') {
 		if (ch != '%') {

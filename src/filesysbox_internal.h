@@ -161,9 +161,6 @@ struct FileSysBoxBase {
 
 #ifdef NODEBUG
 
-#define debugf(...)
-#define vdebugf(fmt,args)
-
 #define DEBUGF(...)
 #define ADEBUGF(...)
 #define PDEBUGF(...)
@@ -177,68 +174,67 @@ struct FileSysBoxBase {
 
 typedef int (*fbx_putc_cb)(char ch, void *udata);
 
-int FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg);
+size_t FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg);
 
 #ifdef __GNUC__
 __attribute__((format(printf, 1, 2)))
 #endif
-int debugf(const char *fmt, ...);
-int vdebugf(const char *fmt, va_list args);
+size_t FbxDebugPrintf(const char *fmt, ...);
 
 // general debug
 #ifdef DEBUG
-#define DEBUGF(...) debugf("fbx: " __VA_ARGS__)
+#define DEBUGF(...) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #else
-#define DEBUGF(...) if (fs->dbgflags & FBXDF_GENERAL) debugf("fbx: " __VA_ARGS__)
+#define DEBUGF(...) if (fs->dbgflags & FBXDF_GENERAL) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #endif
 
 // API debug
 #ifdef ADEBUG
-#define ADEBUGF(...) debugf("fbx: " __VA_ARGS__)
+#define ADEBUGF(...) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #else
 #define ADEBUGF(...) /* fs not always available.. */
 #endif
 
 // Packet debug
 #ifdef PDEBUG
-#define PDEBUGF(...) debugf("fbx: " __VA_ARGS__)
+#define PDEBUGF(...) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #else
-#define PDEBUGF(...) if (fs->dbgflags & FBXDF_PACKETS) debugf("fbx: " __VA_ARGS__)
+#define PDEBUGF(...) if (fs->dbgflags & FBXDF_PACKETS) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #endif
 
 // Notify debug
 #ifdef NDEBUG
-#define NDEBUGF(...) debugf("fbx: " __VA_ARGS__)
+#define NDEBUGF(...) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #else
-#define NDEBUGF(...) if (fs->dbgflags & FBXDF_NOTIFY) debugf("fbx: " __VA_ARGS__)
+#define NDEBUGF(...) if (fs->dbgflags & FBXDF_NOTIFY) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #endif
 
 // Resolve debug
 #ifdef RDEBUG
-#define RDEBUGF(...) debugf("fbx: " __VA_ARGS__)
+#define RDEBUGF(...) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #else
-#define RDEBUGF(...) if (fs->dbgflags & FBXDF_RESOLVE) debugf("fbx: " __VA_ARGS__)
+#define RDEBUGF(...) if (fs->dbgflags & FBXDF_RESOLVE) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #endif
 
 // Dir debug
 #ifdef DIRDEBUG
-#define DIRDEBUGF(...) debugf("fbx: " __VA_ARGS__)
+#define DIRDEBUGF(...) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #else
-#define DIRDEBUGF(...) if (fs->dbgflags & FBXDF_DIR) debugf("fbx: " __VA_ARGS__)
+#define DIRDEBUGF(...) if (fs->dbgflags & FBXDF_DIR) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #endif
 
 // Character conversion debug
 #ifdef CDEBUG
-#define CDEBUGF(...) debugf("fbx: " __VA_ARGS__)
+#define CDEBUGF(...) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #else
-#define CDEBUGF(...) if (fs->dbgflags & FBXDF_CCONV) debugf("fbx: " __VA_ARGS__)
+#define CDEBUGF(...) if (fs->dbgflags & FBXDF_CCONV) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #endif
 
 // FS Operations debug
 #ifdef ODEBUG
-#define ODEBUGF(...) debugf("fbx: " __VA_ARGS__)
+#define ODEBUGF(...) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #else
-#define ODEBUGF(...) if (fs->dbgflags & FBXDF_FSOPS) debugf("fbx: " __VA_ARGS__)
+#define ODEBUGF(...) if (fs->dbgflags & FBXDF_FSOPS) FbxDebugPrintf("fbx: " __VA_ARGS__)
 #endif
 
 #endif /* NODEBUG */

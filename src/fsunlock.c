@@ -16,7 +16,7 @@ int FbxUnLockObject(struct FbxFS *fs, struct FbxLock *lock) {
 	PDEBUGF("FbxUnLockObject(%p, %p)\n", fs, lock);
 
 	if (lock == NULL) {
-		debugf("FbxUnLockObject got a NULL lock, btw.\n");
+		DEBUGF("FbxUnLockObject got a NULL lock, btw.\n");
 		fs->r2 = 0;
 		return DOSTRUE;
 	}

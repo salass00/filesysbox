@@ -40,7 +40,7 @@ int FbxCloseFile(struct FbxFS *fs, struct FbxLock *lock) {
 
 	if (lock->fh == NULL) {
 		// this lock should be ended with FbxUnLockObject()
-		debugf("FbxCloseFile: lock %p was never opened!\n", lock);
+		DEBUGF("FbxCloseFile: lock %p was never opened!\n", lock);
 		fs->r2 = ERROR_INVALID_LOCK;
 		return DOSFALSE;
 	}

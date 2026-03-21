@@ -36,17 +36,17 @@ int debug_putc_cb(char ch, void *udata) {
 	return 0;
 }
 
-int vdebugf(const char *fmt, va_list args) {
+size_t FbxDebugPrintf(const char *fmt, ...) {
 	extern struct Library *SysBase;
-	return FbxDoFmt(debug_putc_cb, SysBase, fmt, args);
-}
-
-int debugf(const char *fmt, ...) {
+	size_t retval;
 	va_list ap;
+
 	va_start(ap, fmt);
-	int retval = vdebugf(fmt, ap);
+	retval = FbxDoFmt(debug_putc_cb, SysBase, fmt, ap);
 	va_end(ap);
+
 	return retval;
 }
+
 #endif /* !NODEBUG */
 

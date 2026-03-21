@@ -78,7 +78,7 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 	initret = Fbx_init(fs, conn);
 	if (initret == (APTR)-2) {
 		// error setting up resources for accessing volume
-		debugf("fbx fs failed to open resources for volume\n");
+		DEBUGF("fbx fs failed to open resources for volume\n");
 		return fs->currvol = (APTR)-2;
 	} else if (initret == (APTR)-1) {
 		// broken on-disk layout (or not formatted)

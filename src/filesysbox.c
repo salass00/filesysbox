@@ -369,7 +369,7 @@ int FbxFuseErrno2Error(int error) {
 	case ENOTEMPTY: /* Directory not empty */       return ERROR_DIRECTORY_NOT_EMPTY;
 	case EOPNOTSUPP: /* Operation not supported on socket */ return ERROR_ACTION_NOT_KNOWN;
 	default:     
-		debugf("FbxFuseErrno2Error: unknown fuse error %d\n", error);
+		ADEBUGF("FbxFuseErrno2Error: unknown fuse error %d\n", error);
 		return -1;
 	}
 }
