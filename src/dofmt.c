@@ -24,7 +24,7 @@ static void reverse(char *str, size_t len) {
 }
 
 static size_t itoa(unsigned num, char *dst, unsigned base,
-	char issigned, char addplus, char uppercase)
+	BOOL issigned, BOOL addplus, BOOL uppercase)
 {
 	char a = uppercase ? 'A' : 'a';
 	char negative = FALSE;
@@ -58,7 +58,7 @@ static size_t itoa(unsigned num, char *dst, unsigned base,
 }
 
 static size_t ltoa(unsigned long num, char *dst, unsigned base,
-	char issigned, char addplus, char uppercase)
+	BOOL issigned, BOOL addplus, BOOL uppercase)
 {
 	char a = uppercase ? 'A' : 'a';
 	char negative = FALSE;
@@ -92,7 +92,7 @@ static size_t ltoa(unsigned long num, char *dst, unsigned base,
 }
 
 static size_t lltoa(unsigned long long num, char *dst, unsigned base,
-	char issigned, char addplus, char uppercase)
+	BOOL issigned, BOOL addplus, BOOL uppercase)
 {
 	char a = uppercase ? 'A' : 'a';
 	char negative = FALSE;
@@ -133,6 +133,12 @@ static size_t lltoa(unsigned long long num, char *dst, unsigned base,
 			return -1; \
 	} while (0)
 
+#define FBXF_DOFMT_LEFTJUSTIFY 0x01
+#define FBXF_DOFMT_ADDPLUS     0x02
+#define FBXF_DOFMT_ALTERNATE   0x04
+#define FBXF_DOFMT_LONG        0x08
+#define FBXF_DOFMT_LONGLONG    0x10
+
 size_t FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 	size_t count = 0;
 	char ch;
@@ -141,15 +147,10 @@ size_t FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 		if (ch != '%') {
 			PUTC(ch);
 		} else {
-			char left = FALSE;
-			char addplus = FALSE;
-			char alternate = FALSE;
+			unsigned int flags = 0;
 			char lead = ' ';
 			size_t width = 0;
 			size_t limit = 0;
-			char longint = FALSE;
-			char longlong = FALSE;
-			char uppercase;
 			char tmp[128];
 			const char *src;
 			size_t len;
@@ -159,11 +160,11 @@ size_t FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 
 			while (TRUE) {
 				if (ch == '-')
-					left = TRUE;
+					flags |= FBXF_DOFMT_LEFTJUSTIFY;
 				else if (ch == '+')
-					addplus = TRUE;
+					flags |= FBXF_DOFMT_ADDPLUS;
 				else if (ch == '#')
-					alternate = TRUE;
+					flags |= FBXF_DOFMT_ALTERNATE;
 				else if (ch == '0')
 					lead = '0';
 				else
@@ -193,201 +194,215 @@ size_t FbxDoFmt(fbx_putc_cb cb, void *cb_data, const char *fmt, va_list arg) {
 				if ((ch = *fmt++) == '\0')
 					return count;
 				if (sizeof(size_t) == sizeof(long long) && sizeof(long long) > sizeof(long))
-					longlong = TRUE;
+					flags |= FBXF_DOFMT_LONGLONG;
 				else if (sizeof(size_t) == sizeof(long) && sizeof(long) > sizeof(int))
-					longint = TRUE;
+					flags |= FBXF_DOFMT_LONG;
 			} else if (ch == 'l' || ch == 'h') {
 				if ((ch = *fmt++) == '\0')
 					return count;
 				if (ch == 'l') {
 					if (sizeof(long long) > sizeof(long))
-						longlong = TRUE;
+						flags |= FBXF_DOFMT_LONGLONG;
 					else
-						longint = TRUE;
+						flags |= FBXF_DOFMT_LONG;
 					if ((ch = *fmt++) == '\0')
 						return count;
 				} else if (sizeof(long) > sizeof(int)) {
-					longint = TRUE;
+					flags |= FBXF_DOFMT_LONG;
 				}
 			}
 
 			switch (ch) {
-			case '%':
-				PUTC('%');
-				break;
-			case 'D':
-			case 'd':
-			case 'I':
-			case 'i':
-				uppercase = (ch == 'D' || ch == 'I') ? TRUE : FALSE;
-				if (longlong)
-					len = lltoa(va_arg(arg, long long), tmp, 10, TRUE, addplus, uppercase);
-				else if (longint)
-					len = ltoa(va_arg(arg, long), tmp, 10, TRUE, addplus, uppercase);
-				else
-					len = itoa(va_arg(arg, int), tmp, 10, TRUE, addplus, uppercase);
+				case '%':
+					PUTC('%');
+					break;
+				case 'D':
+				case 'd':
+				case 'I':
+				case 'i':
+				{
+					BOOL addplus = (flags & FBXF_DOFMT_ADDPLUS) ? TRUE : FALSE;
+					BOOL uppercase = (ch == 'D' || ch == 'I') ? TRUE : FALSE;
+					if (flags & FBXF_DOFMT_LONGLONG)
+						len = lltoa(va_arg(arg, long long), tmp, 10, TRUE, addplus, uppercase);
+					else if (flags & FBXF_DOFMT_LONG)
+						len = ltoa(va_arg(arg, long), tmp, 10, TRUE, addplus, uppercase);
+					else
+						len = itoa(va_arg(arg, int), tmp, 10, TRUE, addplus, uppercase);
 
-				src = tmp;
-				if (width > len)
-					width -= len;
-				else
-					width = 0;
+					src = tmp;
+					if (width > len)
+						width -= len;
+					else
+						width = 0;
 
-				if (!left)
-					while (width--)
-						PUTC(lead);
+					if ((flags & FBXF_DOFMT_LEFTJUSTIFY) == 0)
+						while (width--)
+							PUTC(lead);
 
-				while (len--)
-					PUTC(*src++);
+					while (len--)
+						PUTC(*src++);
 
-				if (left)
-					while (width--)
-						PUTC(' ');
-				break;
-			case 'U':
-			case 'u':
-				uppercase = (ch == 'X') ? TRUE : FALSE;
-				if (longlong)
-					len = lltoa(va_arg(arg, long long), tmp, 10, FALSE, addplus, uppercase);
-				else if (longint)
-					len = ltoa(va_arg(arg, long), tmp, 10, FALSE, addplus, uppercase);
-				else
-					len = itoa(va_arg(arg, int), tmp, 10, FALSE, addplus, uppercase);
-
-				src = tmp;
-				if (width > len)
-					width -= len;
-				else
-					width = 0;
-
-				if (!left)
-					while (width--)
-						PUTC(lead);
-
-				while (len--)
-					PUTC(*src++);
-
-				if (left)
-					while (width--)
-						PUTC(' ');
-				break;
-			case 'O':
-			case 'o':
-				uppercase = (ch == 'O') ? TRUE : FALSE;
-				if (longlong)
-					len = lltoa(va_arg(arg, long long), tmp, 8, FALSE, addplus, uppercase);
-				else if (longint)
-					len = ltoa(va_arg(arg, long), tmp, 8, FALSE, addplus, uppercase);
-				else
-					len = itoa(va_arg(arg, int), tmp, 8, FALSE, addplus, uppercase);
-
-				src = tmp;
-				if (width > len)
-					width -= len;
-				else
-					width = 0;
-
-				if (alternate && tmp[0] != '0') {
-					PUTC('0');
+					if ((flags & FBXF_DOFMT_LEFTJUSTIFY) != 0)
+						while (width--)
+							PUTC(' ');
+					break;
 				}
+				case 'U':
+				case 'u':
+				{
+					BOOL addplus = (flags & FBXF_DOFMT_ADDPLUS) ? TRUE : FALSE;
+					BOOL uppercase = (ch == 'X') ? TRUE : FALSE;
+					if (flags & FBXF_DOFMT_LONGLONG)
+						len = lltoa(va_arg(arg, long long), tmp, 10, FALSE, addplus, uppercase);
+					else if (flags & FBXF_DOFMT_LONG)
+						len = ltoa(va_arg(arg, long), tmp, 10, FALSE, addplus, uppercase);
+					else
+						len = itoa(va_arg(arg, int), tmp, 10, FALSE, addplus, uppercase);
 
-				if (!left)
-					while (width--)
-						PUTC(lead);
+					src = tmp;
+					if (width > len)
+						width -= len;
+					else
+						width = 0;
 
-				while (len--)
-					PUTC(*src++);
+					if ((flags & FBXF_DOFMT_LEFTJUSTIFY) == 0)
+						while (width--)
+							PUTC(lead);
 
-				if (left)
-					while (width--)
-						PUTC(' ');
-				break;
-			case 'X':
-			case 'x':
-				uppercase = (ch == 'X') ? TRUE : FALSE;
-				if (longlong)
-					len = lltoa(va_arg(arg, long long), tmp, 16, FALSE, addplus, uppercase);
-				else if (longint)
-					len = ltoa(va_arg(arg, long), tmp, 16, FALSE, addplus, uppercase);
-				else
-					len = itoa(va_arg(arg, int), tmp, 16, FALSE, addplus, uppercase);
+					while (len--)
+						PUTC(*src++);
 
-				src = tmp;
-				if (width > len)
-					width -= len;
-				else
-					width = 0;
+					if ((flags & FBXF_DOFMT_LEFTJUSTIFY) != 0)
+						while (width--)
+							PUTC(' ');
+					break;
+				}
+				case 'O':
+				case 'o':
+				{
+					BOOL addplus = (flags & FBXF_DOFMT_ADDPLUS) ? TRUE : FALSE;
+					BOOL uppercase = (ch == 'O') ? TRUE : FALSE;
+					if (flags & FBXF_DOFMT_LONGLONG)
+						len = lltoa(va_arg(arg, long long), tmp, 8, FALSE, addplus, uppercase);
+					else if (flags & FBXF_DOFMT_LONG)
+						len = ltoa(va_arg(arg, long), tmp, 8, FALSE, addplus, uppercase);
+					else
+						len = itoa(va_arg(arg, int), tmp, 8, FALSE, addplus, uppercase);
 
-				if (alternate && tmp[0] != '0') {
+					src = tmp;
+					if (width > len)
+						width -= len;
+					else
+						width = 0;
+
+					if ((flags & FBXF_DOFMT_ALTERNATE) && tmp[0] != '0') {
+						PUTC('0');
+					}
+
+					if ((flags & FBXF_DOFMT_LEFTJUSTIFY) == 0)
+						while (width--)
+							PUTC(lead);
+
+					while (len--)
+						PUTC(*src++);
+
+					if ((flags & FBXF_DOFMT_LEFTJUSTIFY) != 0)
+						while (width--)
+							PUTC(' ');
+					break;
+				}
+				case 'X':
+				case 'x':
+				{
+					BOOL addplus = (flags & FBXF_DOFMT_ADDPLUS) ? TRUE : FALSE;
+					BOOL uppercase = (ch == 'X') ? TRUE : FALSE;
+					if (flags & FBXF_DOFMT_LONGLONG)
+						len = lltoa(va_arg(arg, long long), tmp, 16, FALSE, addplus, uppercase);
+					else if (flags & FBXF_DOFMT_LONG)
+						len = ltoa(va_arg(arg, long), tmp, 16, FALSE, addplus, uppercase);
+					else
+						len = itoa(va_arg(arg, int), tmp, 16, FALSE, addplus, uppercase);
+
+					src = tmp;
+					if (width > len)
+						width -= len;
+					else
+						width = 0;
+
+					if ((flags & FBXF_DOFMT_ALTERNATE) && tmp[0] != '0') {
+						PUTC('0');
+						PUTC('x');
+					}
+
+					if ((flags & FBXF_DOFMT_LEFTJUSTIFY) == 0)
+						while (width--)
+							PUTC(lead);
+
+					while (len--)
+						PUTC(*src++);
+
+					if ((flags & FBXF_DOFMT_LEFTJUSTIFY) != 0)
+						while (width--)
+							PUTC(' ');
+					break;
+				}
+				case 'P':
+				case 'p':
+				{
+					BOOL uppercase = (ch == 'P') ? TRUE : FALSE;
+					if (sizeof(void *) == sizeof(long long) && sizeof(long long) > sizeof(long))
+						len = lltoa(va_arg(arg, long long), tmp, 16, FALSE, FALSE, uppercase);
+					else if (sizeof(void *) == sizeof(long) && sizeof(long) > sizeof(int))
+						len = ltoa(va_arg(arg, long), tmp, 16, FALSE, FALSE, uppercase);
+					else
+						len = itoa(va_arg(arg, int), tmp, 16, FALSE, FALSE, uppercase);
+
+					src = tmp;
+					width = 2*sizeof(void *);
+					lead = '0';
+					if (width > len)
+						width -= len;
+					else
+						width = 0;
+
 					PUTC('0');
 					PUTC('x');
-				}
 
-				if (!left)
 					while (width--)
 						PUTC(lead);
 
-				while (len--)
-					PUTC(*src++);
+					while (len--)
+						PUTC(*src++);
+					break;
+				}
+				case 'S':
+				case 's':
+					src = va_arg(arg, const char *);
+					if (src == NULL)
+						src = "(null)";
 
-				if (left)
-					while (width--)
-						PUTC(' ');
-				break;
-			case 'P':
-			case 'p':
-				uppercase = (ch == 'P') ? TRUE : FALSE;
-				if (sizeof(void *) == sizeof(long long) && sizeof(long long) > sizeof(long))
-					len = lltoa(va_arg(arg, long long), tmp, 16, FALSE, FALSE, uppercase);
-				else if (sizeof(void *) == sizeof(long) && sizeof(long) > sizeof(int))
-					len = ltoa(va_arg(arg, long), tmp, 16, FALSE, FALSE, uppercase);
-				else
-					len = itoa(va_arg(arg, int), tmp, 16, FALSE, FALSE, uppercase);
+					len = strlen(src);
 
-				src = tmp;
-				width = 2*sizeof(void *);
-				lead = '0';
-				if (width > len)
-					width -= len;
-				else
-					width = 0;
+					if (limit != 0)
+						len = min(len, limit);
 
-				PUTC('0');
-				PUTC('x');
+					if (width > len)
+						width -= len;
+					else
+						width = 0;
 
-				while (width--)
-					PUTC(lead);
+					if ((flags & FBXF_DOFMT_LEFTJUSTIFY) == 0)
+						while (width--)
+							PUTC(' ');
 
-				while (len--)
-					PUTC(*src++);
-				break;
-			case 'S':
-			case 's':
-				src = va_arg(arg, const char *);
-				if (src == NULL)
-					src = "(null)";
+					while (len--)
+						PUTC(*src++);
 
-				len = strlen(src);
-
-				if (limit != 0)
-					len = min(len, limit);
-
-				if (width > len)
-					width -= len;
-				else
-					width = 0;
-
-				if (!left)
-					while (width--)
-						PUTC(' ');
-
-				while (len--)
-					PUTC(*src++);
-
-				if (left)
-					while (width--)
-						PUTC(' ');
-				break;
+					if ((flags & FBXF_DOFMT_LEFTJUSTIFY) != 0)
+						while (width--)
+							PUTC(' ');
+					break;
 			}
 		}
 	}
