@@ -14,7 +14,7 @@
 
 static int Fbx_readlink(struct FbxFS *fs, const char *path, char *buf, size_t buflen)
 {
-	ODEBUGF("Fbx_readlink(%#p, '%s', %#p, %lu)\n", fs, path, buf, buflen);
+	ODEBUGF("Fbx_readlink(%p, '%s', %p, %lu)\n", fs, path, buf, buflen);
 
 	return FSOP readlink(path, buf, buflen, &fs->fcntx);
 }
@@ -30,7 +30,7 @@ int FbxReadLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	char fsname[FBX_MAX_NAME];
 #endif
 
-	PDEBUGF("FbxReadLink(%#p, %#p, '%s', %#p, %d)\n", fs, lock, name, buffer, size);
+	PDEBUGF("FbxReadLink(%p, %p, '%s', %p, %d)\n", fs, lock, name, buffer, size);
 
 	CHECKVOLUME(-1);
 

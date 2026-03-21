@@ -12,13 +12,13 @@
 
 static int Fbx_fsync(struct FbxFS *fs, const char *path, int x, struct fuse_file_info *fi)
 {
-	ODEBUGF("Fbx_fsync(%#p, '%s', %d, %#p)\n", fs, path, x, fi);
+	ODEBUGF("Fbx_fsync(%p, '%s', %d, %p)\n", fs, path, x, fi);
 
 	return FSOP fsync(path, x, fi, &fs->fcntx);
 }
 
 int FbxFlushAll(struct FbxFS *fs) {
-	PDEBUGF("FbxFlushAll(%#p)\n", fs);
+	PDEBUGF("FbxFlushAll(%p)\n", fs);
 
 	if (OKVOLUME(fs->currvol)) {
 		Fbx_fsync(fs, "/", 0, NULL);

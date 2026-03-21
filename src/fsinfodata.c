@@ -81,7 +81,7 @@ static void FbxFillInfoData(struct FbxFS *fs, struct InfoData *info) {
 }
 
 int FbxDiskInfo(struct FbxFS *fs, struct InfoData *info) {
-	PDEBUGF("FbxDiskInfo(%#p, %#p)\n", fs, info);
+	PDEBUGF("FbxDiskInfo(%p, %p)\n", fs, info);
 
 	FbxFillInfoData(fs, info);
 
@@ -90,7 +90,7 @@ int FbxDiskInfo(struct FbxFS *fs, struct InfoData *info) {
 }
 
 int FbxInfo(struct FbxFS *fs, struct FbxLock *lock, struct InfoData *info) {
-	PDEBUGF("FbxInfo(%#p, %#p, %#p)\n", fs, lock, info);
+	PDEBUGF("FbxInfo(%p, %p, %p)\n", fs, lock, info);
 
 	CHECKVOLUME(DOSFALSE);
 

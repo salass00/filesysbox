@@ -14,7 +14,7 @@ int FbxRemoveNotify(struct FbxFS *fs, struct NotifyRequest *nr) {
 	struct Library *SysBase = fs->sysbase;
 	struct FbxNotifyNode *nn;
 
-	PDEBUGF("action_rem_notify(%#p, %#p)\n", fs, nr);
+	PDEBUGF("action_rem_notify(%p, %p)\n", fs, nr);
 
 	if (nr->nr_Handler != fs->fsport) {
 		fs->r2 = 0;

@@ -26,7 +26,7 @@ int FbxAddNotify(struct FbxFS *fs, struct NotifyRequest *notify) {
 	const char *fullname;
 #endif
 
-	PDEBUGF("FbxAddNotify(%#p, %#p)\n", fs, notify);
+	PDEBUGF("FbxAddNotify(%p, %p)\n", fs, notify);
 
 	CHECKVOLUME(DOSFALSE);
 

@@ -27,7 +27,7 @@ struct FbxLock *FbxLocateParent(struct FbxFS *fs, struct FbxLock *lock) {
 	char pname[FBX_MAX_PATH];
 	const char *name;
 
-	PDEBUGF("FbxLocateParent(%#p, %#p)\n", fs, lock);
+	PDEBUGF("FbxLocateParent(%p, %p)\n", fs, lock);
 
 	CHECKVOLUME(NULL);
 

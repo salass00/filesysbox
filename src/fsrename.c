@@ -15,7 +15,7 @@
 
 static int Fbx_rename(struct FbxFS *fs, const char *path, const char *path2)
 {
-	ODEBUGF("Fbx_rename(%#p, '%s', '%s')\n", fs, path, path2);
+	ODEBUGF("Fbx_rename(%p, '%s', '%s')\n", fs, path, path2);
 
 	return FSOP rename(path, path2, &fs->fcntx);
 }

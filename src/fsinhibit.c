@@ -11,7 +11,7 @@
 #include "filesysbox_internal.h"
 
 int FbxInhibit(struct FbxFS *fs, int inhibit) {
-	PDEBUGF("FbxInhibit(%#p, %d)\n", fs, inhibit);
+	PDEBUGF("FbxInhibit(%p, %d)\n", fs, inhibit);
 
 	if (inhibit) {
 		if (fs->inhibit == 0) {

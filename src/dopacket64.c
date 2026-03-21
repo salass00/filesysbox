@@ -15,11 +15,11 @@ QUAD FbxDoPacket64(struct FbxFS *fs, struct DosPacket64 *pkt) {
 	LONG type;
 	QUAD r1;
 
-	PDEBUGF("FbxDoPacket64(%#p, %#p)\n", fs, pkt);
+	PDEBUGF("FbxDoPacket64(%p, %p)\n", fs, pkt);
 
 #ifndef NODEBUG
 	struct Task *callertask = pkt->dp_Port->mp_SigTask;
-	PDEBUGF("action %ld task %#p '%s'\n", pkt->dp_Type, callertask, callertask->tc_Node.ln_Name);
+	PDEBUGF("action %ld task %p '%s'\n", pkt->dp_Type, callertask, callertask->tc_Node.ln_Name);
 #endif
 
 	type = pkt->dp_Type;
@@ -42,7 +42,7 @@ QUAD FbxDoPacket64(struct FbxFS *fs, struct DosPacket64 *pkt) {
 		break;
 	}
 
-	PDEBUGF("Done with packet %#p. r1 %lld r2 %#p\n\n", pkt, r1, (APTR)fs->r2);
+	PDEBUGF("Done with packet %p. r1 %lld r2 %p\n\n", pkt, r1, (APTR)fs->r2);
 
 	return r1;
 }

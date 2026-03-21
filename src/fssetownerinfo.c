@@ -12,7 +12,7 @@
 
 static int Fbx_chown(struct FbxFS *fs, const char *path, uid_t uid, gid_t gid)
 {
-	ODEBUGF("Fbx_chown(%#p, '%s', %#x, %#x)\n", fs, path, uid, gid);
+	ODEBUGF("Fbx_chown(%p, '%s', %#x, %#x)\n", fs, path, uid, gid);
 
 	return FSOP chown(path, uid, gid, &fs->fcntx);
 }
@@ -32,7 +32,7 @@ int FbxSetOwnerInfo(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	char fsname[FBX_MAX_NAME];
 #endif
 
-	PDEBUGF("FbxSetOwnerInfo(%#p, %#p, '%s', %#x, %#x)\n", fs, lock, name, uid, gid);
+	PDEBUGF("FbxSetOwnerInfo(%p, %p, '%s', %#x, %#x)\n", fs, lock, name, uid, gid);
 
 	CHECKVOLUME(DOSFALSE);
 	CHECKWRITABLE(DOSFALSE);

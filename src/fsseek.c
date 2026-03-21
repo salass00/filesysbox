@@ -13,7 +13,7 @@
 QUAD FbxSeekFile64(struct FbxFS *fs, struct FbxLock *lock, QUAD pos, int mode) {
 	QUAD newpos, oldpos, size;
 
-	PDEBUGF("FbxSeekFile(%#p, %#p, %lld, %d)\n", fs, lock, pos, mode);
+	PDEBUGF("FbxSeekFile(%p, %p, %lld, %d)\n", fs, lock, pos, mode);
 
 	oldpos = FbxGetFilePosition(fs, lock);
 	if (oldpos == -1) return -1;

@@ -12,7 +12,7 @@
 
 static int Fbx_ftruncate(struct FbxFS *fs, const char *path, QUAD size, struct fuse_file_info *fi)
 {
-	ODEBUGF("Fbx_ftruncate(%#p, '%s', %lld, %#p)\n", fs, path, size, fi);
+	ODEBUGF("Fbx_ftruncate(%p, '%s', %lld, %p)\n", fs, path, size, fi);
 
 	return FSOP ftruncate(path, size, fi, &fs->fcntx);
 }
@@ -21,7 +21,7 @@ static QUAD FbxTruncNewSize(struct FbxFS *fs, struct FbxLock *lock, QUAD newsize
 	struct FbxLock *fslock;
 	struct MinNode *chain, *succ;
 
-	PDEBUGF("FbxTruncNewSize(%#p, %#p, %lld)\n", fs, lock, newsize);
+	PDEBUGF("FbxTruncNewSize(%p, %p, %lld)\n", fs, lock, newsize);
 
 	chain = lock->entry->locklist.mlh_Head;
 	while ((succ = chain->mln_Succ) != NULL) {
@@ -39,7 +39,7 @@ QUAD FbxSetFileSize64(struct FbxFS *fs, struct FbxLock *lock, QUAD offs, int mod
 	QUAD oldsize, newsize;
 	int error;
 
-	PDEBUGF("FbxSetFileSize(%#p, %#p, %lld, %d)\n", fs, lock, offs, mode);
+	PDEBUGF("FbxSetFileSize(%p, %p, %lld, %d)\n", fs, lock, offs, mode);
 
 	oldsize = FbxGetFileSize(fs, lock);
 	if (oldsize == -1) return -1;

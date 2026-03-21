@@ -15,7 +15,7 @@ QUAD FbxGetFileSize(struct FbxFS *fs, struct FbxLock *lock) {
 	struct fbx_stat statbuf;
 	int error;
 
-	PDEBUGF("FbxGetFileSize(%#p, %#p)\n", fs, lock);
+	PDEBUGF("FbxGetFileSize(%p, %p)\n", fs, lock);
 
 	CHECKVOLUME(-1);
 

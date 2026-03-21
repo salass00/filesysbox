@@ -14,7 +14,7 @@
 
 static int Fbx_chmod(struct FbxFS *fs, const char *path, mode_t mode)
 {
-	ODEBUGF("Fbx_chmod(%#p, '%s', 0%o)\n", fs, path, mode);
+	ODEBUGF("Fbx_chmod(%p, '%s', 0%o)\n", fs, path, mode);
 
 	return FSOP chmod(path, mode, &fs->fcntx);
 }
@@ -42,7 +42,7 @@ int FbxSetProtection(struct FbxFS *fs, struct FbxLock *lock, const char *name, U
 	char fsname[FBX_MAX_NAME];
 #endif
 
-	PDEBUGF("FbxSetProtection(%#p, %#p, '%s', %#lx)\n", fs, lock, name, prot);
+	PDEBUGF("FbxSetProtection(%p, %p, '%s', %#lx)\n", fs, lock, name, prot);
 
 	CHECKVOLUME(DOSFALSE);
 	CHECKWRITABLE(DOSFALSE);

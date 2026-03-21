@@ -11,7 +11,7 @@
 #include "filesysbox_internal.h"
 
 int FbxChangeMode(struct FbxFS *fs, struct FbxLock *lock, int mode) {
-	PDEBUGF("FbxChangeMode(%#p, %#p, %d)\n", fs, lock, mode);
+	PDEBUGF("FbxChangeMode(%p, %p, %d)\n", fs, lock, mode);
 
 	CHECKVOLUME(DOSFALSE);
 

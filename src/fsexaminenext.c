@@ -14,14 +14,14 @@
 
 static int Fbx_opendir(struct FbxFS *fs, const char *path, struct fuse_file_info *fi)
 {
-	ODEBUGF("Fbx_opendir(%#p, '%s', %#p)\n", fs, path, fi);
+	ODEBUGF("Fbx_opendir(%p, '%s', %p)\n", fs, path, fi);
 
 	return FSOP opendir(path, fi, &fs->fcntx);
 }
 
 static int Fbx_releasedir(struct FbxFS *fs, const char *path, struct fuse_file_info *fi)
 {
-	ODEBUGF("Fbx_releasedir(%#p, '%s', %#p)\n", fs, path, fi);
+	ODEBUGF("Fbx_releasedir(%p, '%s', %p)\n", fs, path, fi);
 
 	return FSOP releasedir(path, fi, &fs->fcntx);
 }
@@ -29,7 +29,7 @@ static int Fbx_releasedir(struct FbxFS *fs, const char *path, struct fuse_file_i
 static int Fbx_readdir(struct FbxFS *fs, const char *path, APTR udata, fuse_fill_dir_t func,
 	QUAD offset, struct fuse_file_info *fi)
 {
-	ODEBUGF("Fbx_readdir(%#p, '%s', %#p, %#p, %lld, %#p)\n", fs, path, udata, func, offset, fi);
+	ODEBUGF("Fbx_readdir(%p, '%s', %p, %p, %lld, %p)\n", fs, path, udata, func, offset, fi);
 
 	return FSOP readdir(path, udata, func, offset, fi, &fs->fcntx);
 }
@@ -123,7 +123,7 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 	int error;
 	char fullpath[FBX_MAX_PATH];
 
-	PDEBUGF("FbxExamineNext(%#p, %#p, %#p)\n", fs, lock, fib);
+	PDEBUGF("FbxExamineNext(%p, %p, %p)\n", fs, lock, fib);
 
 	CHECKVOLUME(DOSFALSE);
 

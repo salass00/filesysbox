@@ -146,7 +146,7 @@ int FbxExamineLock(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 	struct fbx_stat statbuf;
 	int error;
 
-	PDEBUGF("FbxExamineLock(%#p, %#p, %#p)\n", fs, lock, fib);
+	PDEBUGF("FbxExamineLock(%p, %p, %p)\n", fs, lock, fib);
 
 	CHECKVOLUME(DOSFALSE);
 

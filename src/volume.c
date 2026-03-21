@@ -15,7 +15,7 @@
 
 static APTR Fbx_init(struct FbxFS *fs, struct fuse_conn_info *conn)
 {
-	ODEBUGF("Fbx_init(%#p, %#p)\n", fs, conn);
+	ODEBUGF("Fbx_init(%p, %p)\n", fs, conn);
 
 	if (FSOP init)
 	{
@@ -41,7 +41,7 @@ static APTR Fbx_init(struct FbxFS *fs, struct fuse_conn_info *conn)
 
 static void Fbx_destroy(struct FbxFS *fs, APTR x)
 {
-	ODEBUGF("Fbx_destroy(%#p, %#p)\n", fs, x);
+	ODEBUGF("Fbx_destroy(%p, %p)\n", fs, x);
 
 	if (FSOP destroy) FSOP destroy(x, &fs->fcntx);
 }
@@ -63,7 +63,7 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 	const char *volname;
 #endif
 
-	DEBUGF("FbxSetupVolume(%#p)\n", fs);
+	DEBUGF("FbxSetupVolume(%p)\n", fs);
 
 	if (OKVOLUME(fs->currvol)) {
 		return fs->currvol;
@@ -171,7 +171,7 @@ struct FbxVolume *FbxSetupVolume(struct FbxFS *fs) {
 	// tell input.device there was a change
 	FbxNotifyDiskChange(fs, IECLASS_DISKINSERTED);
 
-	DEBUGF("FbxSetupVolume: Volume %#p set up OK.\n", vol);
+	DEBUGF("FbxSetupVolume: Volume %p set up OK.\n", vol);
 
 	return vol;
 }

@@ -70,7 +70,7 @@ BOOL FbxCheckString(struct FbxFS *fs, const char *str) {
 	const char *s = str;
 	int c;
 
-	CDEBUGF("FbxCheckString(%#p, '%s')\n", fs, str);
+	CDEBUGF("FbxCheckString(%p, '%s')\n", fs, str);
 
 	while ((c = utf8_decode_slow(&s)) > 0);
 	if (c != '\0') {
@@ -117,7 +117,7 @@ static IPTR FbxHashPathInoCase(struct FbxFS *fs, const char *str) {
 	IPTR v = 0;
 	ULONG c;
 
-	DEBUGF("FbxHashPathInoCase(%#p, '%s')\n", fs, str);
+	DEBUGF("FbxHashPathInoCase(%p, '%s')\n", fs, str);
 
 	// get a small seed from number of characters
 	v = FbxCharCount(fs, str);
@@ -149,7 +149,7 @@ static IPTR FbxHashPathInoNoCase(struct FbxFS *fs, const char *str) {
 }
 
 IPTR FbxHashPathIno(struct FbxFS *fs, const char *str) {
-	DEBUGF("FbxHashPathIno(%#p, '%s')\n", fs, str);
+	DEBUGF("FbxHashPathIno(%p, '%s')\n", fs, str);
 
 	if (fs->currvol->vflags & FBXVF_CASE_SENSITIVE)
 		return FbxHashPathInoCase(fs, str);
@@ -167,7 +167,7 @@ struct FbxEntry *FbxFindEntry(struct FbxFS *fs, const char *path) {
 	struct FbxEntry *e;
 	unsigned int i;
 
-	DEBUGF("FbxFindEntry(%#p, '%s')\n", fs, path);
+	DEBUGF("FbxFindEntry(%p, '%s')\n", fs, path);
 
 	i = FbxHashPath(fs, path);
 	for (chain = fs->currvol->entrytab[i].mlh_Head;
@@ -187,7 +187,7 @@ struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mode) {
 	struct Library *SysBase = fs->sysbase;
 	struct FbxLock *lock;
 
-	DEBUGF("FbxLockEntry(%#p, %#p, %d)\n", fs, e, mode);
+	DEBUGF("FbxLockEntry(%p, %p, %d)\n", fs, e, mode);
 
 	// exclusive locks are not allowed on directories
 	if (e->type == ETYPE_DIR && mode == EXCLUSIVE_LOCK) {
@@ -236,7 +236,7 @@ struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mode) {
 	AddTail((struct List *)&e->locklist, (struct Node *)&lock->entrychain);
 	AddTail((struct List *)&lock->fsvol->locklist, (struct Node *)&lock->volumechain);
 
-	DEBUGF("FbxLockEntry: lock %#p\n", lock);
+	DEBUGF("FbxLockEntry: lock %p\n", lock);
 
 	return lock;
 }
@@ -244,7 +244,7 @@ struct FbxLock *FbxLockEntry(struct FbxFS *fs, struct FbxEntry *e, int mode) {
 void FbxEndLock(struct FbxFS *fs, struct FbxLock *lock) {
 	struct Library *SysBase = fs->sysbase;
 
-	DEBUGF("FbxEndLock(%#p, %#p)\n", fs, lock);
+	DEBUGF("FbxEndLock(%p, %p)\n", fs, lock);
 
 	Remove((struct Node *)&lock->entrychain);
 	Remove((struct Node *)&lock->volumechain);
@@ -270,7 +270,7 @@ void FbxAddEntry(struct FbxFS *fs, struct FbxEntry *e) {
 	struct Library *SysBase = fs->sysbase;
 	unsigned int i;
 
-	DEBUGF("FbxAddEntry(%#p, %#p)\n", fs, e);
+	DEBUGF("FbxAddEntry(%p, %p)\n", fs, e);
 
 	i = FbxHashPath(fs, e->path);
 	AddTail((struct List *)&fs->currvol->entrytab[i], (struct Node *)&e->hashchain);
@@ -286,7 +286,7 @@ BOOL FbxLockName2Path(struct FbxFS *fs, struct FbxLock *lock, const char *name, 
 	char *p;
 	size_t len;
 
-	RDEBUGF("FbxLockName2Path(%#p, '%s', %#p)\n", lock, name, fullpathbuf);
+	RDEBUGF("FbxLockName2Path(%p, '%s', %p)\n", lock, name, fullpathbuf);
 
 	if (lock != NULL)
 		FbxStrlcpy(fs, fullpathbuf, lock->entry->path, FBX_MAX_PATH);
@@ -382,7 +382,7 @@ struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int type, QUA
 	struct Library *SysBase = fs->sysbase;
 	struct FbxEntry *e;
 
-	DEBUGF("FbxSetupEntry(%#p, '%s', %d, 0x%llx)\n", fs, path, type, id);
+	DEBUGF("FbxSetupEntry(%p, '%s', %d, 0x%llx)\n", fs, path, type, id);
 
 	e = AllocFbxEntry(fs);
 	if (e == NULL) {
@@ -408,7 +408,7 @@ struct FbxEntry *FbxSetupEntry(struct FbxFS *fs, const char *path, int type, QUA
 }
 
 void FbxCleanupEntry(struct FbxFS *fs, struct FbxEntry *e) {
-	DEBUGF("FbxCleanupEntry(%#p, %#p)\n", fs, e);
+	DEBUGF("FbxCleanupEntry(%p, %p)\n", fs, e);
 	if (e != NULL) {
 		struct Library *SysBase = fs->sysbase;
 
@@ -418,14 +418,14 @@ void FbxCleanupEntry(struct FbxFS *fs, struct FbxEntry *e) {
 			Remove((struct Node *)&e->hashchain);
 			FbxStrlcpy(fs, e->path, "<<im free!>>", FBX_MAX_PATH);
 			FreeFbxEntry(fs, e);
-			DEBUGF("FbxCleanupEntry: freed entry %#p\n", e);
+			DEBUGF("FbxCleanupEntry: freed entry %p\n", e);
 		}
 	}
 }
 
 BOOL FbxCheckLock(struct FbxFS *fs, struct FbxLock *lock) {
 	if (lock->fs != fs) {
-		DEBUGF("INVALID LOCK %#p, -> cookie %#p (should be %#p)\n", lock, lock->fs, fs);
+		DEBUGF("INVALID LOCK %p, -> cookie %p (should be %p)\n", lock, lock->fs, fs);
 		return FALSE;
 	}
 	return TRUE;
@@ -481,7 +481,7 @@ void FbxNotifyDiskChange(struct FbxFS *fs, UBYTE ieclass) {
 	struct InputEvent ie;
 	struct timeval tv;
 
-	DEBUGF("FbxNotifyDiskChange(%#p, %#x)\n", fs, ieclass);
+	DEBUGF("FbxNotifyDiskChange(%p, %#x)\n", fs, ieclass);
 
 	inputmp = CreateMsgPort();
 	inputio = CreateIORequest(inputmp, sizeof(struct IOStdReq));

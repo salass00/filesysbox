@@ -12,7 +12,7 @@
 
 static int Fbx_format(struct FbxFS *fs, const char *volname, ULONG dostype)
 {
-	ODEBUGF("Fbx_format(%#p, '%s', %#lx)\n", fs, volname, dostype);
+	ODEBUGF("Fbx_format(%p, '%s', %#lx)\n", fs, volname, dostype);
 
 	return FSOP format(volname, dostype, &fs->fcntx);
 }
@@ -23,7 +23,7 @@ int FbxFormat(struct FbxFS *fs, const char *volname, ULONG dostype) {
 	char fsvolname[FBX_MAX_NAME];
 #endif
 
-	PDEBUGF("FbxFormat(%#p, '%s', %#lx)\n", fs, volname, dostype);
+	PDEBUGF("FbxFormat(%p, '%s', %#lx)\n", fs, volname, dostype);
 
 	if (!fs->inhibit) {
 		fs->r2 = ERROR_OBJECT_IN_USE;

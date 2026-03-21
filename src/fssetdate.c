@@ -12,14 +12,14 @@
 
 static int Fbx_utimens(struct FbxFS *fs, const char *path, const struct timespec *tv)
 {
-	ODEBUGF("Fbx_utimens(%#p, '%s', %#p)\n", fs, path, tv);
+	ODEBUGF("Fbx_utimens(%p, '%s', %p)\n", fs, path, tv);
 
 	return FSOP utimens(path, tv, &fs->fcntx);
 }
 
 static int Fbx_utime(struct FbxFS *fs, const char *path, struct utimbuf *ubuf)
 {
-	ODEBUGF("Fbx_utime(%#p, '%s', %#p)\n", fs, path, ubuf);
+	ODEBUGF("Fbx_utime(%p, '%s', %p)\n", fs, path, ubuf);
 
 	return FSOP utime(path, ubuf, &fs->fcntx);
 }
@@ -54,7 +54,7 @@ int FbxSetDate(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	char fsname[FBX_MAX_NAME];
 #endif
 
-	PDEBUGF("FbxSetDate(%#p, %#p, '%s', %#p)\n", fs, lock, name, date);
+	PDEBUGF("FbxSetDate(%p, %p, '%s', %p)\n", fs, lock, name, date);
 
 	CHECKVOLUME(DOSFALSE);
 	CHECKWRITABLE(DOSFALSE);

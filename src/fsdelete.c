@@ -14,14 +14,14 @@
 
 static int Fbx_unlink(struct FbxFS *fs, const char *path)
 {
-	ODEBUGF("Fbx_unlink(%#p, '%s')\n", fs, path);
+	ODEBUGF("Fbx_unlink(%p, '%s')\n", fs, path);
 
 	return FSOP unlink(path, &fs->fcntx);
 }
 
 static int Fbx_rmdir(struct FbxFS *fs, const char *path)
 {
-	ODEBUGF("Fbx_rmdir(%#p, '%s')\n", fs, path);
+	ODEBUGF("Fbx_rmdir(%p, '%s')\n", fs, path);
 
 	return FSOP rmdir(path, &fs->fcntx);
 }
@@ -35,7 +35,7 @@ int FbxDeleteObject(struct FbxFS *fs, struct FbxLock *lock, const char *name) {
 	char fsname[FBX_MAX_NAME];
 #endif
 
-	PDEBUGF("FbxDeleteObject(%#p, %#p, '%s')\n", fs, lock, name);
+	PDEBUGF("FbxDeleteObject(%p, %p, '%s')\n", fs, lock, name);
 
 	CHECKVOLUME(DOSFALSE);
 	CHECKWRITABLE(DOSFALSE);

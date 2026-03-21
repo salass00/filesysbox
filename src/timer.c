@@ -12,7 +12,7 @@ struct timerequest *FbxSetupTimerIO(struct FbxFS *fs) {
 	struct MsgPort *mp;
 	struct timerequest *tr;
 
-	DEBUGF("FbxSetupTimerIO(%#p)\n", fs);
+	DEBUGF("FbxSetupTimerIO(%p)\n", fs);
 
 	mp = CreateMsgPort();
 	tr = CreateIORequest(mp, sizeof(*tr));
@@ -35,7 +35,7 @@ struct timerequest *FbxSetupTimerIO(struct FbxFS *fs) {
 }
 
 void FbxCleanupTimerIO(struct FbxFS *fs) {
-	DEBUGF("FbxCleanupTimerIO(%#p)\n", fs);
+	DEBUGF("FbxCleanupTimerIO(%p)\n", fs);
 
 	if (fs->timerbase != NULL) {
 		struct Library *SysBase = fs->sysbase;

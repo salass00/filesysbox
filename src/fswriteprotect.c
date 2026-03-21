@@ -11,7 +11,7 @@
 #include "filesysbox_internal.h"
 
 int FbxWriteProtect(struct FbxFS *fs, int on_off, IPTR passkey) {
-	PDEBUGF("FbxWriteProtect(%#p, %d, %#p)\n", fs, on_off, (APTR)passkey);
+	PDEBUGF("FbxWriteProtect(%p, %d, %p)\n", fs, on_off, (APTR)passkey);
 
 	CHECKVOLUME(DOSFALSE);
 

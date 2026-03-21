@@ -13,7 +13,7 @@
 
 static int Fbx_open(struct FbxFS *fs, const char *path, struct fuse_file_info *fi)
 {
-	ODEBUGF("Fbx_open(%#p, '%s', %#p)\n", fs, path, fi);
+	ODEBUGF("Fbx_open(%p, '%s', %p)\n", fs, path, fi);
 
 	return FSOP open(path, fi, &fs->fcntx);
 }
@@ -22,7 +22,7 @@ int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock) {
 	struct Library *SysBase = fs->sysbase;
 	int error;
 
-	PDEBUGF("FbxOpenLock(%#p, %#p, %#p)\n", fs, fh, lock);
+	PDEBUGF("FbxOpenLock(%p, %p, %p)\n", fs, fh, lock);
 
 	CHECKVOLUME(DOSFALSE);
 

@@ -15,21 +15,21 @@
 
 static int Fbx_create(struct FbxFS *fs, const char *path, mode_t mode, struct fuse_file_info *fi)
 {
-	ODEBUGF("Fbx_create(%#p, '%s', 0%o, %#p)\n", fs, path, mode, fi);
+	ODEBUGF("Fbx_create(%p, '%s', 0%o, %p)\n", fs, path, mode, fi);
 
 	return FSOP create(path, mode, fi, &fs->fcntx);
 }
 
 static int Fbx_mknod(struct FbxFS *fs, const char *path, mode_t mode, dev_t dev)
 {
-	ODEBUGF("Fbx_mknod(%#p, '%s', 0%o, %#x)\n", fs, path, mode, dev);
+	ODEBUGF("Fbx_mknod(%p, '%s', 0%o, %#x)\n", fs, path, mode, dev);
 
 	return FSOP mknod(path, mode, dev, &fs->fcntx);
 }
 
 static int Fbx_truncate(struct FbxFS *fs, const char *path, QUAD size)
 {
-	ODEBUGF("Fbx_truncate(%#p, '%s', %lld)\n", fs, path, size);
+	ODEBUGF("Fbx_truncate(%p, '%s', %lld)\n", fs, path, size);
 
 	return FSOP truncate(path, size, &fs->fcntx);
 }
@@ -38,7 +38,7 @@ static int FbxCreateOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct Fbx
 	struct Library *SysBase = fs->sysbase;
 	int error;
 
-	PDEBUGF("FbxCreateOpenLock(%#p, %#p, %#p, 0%o)\n", fs, fh, lock, mode);
+	PDEBUGF("FbxCreateOpenLock(%p, %p, %p, 0%o)\n", fs, fh, lock, mode);
 
 	CHECKLOCK(lock, DOSFALSE);
 
@@ -98,7 +98,7 @@ int FbxOpenFile(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock,
 	char fsname[FBX_MAX_NAME];
 #endif
 
-	DEBUGF("FbxOpenFile(%#p, %#p, %#p, '%s', %d)\n", fs, fh, lock, name, mode);
+	DEBUGF("FbxOpenFile(%p, %p, %p, '%s', %d)\n", fs, fh, lock, name, mode);
 
 	CHECKVOLUME(DOSFALSE);
 

@@ -21,7 +21,7 @@ struct FbxLock *FbxInternalLocateObject(struct FbxFS *fs, struct FbxLock *lock,
 	struct FbxLock *lock2;
 	char fullpath[FBX_MAX_PATH];
 
-	PDEBUGF("FbxInternalLocateObject(%#p, %#p, '%s', %d)\n", fs, lock, name, lockmode);
+	PDEBUGF("FbxInternalLocateObject(%p, %p, '%s', %d)\n", fs, lock, name, lockmode);
 
 	if (!FbxLockName2Path(fs, lock, name, fullpath)) {
 		fs->r2 = ERROR_OBJECT_NOT_FOUND;
@@ -66,7 +66,7 @@ struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock,
 	char fsname[FBX_MAX_NAME];
 #endif
 
-	PDEBUGF("FbxLocateObject(%#p, %#p, '%s', %d)\n", fs, lock, name, lockmode);
+	PDEBUGF("FbxLocateObject(%p, %p, '%s', %d)\n", fs, lock, name, lockmode);
 
 	CHECKVOLUME(NULL);
 

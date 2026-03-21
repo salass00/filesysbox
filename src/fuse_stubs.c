@@ -13,21 +13,21 @@
 
 int Fbx_getattr(struct FbxFS *fs, const char *path, struct fbx_stat *stat)
 {
-	ODEBUGF("Fbx_getattr(%#p, '%s', %#p)\n", fs, path, stat);
+	ODEBUGF("Fbx_getattr(%p, '%s', %p)\n", fs, path, stat);
 
 	return FSOP getattr(path, stat, &fs->fcntx);
 }
 
 int Fbx_statfs(struct FbxFS *fs, const char *name, struct statvfs *stat)
 {
-	ODEBUGF("Fbx_statfs(%#p, '%s', %#p)\n", fs, name, stat);
+	ODEBUGF("Fbx_statfs(%p, '%s', %p)\n", fs, name, stat);
 
 	return FSOP statfs(name, stat, &fs->fcntx);
 }
 
 int Fbx_release(struct FbxFS *fs, const char *path, struct fuse_file_info *fi)
 {
-	ODEBUGF("Fbx_release(%#p, '%s', %#p)\n", fs, path, fi);
+	ODEBUGF("Fbx_release(%p, '%s', %p)\n", fs, path, fi);
 
 	return FSOP release(path, fi, &fs->fcntx);
 }
@@ -35,7 +35,7 @@ int Fbx_release(struct FbxFS *fs, const char *path, struct fuse_file_info *fi)
 int Fbx_fgetattr(struct FbxFS *fs, const char *path, struct fbx_stat *stat,
 	struct fuse_file_info *fi)
 {
-	ODEBUGF("Fbx_fgetattr(%#p, '%s', %#p, %#p)\n", fs, path, stat, fi);
+	ODEBUGF("Fbx_fgetattr(%p, '%s', %p, %p)\n", fs, path, stat, fi);
 
 	return FSOP fgetattr(path, stat, fi, &fs->fcntx);
 }
@@ -43,7 +43,7 @@ int Fbx_fgetattr(struct FbxFS *fs, const char *path, struct fbx_stat *stat,
 int Fbx_setxattr(struct FbxFS *fs, const char *path, const char *attr,
 	CONST_APTR buf, size_t len, int flags)
 {
-	ODEBUGF("Fbx_setxattr(%#p, '%s', '%s', %#p, %lu, %d)\n", fs, path, attr, buf, len, flags);
+	ODEBUGF("Fbx_setxattr(%p, '%s', '%s', %p, %lu, %d)\n", fs, path, attr, buf, len, flags);
 
 	return FSOP setxattr(path, attr, buf, len, flags, &fs->fcntx);
 }
@@ -51,14 +51,14 @@ int Fbx_setxattr(struct FbxFS *fs, const char *path, const char *attr,
 int Fbx_getxattr(struct FbxFS *fs, const char *path, const char *attr,
 	APTR buf, size_t len)
 {
-	ODEBUGF("Fbx_getxattr(%#p, '%s', '%s', %#p, %lu)\n", fs, path, attr, buf, len);
+	ODEBUGF("Fbx_getxattr(%p, '%s', '%s', %p, %lu)\n", fs, path, attr, buf, len);
 
 	return FSOP getxattr(path, attr, buf, len, &fs->fcntx);
 }
 
 int Fbx_removexattr(struct FbxFS *fs, const char *path, const char *attr)
 {
-	ODEBUGF("Fbx_removexattr(%#p, '%s', '%s')\n", fs, path, attr);
+	ODEBUGF("Fbx_removexattr(%p, '%s', '%s')\n", fs, path, attr);
 
 	return FSOP removexattr(path, attr, &fs->fcntx);
 }

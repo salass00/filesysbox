@@ -22,11 +22,11 @@ SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
     #define BTOC2(arg) (CopyStringBSTRToC((arg), namebuf2, sizeof(namebuf2)), namebuf2)
 #endif
 
-	PDEBUGF("FbxDoPacket(%#p, %#p)\n", fs, pkt);
+	PDEBUGF("FbxDoPacket(%p, %p)\n", fs, pkt);
 
 #ifndef NODEBUG
 	struct Task *callertask = pkt->dp_Port->mp_SigTask;
-	PDEBUGF("action %ld task %#p '%s'\n", pkt->dp_Type, callertask, callertask->tc_Node.ln_Name);
+	PDEBUGF("action %ld task %p '%s'\n", pkt->dp_Type, callertask, callertask->tc_Node.ln_Name);
 #endif
 
 	type = pkt->dp_Type;
@@ -206,7 +206,7 @@ SIPTR FbxDoPacket(struct FbxFS *fs, struct DosPacket *pkt) {
 		break;
 	}
 
-	PDEBUGF("Done with packet %#p. r1 %#p r2 %#p\n\n", pkt, (APTR)r1, (APTR)fs->r2);
+	PDEBUGF("Done with packet %p. r1 %p r2 %p\n\n", pkt, (APTR)r1, (APTR)fs->r2);
 
 	return r1;
 }

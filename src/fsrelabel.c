@@ -13,7 +13,7 @@
 
 static int Fbx_relabel(struct FbxFS *fs, const char *volname)
 {
-	ODEBUGF("Fbx_relabel(%#p, '%s')\n", fs, volname);
+	ODEBUGF("Fbx_relabel(%p, '%s')\n", fs, volname);
 
 	return FSOP relabel(volname, &fs->fcntx);
 }
@@ -27,7 +27,7 @@ int FbxRelabel(struct FbxFS *fs, const char *volname) {
 	const char *fsvolname = volname;
 #endif
 
-	PDEBUGF("FbxRelabel(%#p, '%s')\n", fs, volname);
+	PDEBUGF("FbxRelabel(%p, '%s')\n", fs, volname);
 
 	CHECKVOLUME(DOSFALSE);
 	CHECKWRITABLE(DOSFALSE);

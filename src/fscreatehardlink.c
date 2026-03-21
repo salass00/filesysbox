@@ -12,7 +12,7 @@
 
 static int Fbx_link(struct FbxFS *fs, const char *dest, const char *path)
 {
-	ODEBUGF("Fbx_link(%#p, '%s', '%s')\n", fs, dest, path);
+	ODEBUGF("Fbx_link(%p, '%s', '%s')\n", fs, dest, path);
 
 	return FSOP link(dest, path, &fs->fcntx);
 }
@@ -27,7 +27,7 @@ int FbxMakeHardLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	char fsname[FBX_MAX_NAME];
 #endif
 
-	PDEBUGF("FbxMakeHardlink(%#p, %#p, '%s', %#p)\n", fs, lock, name, lock2);
+	PDEBUGF("FbxMakeHardlink(%p, %p, '%s', %p)\n", fs, lock, name, lock2);
 
 	CHECKVOLUME(DOSFALSE);
 	CHECKWRITABLE(DOSFALSE);

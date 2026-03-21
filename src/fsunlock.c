@@ -13,7 +13,7 @@
 int FbxUnLockObject(struct FbxFS *fs, struct FbxLock *lock) {
 	struct FbxEntry *e;
 
-	PDEBUGF("FbxUnLockObject(%#p, %#p)\n", fs, lock);
+	PDEBUGF("FbxUnLockObject(%p, %p)\n", fs, lock);
 
 	if (lock == NULL) {
 		debugf("FbxUnLockObject got a NULL lock, btw.\n");

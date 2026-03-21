@@ -13,7 +13,7 @@
 
 static int Fbx_mkdir(struct FbxFS *fs, const char *path, mode_t mode)
 {
-	ODEBUGF("Fbx_mkdir(%#p, '%s', 0%o)\n", fs, path, mode);
+	ODEBUGF("Fbx_mkdir(%p, '%s', 0%o)\n", fs, path, mode);
 
 	return FSOP mkdir(path, mode, &fs->fcntx);
 }
@@ -28,7 +28,7 @@ struct FbxLock *FbxCreateDir(struct FbxFS *fs, struct FbxLock *lock, const char 
 	char fsname[FBX_MAX_NAME];
 #endif
 
-	PDEBUGF("FbxCreateDir(%#p, %#p, '%s')\n", fs, lock, name);
+	PDEBUGF("FbxCreateDir(%p, %p, '%s')\n", fs, lock, name);
 
 	CHECKVOLUME(NULL);
 	CHECKWRITABLE(NULL);

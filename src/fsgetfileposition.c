@@ -11,7 +11,7 @@
 #include "filesysbox_internal.h"
 
 QUAD FbxGetFilePosition(struct FbxFS *fs, struct FbxLock *lock) {
-	PDEBUGF("FbxGetFilePosition(%#p, %#p)\n", fs, lock);
+	PDEBUGF("FbxGetFilePosition(%p, %p)\n", fs, lock);
 
 	CHECKVOLUME(-1);
 

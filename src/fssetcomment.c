@@ -27,7 +27,7 @@ int FbxSetComment(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	char fscomment[FBX_MAX_COMMENT];
 #endif
 
-	PDEBUGF("FbxSetComment(%#p, %#p, '%s', '%s')\n", fs, lock, name, comment);
+	PDEBUGF("FbxSetComment(%p, %p, '%s', '%s')\n", fs, lock, name, comment);
 
 	CHECKVOLUME(DOSFALSE);
 	CHECKWRITABLE(DOSFALSE);

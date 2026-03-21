@@ -12,7 +12,7 @@
 
 static int Fbx_symlink(struct FbxFS *fs, const char *dest, const char *path)
 {
-	ODEBUGF("Fbx_symlink(%#p, '%s', '%s')\n", fs, path, dest);
+	ODEBUGF("Fbx_symlink(%p, '%s', '%s')\n", fs, path, dest);
 
 	return FSOP symlink(dest, path, &fs->fcntx);
 }
@@ -27,7 +27,7 @@ int FbxMakeSoftLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	char fssoftname[FBX_MAX_PATH];
 #endif
 
-	PDEBUGF("FbxMakeSoftlink(%#p, %#p, '%s', '%s')\n", fs, lock, name, softname);
+	PDEBUGF("FbxMakeSoftlink(%p, %p, '%s', '%s')\n", fs, lock, name, softname);
 
 	CHECKVOLUME(DOSFALSE);
 	CHECKWRITABLE(DOSFALSE);

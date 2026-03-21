@@ -13,7 +13,7 @@
 static int Fbx_read(struct FbxFS *fs, const char *path, char *buf, size_t len,
 	QUAD offset, struct fuse_file_info *fi)
 {
-	ODEBUGF("Fbx_read(%#p, '%s', %#p, %lu, %lld, %#p)\n", fs, path, buf, len, offset, fi);
+	ODEBUGF("Fbx_read(%p, '%s', %p, %lu, %lld, %p)\n", fs, path, buf, len, offset, fi);
 
 	return FSOP read(path, buf, len, offset, fi, &fs->fcntx);
 }
@@ -21,7 +21,7 @@ static int Fbx_read(struct FbxFS *fs, const char *path, char *buf, size_t len,
 int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes) {
 	int res;
 
-	PDEBUGF("FbxReadFile(%#p, %#p, %#p, %d)\n", fs, lock, buffer, bytes);
+	PDEBUGF("FbxReadFile(%p, %p, %p, %d)\n", fs, lock, buffer, bytes);
 
 	CHECKVOLUME(-1);
 
