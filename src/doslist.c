@@ -38,56 +38,57 @@ static int FbxDosListProc(void) {
 #endif
 	struct FileSysBoxBase *libBase;
 	struct Library *DOSBase;
-	struct Process *proc;
-	struct MsgPort *port;
+	struct Process *thisproc;
 #ifndef __AROS__
 	struct Message *msg;
 #endif
 	struct FbxAsyncMsg *async_msg;
+	ULONG sigmask;
 
-	proc = (struct Process *)FindTask(NULL);
-	port = &proc->pr_MsgPort;
+	thisproc = (struct Process *)FindTask(NULL);
 
 #ifdef __AROS__
-	libBase = proc->pr_Task.tc_UserData;
+	libBase = (struct FileSysBoxBase *)thisproc->pr_Task.tc_UserData;
 #else
-	WaitPort(port);
-	msg = GetMsg(port);
+	WaitPort(&thisproc->pr_MsgPort);
+	msg = GetMsg(&thisproc->pr_MsgPort);
 	libBase = (struct FileSysBoxBase *)msg->mn_Node.ln_Name;
 #endif
 	DOSBase = libBase->dosbase;
 
+	sigmask = SIGBREAKF_CTRL_C | (1UL << thisproc->pr_MsgPort.mp_SigBit);
 	for (;;) {
-		Wait(SIGBREAKF_CTRL_C | (1UL << port->mp_SigBit));
+		Wait(sigmask);
 
-		if (!IsListEmpty(&port->mp_MsgList)) {
+		if (!IsListEmpty(&thisproc->pr_MsgPort.mp_MsgList)) {
 			LockDosList(LDF_ALL|LDF_WRITE);
-			while ((async_msg = (struct FbxAsyncMsg *)GetMsg(port)) != NULL) {
+			while ((async_msg = (struct FbxAsyncMsg *)GetMsg(&thisproc->pr_MsgPort)) != NULL) {
 				struct FbxVolume *vol = async_msg->vol;
-				int cmd = async_msg->cmd;
-				switch (cmd) {
-				case FBX_ASYNC_ADD:
-					AddDosEntry((struct DosList *)vol);
-					break;
-				case FBX_ASYNC_REMOVE:
-					RemDosEntry((struct DosList *)vol);
-					break;
-				case FBX_ASYNC_REMOVE_FREE:
-					if (RemDosEntry((struct DosList *)vol))
-						FreeFbxVolume(vol);
-					break;
-				case FBX_ASYNC_RENAME:
-					if (RemDosEntry((struct DosList *)vol)) {
-#ifdef ENABLE_CHARSET_CONVERSION
-						strlcpy(vol->volname, async_msg->name, CONN_VOLUME_NAME_BYTES);
-#else
-						FbxStrlcpy(async_msg->fs, vol->volname, async_msg->name, CONN_VOLUME_NAME_BYTES);
-#endif
-						vol->volnamelen = strlen(vol->volname);
+
+				switch (async_msg->cmd) {
+					case FBX_ASYNC_ADD:
 						AddDosEntry((struct DosList *)vol);
-					}
-					break;
+						break;
+					case FBX_ASYNC_REMOVE:
+						RemDosEntry((struct DosList *)vol);
+						break;
+					case FBX_ASYNC_REMOVE_FREE:
+						if (RemDosEntry((struct DosList *)vol))
+							FreeFbxVolume(vol);
+						break;
+					case FBX_ASYNC_RENAME:
+						if (RemDosEntry((struct DosList *)vol)) {
+#ifdef ENABLE_CHARSET_CONVERSION
+							strlcpy(vol->volname, async_msg->name, CONN_VOLUME_NAME_BYTES);
+#else
+							FbxStrlcpy(async_msg->fs, vol->volname, async_msg->name, CONN_VOLUME_NAME_BYTES);
+#endif
+							vol->volnamelen = strlen(vol->volname);
+							AddDosEntry((struct DosList *)vol);
+						}
+						break;
 				}
+
 				FreeMem(async_msg, async_msg->msg.mn_Length);
 			}
 			UnLockDosList(LDF_ALL|LDF_WRITE);
@@ -101,7 +102,7 @@ static int FbxDosListProc(void) {
 		}
 	}
 
-	while ((async_msg = (struct FbxAsyncMsg *)GetMsg(port)) != NULL)
+	while ((async_msg = (struct FbxAsyncMsg *)GetMsg(&thisproc->pr_MsgPort)) != NULL)
 		FreeMem(async_msg, async_msg->msg.mn_Length);
 
 	Forbid();

@@ -33,24 +33,22 @@ static int FbxLockHandlerProc(void) {
 #endif
 	struct FileSysBoxBase *libBase;
 	struct Library *DOSBase;
-	struct Process *proc;
-	struct MsgPort *port;
+	struct Process *thisproc;
 	struct Message *msg;
 	struct DosPacket *pkt;
-	LONG type;
 	SIPTR r1, r2;
 	struct MinList locklist;
 	/* struct MinList fhlist; */
 	struct MinList notifylist;
+	ULONG sigmask;
 
-	proc = (struct Process *)FindTask(NULL);
-	port = &proc->pr_MsgPort;
+	thisproc = (struct Process *)FindTask(NULL);
 
 #ifdef __AROS__
-	libBase = proc->pr_Task.tc_UserData;
+	libBase = (struct FileSysBoxBase *)thisproc->pr_Task.tc_UserData;
 #else
-	WaitPort(port);
-	msg = GetMsg(port);
+	WaitPort(&thisproc->pr_MsgPort);
+	msg = GetMsg(&thisproc->pr_MsgPort);
 	libBase = (struct FileSysBoxBase *)msg->mn_Node.ln_Name;
 #endif
 	DOSBase = libBase->dosbase;
@@ -59,13 +57,14 @@ static int FbxLockHandlerProc(void) {
 	/* NEWMINLIST(&fhlist); */
 	NEWMINLIST(&notifylist);
 
+	sigmask = SIGBREAKF_CTRL_C | (1UL << thisproc->pr_MsgPort.mp_SigBit);
 	for (;;) {
-		Wait(SIGBREAKF_CTRL_C | (1UL << port->mp_SigBit));
+		Wait(sigmask);
 
-		while ((msg = GetMsg(port)) != NULL) {
+		while ((msg = GetMsg(&thisproc->pr_MsgPort)) != NULL) {
 			pkt = (struct DosPacket *)msg->mn_Node.ln_Name;
-			type = pkt->dp_Type;
-			switch (type) {
+
+			switch (pkt->dp_Type) {
 				case ACTION_IS_FILESYSTEM:
 					r1 = DOSTRUE;
 					r2 = 0;
@@ -73,15 +72,15 @@ static int FbxLockHandlerProc(void) {
 
 				case ACTION_COLLECT:
 				{
-					int type;
-					APTR item;
+					LONG collect_type;
+					APTR collect_item;
 					struct MinList *list = NULL;
 					struct Node *node;
 
-					type = pkt->dp_Arg1;
-					item = (APTR)pkt->dp_Arg2;
+					collect_type = pkt->dp_Arg1;
+					collect_item = (APTR)pkt->dp_Arg2;
 
-					switch (type) {
+					switch (collect_type) {
 						case ID_COLLECT_LOCK:
 							list = &locklist;
 							break;
@@ -106,8 +105,8 @@ static int FbxLockHandlerProc(void) {
 						break;
 					}
 
-					node->ln_Type = type;
-					node->ln_Name = item;
+					node->ln_Type = collect_type;
+					node->ln_Name = collect_item;
 					AddHead((struct List *)list, node);
 
 					r1 = DOSTRUE;
@@ -280,6 +279,7 @@ static int FbxLockHandlerProc(void) {
 					r2 = ERROR_ACTION_NOT_KNOWN;
 					break;
 			}
+
 			ReplyPkt(pkt, r1, r2);
 		}
 
