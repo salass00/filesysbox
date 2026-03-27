@@ -92,8 +92,6 @@ int FbxDiskInfo(struct FbxFS *fs, struct InfoData *info) {
 int FbxInfo(struct FbxFS *fs, struct FbxLock *lock, struct InfoData *info) {
 	PDEBUGF("FbxInfo(%p, %p, %p)\n", fs, lock, info);
 
-	CHECKVOLUME(DOSFALSE);
-
 	if (lock != NULL) {
 		CHECKLOCK(lock, DOSFALSE);
 
@@ -101,6 +99,8 @@ int FbxInfo(struct FbxFS *fs, struct FbxLock *lock, struct InfoData *info) {
 			fs->r2 = ERROR_NO_DISK;
 			return DOSFALSE;
 		}
+	} else {
+		CHECKVOLUME(DOSFALSE);
 	}
 
 	FbxFillInfoData(fs, info);
