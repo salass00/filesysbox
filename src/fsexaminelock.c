@@ -148,8 +148,6 @@ int FbxExamineLock(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 
 	PDEBUGF("FbxExamineLock(%p, %p, %p)\n", fs, lock, fib);
 
-	CHECKVOLUME(DOSFALSE);
-
 	CHECKLOCK(lock, DOSFALSE);	
 
 	if (lock->fsvol != fs->currvol) {
