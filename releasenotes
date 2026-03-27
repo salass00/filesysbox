@@ -229,3 +229,8 @@ filesysbox.library 54.10 (19.3.2026)
 
 - Added fallback for diskchange interrupt name if DeviceNode is not available.
 
+
+filesysbox.library 54.11 (d.m.2026)
+
+- Removed superfluous current volume checking in several functions.
+
