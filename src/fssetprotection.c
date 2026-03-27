@@ -44,9 +44,6 @@ int FbxSetProtection(struct FbxFS *fs, struct FbxLock *lock, const char *name, U
 
 	PDEBUGF("FbxSetProtection(%p, %p, '%s', %#x)\n", fs, lock, name, prot);
 
-	CHECKVOLUME(DOSFALSE);
-	CHECKWRITABLE(DOSFALSE);
-
 	if (lock != NULL) {
 		CHECKLOCK(lock, DOSFALSE);
 
@@ -54,7 +51,11 @@ int FbxSetProtection(struct FbxFS *fs, struct FbxLock *lock, const char *name, U
 			fs->r2 = ERROR_NO_DISK;
 			return DOSFALSE;
 		}
+	} else {
+		CHECKVOLUME(DOSFALSE);
 	}
+
+	CHECKWRITABLE(DOSFALSE);
 
 #ifdef ENABLE_CHARSET_CONVERSION
 	if (FbxLocalToUTF8(fs, fsname, name, FBX_MAX_NAME) >= FBX_MAX_NAME) {
