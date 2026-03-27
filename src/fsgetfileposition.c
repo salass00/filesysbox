@@ -13,8 +13,6 @@
 QUAD FbxGetFilePosition(struct FbxFS *fs, struct FbxLock *lock) {
 	PDEBUGF("FbxGetFilePosition(%p, %p)\n", fs, lock);
 
-	CHECKVOLUME(-1);
-
 	CHECKLOCK(lock, -1);
 
 	if (lock->fsvol != fs->currvol) {
