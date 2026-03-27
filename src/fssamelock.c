@@ -13,8 +13,6 @@
 int FbxSameLock(struct FbxFS *fs, struct FbxLock *lock, struct FbxLock *lock2) {
 	PDEBUGF("FbxSameLock(%p, %p, %p)\n", fs, lock, lock2);
 
-	CHECKVOLUME(DOSFALSE);
-
 	CHECKLOCK(lock, DOSFALSE);
 	CHECKLOCK(lock2, DOSFALSE);
 
