@@ -29,9 +29,6 @@ int FbxMakeSoftLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 
 	PDEBUGF("FbxMakeSoftlink(%p, %p, '%s', '%s')\n", fs, lock, name, softname);
 
-	CHECKVOLUME(DOSFALSE);
-	CHECKWRITABLE(DOSFALSE);
-
 	if (lock != NULL) {
 		CHECKLOCK(lock, DOSFALSE);
 
@@ -39,7 +36,11 @@ int FbxMakeSoftLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 			fs->r2 = ERROR_NO_DISK;
 			return DOSFALSE;
 		}
+	} else {
+		CHECKVOLUME(DOSFALSE);
 	}
+
+	CHECKWRITABLE(DOSFALSE);
 
 #ifdef ENABLE_CHARSET_CONVERSION
 	if (FbxLocalToUTF8(fs, fsname, name, FBX_MAX_NAME) >= FBX_MAX_NAME) {
