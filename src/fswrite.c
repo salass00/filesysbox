@@ -23,15 +23,14 @@ int FbxWriteFile(struct FbxFS *fs, struct FbxLock *lock, CONST_APTR buffer, int 
 
 	PDEBUGF("FbxWriteFile(%p, %p, %p, %d)\n", fs, lock, buffer, bytes);
 
-	CHECKVOLUME(-1);
-	CHECKWRITABLE(-1);
-
 	CHECKLOCK(lock, -1);
 
 	if (lock->fsvol != fs->currvol) {
 		fs->r2 = ERROR_NO_DISK;
 		return -1;
 	}
+
+	CHECKWRITABLE(-1);
 
 	if (bytes == 0) {
 		fs->r2 = 0;
