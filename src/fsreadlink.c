@@ -32,8 +32,6 @@ int FbxReadLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 
 	PDEBUGF("FbxReadLink(%p, %p, '%s', %p, %d)\n", fs, lock, name, buffer, size);
 
-	CHECKVOLUME(-1);
-
 	if (lock != NULL) {
 		CHECKLOCK(lock, -1);
 
@@ -41,6 +39,8 @@ int FbxReadLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 			fs->r2 = ERROR_NO_DISK;
 			return -1;
 		}
+	} else {
+		CHECKVOLUME(-1);
 	}
 
 #ifdef ENABLE_CHARSET_CONVERSION
