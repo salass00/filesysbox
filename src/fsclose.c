@@ -32,8 +32,6 @@ int FbxCloseFile(struct FbxFS *fs, struct FbxLock *lock) {
 
 	PDEBUGF("FbxCloseFile(%p, %p)\n", fs, lock);
 
-	CHECKVOLUME(DOSFALSE);
-
 	CHECKLOCK(lock, DOSFALSE);
 
 	e = lock->entry;
