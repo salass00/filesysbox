@@ -24,8 +24,6 @@ int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock) {
 
 	PDEBUGF("FbxOpenLock(%p, %p, %p)\n", fs, fh, lock);
 
-	CHECKVOLUME(DOSFALSE);
-
 	CHECKLOCK(lock, DOSFALSE);
 
 	if (lock->fsvol != fs->currvol) {
