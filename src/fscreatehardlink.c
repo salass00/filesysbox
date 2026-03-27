@@ -42,6 +42,18 @@ int FbxMakeHardLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 
 	CHECKWRITABLE(DOSFALSE);
 
+	if (lock2 != NULL) {
+		CHECKLOCK(lock2, DOSFALSE);
+
+		if (lock2->fsvol != fs->currvol) {
+			fs->r2 = ERROR_NO_DISK;
+			return DOSFALSE;
+		}
+	} else {
+		fs->r2 = ERROR_REQUIRED_ARG_MISSING;
+		return DOSFALSE;
+	}
+
 #ifdef ENABLE_CHARSET_CONVERSION
 	if (FbxLocalToUTF8(fs, fsname, name, FBX_MAX_NAME) >= FBX_MAX_NAME) {
 		fs->r2 = ERROR_LINE_TOO_LONG;
@@ -49,15 +61,8 @@ int FbxMakeHardLink(struct FbxFS *fs, struct FbxLock *lock, const char *name,
 	}
 	name = fsname;
 #else
-	CHECKLOCK(lock2, DOSFALSE);
-#endif
-
 	CHECKSTRING(name, DOSFALSE);
-
-	if (lock2->fsvol != fs->currvol) {
-		fs->r2 = ERROR_NO_DISK;
-		return DOSFALSE;
-	}
+#endif
 
 	if (!FbxLockName2Path(fs, lock, name, fullpath) ||
 		!FbxLockName2Path(fs, lock2, "", fullpath2))
