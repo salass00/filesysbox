@@ -68,8 +68,6 @@ struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock,
 
 	PDEBUGF("FbxLocateObject(%p, %p, '%s', %d)\n", fs, lock, name, lockmode);
 
-	CHECKVOLUME(NULL);
-
 	if (lock != NULL) {
 		CHECKLOCK(lock, NULL);
 
@@ -77,6 +75,8 @@ struct FbxLock *FbxLocateObject(struct FbxFS *fs, struct FbxLock *lock,
 			fs->r2 = ERROR_NO_DISK;
 			return NULL;
 		}
+	} else {
+		CHECKVOLUME(NULL);
 	}
 
 #ifdef ENABLE_CHARSET_CONVERSION
