@@ -133,7 +133,7 @@ int FbxExamineNext(struct FbxFS *fs, struct FbxLock *lock, struct FileInfoBlock 
 			return DOSFALSE;
 		}
 	} else {
-		fs->r2 = ERROR_REQUIRED_ARG_MISSING
+		fs->r2 = ERROR_REQUIRED_ARG_MISSING;
 		return DOSFALSE;
 	}
 

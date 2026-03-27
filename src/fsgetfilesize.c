@@ -25,7 +25,7 @@ QUAD FbxGetFileSize(struct FbxFS *fs, struct FbxLock *lock) {
 			return -1;
 		}
 	} else {
-		fs->r2 = ERROR_REQUIRED_ARG_MISSING
+		fs->r2 = ERROR_REQUIRED_ARG_MISSING;
 		return -1;
 	}
 

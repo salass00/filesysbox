@@ -35,7 +35,7 @@ int FbxCloseFile(struct FbxFS *fs, struct FbxLock *lock) {
 	if (lock != NULL) {
 		CHECKLOCK(lock, DOSFALSE);
 	} else {
-		fs->r2 = ERROR_REQUIRED_ARG_MISSING
+		fs->r2 = ERROR_REQUIRED_ARG_MISSING;
 		return DOSFALSE;
 	}
 

@@ -58,7 +58,7 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 			return DOSFALSE;
 		}
 	} else {
-		fs->r2 = ERROR_REQUIRED_ARG_MISSING
+		fs->r2 = ERROR_REQUIRED_ARG_MISSING;
 		return DOSFALSE;
 	}
 

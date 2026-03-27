@@ -32,7 +32,7 @@ int FbxOpenLock(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock) {
 			return DOSFALSE;
 		}
 	} else {
-		fs->r2 = ERROR_REQUIRED_ARG_MISSING
+		fs->r2 = ERROR_REQUIRED_ARG_MISSING;
 		return DOSFALSE;
 	}
 

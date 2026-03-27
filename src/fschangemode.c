@@ -21,7 +21,7 @@ int FbxChangeMode(struct FbxFS *fs, struct FbxLock *lock, int mode) {
 			return DOSFALSE;
 		}
 	} else {
-		fs->r2 = ERROR_REQUIRED_ARG_MISSING
+		fs->r2 = ERROR_REQUIRED_ARG_MISSING;
 		return DOSFALSE;
 	}
 

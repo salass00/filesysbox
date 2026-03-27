@@ -15,7 +15,7 @@ int FbxSameLock(struct FbxFS *fs, struct FbxLock *lock, struct FbxLock *lock2) {
 
 	/* Is this okay, or should NULL locks be treated as root locks instead? */
 	if (lock == NULL || lock2 == NULL) {
-		fs->r2 = ERROR_REQUIRED_ARG_MISSING
+		fs->r2 = ERROR_REQUIRED_ARG_MISSING;
 		return DOSFALSE;
 	}
 
