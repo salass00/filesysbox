@@ -234,3 +234,6 @@ filesysbox.library 54.11 (d.m.2026)
 
 - Removed superfluous current volume checking in several functions.
 
+- Various packets that take one or more locks as parameters now fail with
+  ERROR_REQUIRED_ARG_MISSING instead of crashing.
+

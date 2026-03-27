@@ -13,11 +13,21 @@
 int FbxSameLock(struct FbxFS *fs, struct FbxLock *lock, struct FbxLock *lock2) {
 	PDEBUGF("FbxSameLock(%p, %p, %p)\n", fs, lock, lock2);
 
+	/* Is this okay, or should NULL locks be treated as root locks instead? */
+	if (lock == NULL || lock2 == NULL) {
+		fs->r2 = ERROR_REQUIRED_ARG_MISSING
+		return DOSFALSE;
+	}
+
 	CHECKLOCK(lock, DOSFALSE);
 	CHECKLOCK(lock2, DOSFALSE);
 
 	fs->r2 = 0;
-	if (lock == lock2) return DOSTRUE;
+
+	if (lock == lock2) {
+		return DOSTRUE;
+	}
+
 	if (lock->fsvol == lock2->fsvol) {
 		struct FbxEntry *entry = lock->entry;
 		struct FbxEntry *entry2 = lock2->entry;
@@ -33,6 +43,7 @@ int FbxSameLock(struct FbxFS *fs, struct FbxLock *lock, struct FbxLock *lock2) {
 				return DOSTRUE;
 		}
 	}
+
 	return DOSFALSE;
 }
 

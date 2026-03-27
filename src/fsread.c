@@ -23,10 +23,15 @@ int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes) 
 
 	PDEBUGF("FbxReadFile(%p, %p, %p, %d)\n", fs, lock, buffer, bytes);
 
-	CHECKLOCK(lock, -1);
+	if (lock != NULL) {
+		CHECKLOCK(lock, -1);
 
-	if (lock->fsvol != fs->currvol) {
-		fs->r2 = ERROR_NO_DISK;
+		if (lock->fsvol != fs->currvol) {
+			fs->r2 = ERROR_NO_DISK;
+			return -1;
+		}
+	} else {
+		fs->r2 = ERROR_REQUIRED_ARG_MISSING
 		return -1;
 	}
 

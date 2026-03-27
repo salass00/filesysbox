@@ -13,10 +13,15 @@
 QUAD FbxGetFilePosition(struct FbxFS *fs, struct FbxLock *lock) {
 	PDEBUGF("FbxGetFilePosition(%p, %p)\n", fs, lock);
 
-	CHECKLOCK(lock, -1);
+	if (lock != NULL) {
+		CHECKLOCK(lock, -1);
 
-	if (lock->fsvol != fs->currvol) {
-		fs->r2 = ERROR_NO_DISK;
+		if (lock->fsvol != fs->currvol) {
+			fs->r2 = ERROR_NO_DISK;
+			return -1;
+		}
+	} else {
+		fs->r2 = ERROR_REQUIRED_ARG_MISSING
 		return -1;
 	}
 

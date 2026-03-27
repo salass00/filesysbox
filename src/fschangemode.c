@@ -13,10 +13,15 @@
 int FbxChangeMode(struct FbxFS *fs, struct FbxLock *lock, int mode) {
 	PDEBUGF("FbxChangeMode(%p, %p, %d)\n", fs, lock, mode);
 
-	CHECKLOCK(lock, DOSFALSE);
+	if (lock != NULL) {
+		CHECKLOCK(lock, DOSFALSE);
 
-	if (lock->fsvol != fs->currvol) {
-		fs->r2 = ERROR_NO_DISK;
+		if (lock->fsvol != fs->currvol) {
+			fs->r2 = ERROR_NO_DISK;
+			return DOSFALSE;
+		}
+	} else {
+		fs->r2 = ERROR_REQUIRED_ARG_MISSING
 		return DOSFALSE;
 	}
 
