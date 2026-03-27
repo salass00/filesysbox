@@ -50,8 +50,6 @@ int FbxExamineAll(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, SIPTR buf
 	const char *name;
 #endif
 
-	CHECKVOLUME(DOSFALSE);
-
 	CHECKLOCK(lock, DOSFALSE);
 
 	if (lock->fsvol != fs->currvol) {
