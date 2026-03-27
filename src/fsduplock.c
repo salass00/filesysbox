@@ -13,8 +13,6 @@
 struct FbxLock *FbxDupLock(struct FbxFS *fs, struct FbxLock *lock) {
 	PDEBUGF("FbxDupLock(%p, %p)\n", fs, lock);
 
-	CHECKVOLUME(NULL);
-
 	if (lock != NULL) {
 		CHECKLOCK(lock, NULL);
 
@@ -26,6 +24,8 @@ struct FbxLock *FbxDupLock(struct FbxFS *fs, struct FbxLock *lock) {
 		lock = FbxLockEntry(fs, lock->entry, SHARED_LOCK);
 		if (lock == NULL) return NULL;
 	} else {
+		CHECKVOLUME(NULL);
+
 		lock = FbxInternalLocateObject(fs, NULL, "", SHARED_LOCK);
 		if (lock == NULL) return NULL;
 	}
