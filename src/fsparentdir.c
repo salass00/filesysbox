@@ -29,17 +29,17 @@ struct FbxLock *FbxLocateParent(struct FbxFS *fs, struct FbxLock *lock) {
 
 	PDEBUGF("FbxLocateParent(%p, %p)\n", fs, lock);
 
-	CHECKVOLUME(NULL);
+	if (lock != NULL) {
+		CHECKLOCK(lock, NULL);
 
-	if (lock == NULL) {
+		if (lock->fsvol != fs->currvol) {
+			fs->r2 = ERROR_NO_DISK;
+			return NULL;
+		}
+	} else {
+		CHECKVOLUME(NULL);
+
 		fs->r2 = 0; // yes
-		return NULL;
-	}
-
-	CHECKLOCK(lock, NULL);
-
-	if (lock->fsvol != fs->currvol) {
-		fs->r2 = ERROR_NO_DISK;
 		return NULL;
 	}
 
