@@ -23,8 +23,6 @@ int FbxReadFile(struct FbxFS *fs, struct FbxLock *lock, APTR buffer, int bytes) 
 
 	PDEBUGF("FbxReadFile(%p, %p, %p, %d)\n", fs, lock, buffer, bytes);
 
-	CHECKVOLUME(-1);
-
 	CHECKLOCK(lock, -1);
 
 	if (lock->fsvol != fs->currvol) {
