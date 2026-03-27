@@ -30,9 +30,6 @@ struct FbxLock *FbxCreateDir(struct FbxFS *fs, struct FbxLock *lock, const char 
 
 	PDEBUGF("FbxCreateDir(%p, %p, '%s')\n", fs, lock, name);
 
-	CHECKVOLUME(NULL);
-	CHECKWRITABLE(NULL);
-
 	if (lock != NULL) {
 		CHECKLOCK(lock, NULL);
 
@@ -40,7 +37,11 @@ struct FbxLock *FbxCreateDir(struct FbxFS *fs, struct FbxLock *lock, const char 
 			fs->r2 = ERROR_NO_DISK;
 			return NULL;
 		}
+	} else {
+		CHECKVOLUME(NULL);
 	}
+
+	CHECKWRITABLE(NULL);
 
 #ifdef ENABLE_CHARSET_CONVERSION
 	if (FbxLocalToUTF8(fs, fsname, name, FBX_MAX_NAME) >= FBX_MAX_NAME) {
