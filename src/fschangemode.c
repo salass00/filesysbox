@@ -13,8 +13,6 @@
 int FbxChangeMode(struct FbxFS *fs, struct FbxLock *lock, int mode) {
 	PDEBUGF("FbxChangeMode(%p, %p, %d)\n", fs, lock, mode);
 
-	CHECKVOLUME(DOSFALSE);
-
 	CHECKLOCK(lock, DOSFALSE);
 
 	if (lock->fsvol != fs->currvol) {
