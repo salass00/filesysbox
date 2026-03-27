@@ -100,8 +100,6 @@ int FbxOpenFile(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock,
 
 	DEBUGF("FbxOpenFile(%p, %p, %p, '%s', %d)\n", fs, fh, lock, name, mode);
 
-	CHECKVOLUME(DOSFALSE);
-
 	if (lock != NULL) {
 		CHECKLOCK(lock, DOSFALSE);
 
@@ -109,6 +107,8 @@ int FbxOpenFile(struct FbxFS *fs, struct FileHandle *fh, struct FbxLock *lock,
 			fs->r2 = ERROR_NO_DISK;
 			return DOSFALSE;
 		}
+	} else {
+		CHECKVOLUME(DOSFALSE);
 	}
 
 #ifdef ENABLE_CHARSET_CONVERSION
